@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { 
-  FileText, 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
+import React, { useState } from "react";
+import {
+  FileText,
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
   Save,
   X,
   Calendar,
@@ -19,18 +19,20 @@ import {
   BookOpen,
   Award,
   AlertTriangle,
-  RefreshCw
-} from 'lucide-react';
-import { ModalAgregarNota, ModalEditarNota } from './modales';
-import ModalConfirmarEliminar from './modales/ModalConfirmarEliminar';
-import { useAuthStore } from '../../../store/useAuthStore';
-import { useAnotacionesByTrabajador } from '../../../hooks/queries/useAnotacionesQueries';
-import { useAnotaciones } from '../../../hooks/useAnotaciones';
-import { AnotacionCard } from './components';
+  RefreshCw,
+} from "lucide-react";
+import { ModalAgregarNota, ModalEditarNota } from "./modales";
+import ModalConfirmarEliminar from "./modales/ModalConfirmarEliminar";
+import { useAuthStore } from "../../../store/useAuthStore";
+import {
+  useAnotacionesByTrabajadorDemo,
+  useAnotacionesDemo,
+} from "../../../hooks/demo/useAnotacionesDemo";
+import { AnotacionCard } from "./components";
 
 const Notas = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [showModalAgregar, setShowModalAgregar] = useState(false);
@@ -41,45 +43,39 @@ const Notas = () => {
 
   // Hooks para datos
   const { user } = useAuthStore();
-  const trabajadorId = user?.entidadId || localStorage.getItem('entidadId');
-  
-  // Hook para obtener anotaciones del trabajador
-  const { 
-    data: anotaciones = [], 
-    isLoading: loadingAnotaciones, 
-    error: errorAnotaciones,
-    refetch: refetchAnotaciones 
-  } = useAnotacionesByTrabajador(
-    trabajadorId,
-    { 
-      enabled: !!trabajadorId,
-      refetchOnMount: true 
-    }
-  );
+  const trabajadorId = user?.entidadId || localStorage.getItem("entidadId");
 
-  // Hook para operaciones CRUD de anotaciones
-  const { deleteAnotacion, deleting } = useAnotaciones();
+  // Hook para obtener anotaciones del trabajador (versión demo)
+  const {
+    data: anotaciones = [],
+    isLoading: loadingAnotaciones,
+    error: errorAnotaciones,
+    refetch: refetchAnotaciones,
+  } = useAnotacionesByTrabajadorDemo(trabajadorId);
+
+  // Hook para operaciones CRUD de anotaciones (versión demo)
+  const { deleteAnotacion, deleting } = useAnotacionesDemo();
 
   // Debug logs
-  console.log('📝 Datos del trabajador:', {
+  console.log("📝 Datos del trabajador:", {
     user,
     trabajadorId,
     entidadIdFromUser: user?.entidadId,
-    entidadIdFromStorage: localStorage.getItem('entidadId')
+    entidadIdFromStorage: localStorage.getItem("entidadId"),
   });
-  console.log('📝 Anotaciones obtenidas:', anotaciones);
-  console.log('📝 Estado de loading:', loadingAnotaciones);
-  
+  console.log("📝 Anotaciones obtenidas:", anotaciones);
+  console.log("📝 Estado de loading:", loadingAnotaciones);
+
   if (errorAnotaciones) {
-    console.error('❌ Error al cargar anotaciones:', errorAnotaciones);
+    console.error("❌ Error al cargar anotaciones:", errorAnotaciones);
   }
 
   const [newNote, setNewNote] = useState({
-    student: '',
-    category: 'academic',
-    title: '',
-    content: '',
-    priority: 'medium'
+    student: "",
+    category: "academic",
+    title: "",
+    content: "",
+    priority: "medium",
   });
 
   // Datos fake de anotaciones
@@ -90,11 +86,12 @@ const Notas = () => {
       studentId: 1,
       category: "academic",
       title: "Excelente progreso en matemáticas",
-      content: "Ana ha mostrado una mejora significativa en la resolución de problemas de fracciones. Su participación en clase es activa y sus tareas están bien desarrolladas.",
+      content:
+        "Ana ha mostrado una mejora significativa en la resolución de problemas de fracciones. Su participación en clase es activa y sus tareas están bien desarrolladas.",
       date: new Date(Date.now() - 86400000),
       priority: "high",
       status: "active",
-      tags: ["matemáticas", "progreso", "participación"]
+      tags: ["matemáticas", "progreso", "participación"],
     },
     {
       id: 2,
@@ -102,11 +99,12 @@ const Notas = () => {
       studentId: 2,
       category: "behavior",
       title: "Incidente en el recreo",
-      content: "Carlos tuvo una discusión menor con un compañero durante el recreo. Se conversó con ambos estudiantes y resolvieron sus diferencias. Requiere seguimiento.",
+      content:
+        "Carlos tuvo una discusión menor con un compañero durante el recreo. Se conversó con ambos estudiantes y resolvieron sus diferencias. Requiere seguimiento.",
       date: new Date(Date.now() - 172800000),
       priority: "medium",
       status: "pending",
-      tags: ["comportamiento", "conflicto", "seguimiento"]
+      tags: ["comportamiento", "conflicto", "seguimiento"],
     },
     {
       id: 3,
@@ -114,11 +112,12 @@ const Notas = () => {
       studentId: 3,
       category: "achievement",
       title: "Reconocimiento por proyecto de ciencias",
-      content: "Isabella presentó un proyecto excepcional sobre el sistema solar. Su creatividad y dedicación fueron notables. Se recomienda para la feria de ciencias.",
+      content:
+        "Isabella presentó un proyecto excepcional sobre el sistema solar. Su creatividad y dedicación fueron notables. Se recomienda para la feria de ciencias.",
       date: new Date(Date.now() - 259200000),
       priority: "high",
       status: "completed",
-      tags: ["ciencias", "proyecto", "creatividad", "reconocimiento"]
+      tags: ["ciencias", "proyecto", "creatividad", "reconocimiento"],
     },
     {
       id: 4,
@@ -126,11 +125,12 @@ const Notas = () => {
       studentId: 4,
       category: "concern",
       title: "Ausencias frecuentes",
-      content: "Diego ha faltado 3 veces esta semana. Los padres indican problemas de salud menores. Importante dar seguimiento a las tareas perdidas.",
+      content:
+        "Diego ha faltado 3 veces esta semana. Los padres indican problemas de salud menores. Importante dar seguimiento a las tareas perdidas.",
       date: new Date(Date.now() - 345600000),
       priority: "high",
       status: "active",
-      tags: ["ausencias", "salud", "tareas", "seguimiento"]
+      tags: ["ausencias", "salud", "tareas", "seguimiento"],
     },
     {
       id: 5,
@@ -138,27 +138,38 @@ const Notas = () => {
       studentId: 5,
       category: "parent",
       title: "Reunión con padres",
-      content: "Los padres de Sofía solicitaron reunión para discutir su progreso académico. Se programó para el viernes. Preparar informe de rendimiento.",
+      content:
+        "Los padres de Sofía solicitaron reunión para discutir su progreso académico. Se programó para el viernes. Preparar informe de rendimiento.",
       date: new Date(Date.now() - 432000000),
       priority: "medium",
       status: "pending",
-      tags: ["padres", "reunión", "progreso", "informe"]
-    }
+      tags: ["padres", "reunión", "progreso", "informe"],
+    },
   ]);
 
   const categories = [
-    { id: 'all', name: 'Todas las categorías', icon: FileText, color: '#6B7280' },
-    { id: 'academic', name: 'Académico', icon: BookOpen, color: '#3B82F6' },
-    { id: 'behavior', name: 'Comportamiento', icon: User, color: '#F59E0B' },
-    { id: 'achievement', name: 'Logros', icon: Award, color: '#10B981' },
-    { id: 'concern', name: 'Preocupaciones', icon: AlertTriangle, color: '#EF4444' },
-    { id: 'parent', name: 'Padres', icon: MessageSquare, color: '#8B5CF6' }
+    {
+      id: "all",
+      name: "Todas las categorías",
+      icon: FileText,
+      color: "#6B7280",
+    },
+    { id: "academic", name: "Académico", icon: BookOpen, color: "#3B82F6" },
+    { id: "behavior", name: "Comportamiento", icon: User, color: "#F59E0B" },
+    { id: "achievement", name: "Logros", icon: Award, color: "#10B981" },
+    {
+      id: "concern",
+      name: "Preocupaciones",
+      icon: AlertTriangle,
+      color: "#EF4444",
+    },
+    { id: "parent", name: "Padres", icon: MessageSquare, color: "#8B5CF6" },
   ];
 
   const priorities = [
-    { id: 'low', name: 'Baja', color: '#10B981' },
-    { id: 'medium', name: 'Media', color: '#F59E0B' },
-    { id: 'high', name: 'Alta', color: '#EF4444' }
+    { id: "low", name: "Baja", color: "#10B981" },
+    { id: "medium", name: "Media", color: "#F59E0B" },
+    { id: "high", name: "Alta", color: "#EF4444" },
   ];
 
   const students = [
@@ -166,31 +177,31 @@ const Notas = () => {
     { id: 2, name: "Carlos Eduardo López" },
     { id: 3, name: "Isabella Rodríguez" },
     { id: 4, name: "Diego Fernández" },
-    { id: 5, name: "Sofía Mendoza" }
+    { id: 5, name: "Sofía Mendoza" },
   ];
 
   const getCategoryColor = (category) => {
-    const cat = categories.find(c => c.id === category);
-    return cat ? cat.color : '#6B7280';
+    const cat = categories.find((c) => c.id === category);
+    return cat ? cat.color : "#6B7280";
   };
 
   const getCategoryIcon = (category) => {
-    const cat = categories.find(c => c.id === category);
+    const cat = categories.find((c) => c.id === category);
     return cat ? cat.icon : FileText;
   };
 
   const getPriorityColor = (priority) => {
-    const prio = priorities.find(p => p.id === priority);
-    return prio ? prio.color : '#F59E0B';
+    const prio = priorities.find((p) => p.id === priority);
+    return prio ? prio.color : "#F59E0B";
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return CheckCircle;
-      case 'pending':
+      case "pending":
         return Clock;
-      case 'active':
+      case "active":
         return AlertCircle;
       default:
         return FileText;
@@ -198,13 +209,18 @@ const Notas = () => {
   };
 
   // Filtros para las anotaciones
-  const filteredAnotaciones = anotaciones.filter(anotacion => {
-    const matchesSearch = searchTerm === '' || 
+  const filteredAnotaciones = anotaciones.filter((anotacion) => {
+    const matchesSearch =
+      searchTerm === "" ||
       anotacion.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       anotacion.observacion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${anotacion.estudiante?.nombre} ${anotacion.estudiante?.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      anotacion.curso?.nombreCurso?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      `${anotacion.estudiante?.nombre} ${anotacion.estudiante?.apellido}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      anotacion.curso?.nombreCurso
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
     // Por ahora no filtramos por categoría ya que el backend no devuelve categorías específicas
     // Podrías agregar esta lógica si tienes un campo de categoría en el backend
     return matchesSearch;
@@ -230,7 +246,7 @@ const Notas = () => {
       setShowModalEliminar(false);
       setAnotacionAEliminar(null);
     } catch (error) {
-      console.error('Error al eliminar anotación:', error);
+      console.error("Error al eliminar anotación:", error);
       // El error ya se maneja en el hook useAnotaciones
     }
   };
@@ -245,30 +261,34 @@ const Notas = () => {
         id: Date.now(),
         ...newNote,
         date: new Date(),
-        status: 'active',
-        tags: newNote.content.toLowerCase().split(' ').filter(word => word.length > 4).slice(0, 3)
+        status: "active",
+        tags: newNote.content
+          .toLowerCase()
+          .split(" ")
+          .filter((word) => word.length > 4)
+          .slice(0, 3),
       };
-      setNotes(prev => [note, ...prev]);
+      setNotes((prev) => [note, ...prev]);
       setNewNote({
-        student: '',
-        category: 'academic',
-        title: '',
-        content: '',
-        priority: 'medium'
+        student: "",
+        category: "academic",
+        title: "",
+        content: "",
+        priority: "medium",
       });
       setIsCreating(false);
     }
   };
 
   const handleDeleteNote = (noteId) => {
-    setNotes(prev => prev.filter(note => note.id !== noteId));
+    setNotes((prev) => prev.filter((note) => note.id !== noteId));
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -316,14 +336,15 @@ const Notas = () => {
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 border border-gray-300"
             title="Actualizar anotaciones"
           >
-            <RefreshCw className={`w-4 h-4 ${loadingAnotaciones ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${loadingAnotaciones ? "animate-spin" : ""}`}
+            />
             <span>Actualizar</span>
           </button>
         </div>
       </div>
 
       {/* Stats */}
-
 
       {/* Filters */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -357,7 +378,7 @@ const Notas = () => {
 
           <div className="text-sm text-gray-600 flex items-center gap-4">
             <span>{filteredAnotaciones.length} anotaciones encontradas</span>
-            
+
             {loadingAnotaciones && (
               <div className="flex items-center gap-2 text-blue-600">
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -373,18 +394,18 @@ const Notas = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              {isCreating ? 'Nueva Anotación' : 'Editar Anotación'}
+              {isCreating ? "Nueva Anotación" : "Editar Anotación"}
             </h3>
             <button
               onClick={() => {
                 setIsCreating(false);
                 setEditingNote(null);
                 setNewNote({
-                  student: '',
-                  category: 'academic',
-                  title: '',
-                  content: '',
-                  priority: 'medium'
+                  student: "",
+                  category: "academic",
+                  title: "",
+                  content: "",
+                  priority: "medium",
                 });
               }}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
@@ -400,7 +421,9 @@ const Notas = () => {
               </label>
               <select
                 value={newNote.student}
-                onChange={(e) => setNewNote(prev => ({ ...prev, student: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, student: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               >
                 <option value="">Seleccionar estudiante</option>
@@ -418,14 +441,18 @@ const Notas = () => {
               </label>
               <select
                 value={newNote.category}
-                onChange={(e) => setNewNote(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, category: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               >
-                {categories.filter(cat => cat.id !== 'all').map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
+                {categories
+                  .filter((cat) => cat.id !== "all")
+                  .map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -435,7 +462,9 @@ const Notas = () => {
               </label>
               <select
                 value={newNote.priority}
-                onChange={(e) => setNewNote(prev => ({ ...prev, priority: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, priority: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               >
                 {priorities.map((priority) => (
@@ -453,7 +482,9 @@ const Notas = () => {
               <input
                 type="text"
                 value={newNote.title}
-                onChange={(e) => setNewNote(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, title: e.target.value }))
+                }
                 placeholder="Título de la anotación"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
@@ -466,7 +497,9 @@ const Notas = () => {
             </label>
             <textarea
               value={newNote.content}
-              onChange={(e) => setNewNote(prev => ({ ...prev, content: e.target.value }))}
+              onChange={(e) =>
+                setNewNote((prev) => ({ ...prev, content: e.target.value }))
+              }
               placeholder="Describe la observación, logro o preocupación..."
               rows="4"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -511,15 +544,16 @@ const Notas = () => {
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {errorAnotaciones ? 'Error al cargar anotaciones' : 'No se encontraron anotaciones'}
+            {errorAnotaciones
+              ? "Error al cargar anotaciones"
+              : "No se encontraron anotaciones"}
           </h3>
           <p className="text-gray-600 mb-4">
-            {errorAnotaciones 
-              ? 'Hubo un problema al cargar las anotaciones. Intenta actualizar.'
-              : searchTerm 
-                ? 'Prueba ajustando los filtros de búsqueda'
-                : 'Comienza creando tu primera anotación'
-            }
+            {errorAnotaciones
+              ? "Hubo un problema al cargar las anotaciones. Intenta actualizar."
+              : searchTerm
+              ? "Prueba ajustando los filtros de búsqueda"
+              : "Comienza creando tu primera anotación"}
           </p>
           {!searchTerm && !errorAnotaciones && (
             <button
@@ -546,8 +580,12 @@ const Notas = () => {
       {loadingAnotaciones && filteredAnotaciones.length === 0 && (
         <div className="text-center py-12">
           <RefreshCw className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando anotaciones...</h3>
-          <p className="text-gray-600">Obteniendo todas las anotaciones del profesor</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Cargando anotaciones...
+          </h3>
+          <p className="text-gray-600">
+            Obteniendo todas las anotaciones del profesor
+          </p>
         </div>
       )}
 

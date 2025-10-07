@@ -1,14 +1,19 @@
-import { useDemoQuery, useDemoMutation, createDemoQueryFn, createDemoMutationFn } from './useDemoQuery';
-import { mockData } from '../../data/mockData';
+import {
+  useDemoQuery,
+  useDemoMutation,
+  createDemoQueryFn,
+  createDemoMutationFn,
+} from "./useDemoQuery";
+import { mockData } from "../../data/mockData";
 
 /**
  * Hook para obtener tareas
  */
 export const useTareasDemo = (filters = {}) => {
   return useDemoQuery({
-    queryKey: ['tareas', filters],
-    queryFn: createDemoQueryFn('tareas', filters),
-    defaultData: []
+    queryKey: ["tareas", filters],
+    queryFn: createDemoQueryFn("tareas", filters),
+    defaultData: [],
   });
 };
 
@@ -17,28 +22,34 @@ export const useTareasDemo = (filters = {}) => {
  */
 export const useTareasPorEstudianteDemo = (estudianteId) => {
   return useDemoQuery({
-    queryKey: ['tareas', 'estudiante', estudianteId],
+    queryKey: ["tareas", "estudiante", estudianteId],
     queryFn: async () => {
       // Obtener datos del estudiante
-      const estudiante = mockData.estudiantes.find(e => e.id === estudianteId);
-      if (!estudiante) return [];
-      
-      // Filtrar tareas por grado y aula del estudiante
-      const tareas = mockData.tareas.filter(t => 
-        t.gradoId === estudiante.gradoId || t.aulaId === estudiante.aulaId
+      const estudiante = mockData.estudiantes.find(
+        (e) => e.id === estudianteId
       );
-      
+      if (!estudiante) return [];
+
+      // Filtrar tareas por grado y aula del estudiante
+      const tareas = mockData.tareas.filter(
+        (t) =>
+          t.gradoId === estudiante.gradoId || t.aulaId === estudiante.aulaId
+      );
+
       // Simular estado de entrega para cada tarea
-      return tareas.map(tarea => ({
+      return tareas.map((tarea) => ({
         ...tarea,
         entregada: Math.random() > 0.3, // 70% probabilidad de estar entregada
         fechaEntrega: Math.random() > 0.5 ? new Date().toISOString() : null,
-        calificacion: Math.random() > 0.4 ? ['A', 'B', 'C'][Math.floor(Math.random() * 3)] : null,
-        comentarios: Math.random() > 0.6 ? 'Excelente trabajo' : null
+        calificacion:
+          Math.random() > 0.4
+            ? ["A", "B", "C"][Math.floor(Math.random() * 3)]
+            : null,
+        comentarios: Math.random() > 0.6 ? "Excelente trabajo" : null,
       }));
     },
     enabled: !!estudianteId,
-    defaultData: []
+    defaultData: [],
   });
 };
 
@@ -47,23 +58,23 @@ export const useTareasPorEstudianteDemo = (estudianteId) => {
  */
 export const useTareasPorAulaDemo = (aulaId) => {
   return useDemoQuery({
-    queryKey: ['tareas', 'aula', aulaId],
+    queryKey: ["tareas", "aula", aulaId],
     queryFn: async () => {
-      const tareas = mockData.tareas.filter(t => t.aulaId === aulaId);
-      
+      const tareas = mockData.tareas.filter((t) => t.aulaId === aulaId);
+
       // Agregar estadísticas de entrega
-      return tareas.map(tarea => ({
+      return tareas.map((tarea) => ({
         ...tarea,
         estadisticas: {
           totalEstudiantes: 15,
           entregadas: Math.floor(Math.random() * 15) + 1,
           pendientes: Math.floor(Math.random() * 5),
-          calificadas: Math.floor(Math.random() * 12) + 1
-        }
+          calificadas: Math.floor(Math.random() * 12) + 1,
+        },
       }));
     },
     enabled: !!aulaId,
-    defaultData: []
+    defaultData: [],
   });
 };
 
@@ -72,22 +83,42 @@ export const useTareasPorAulaDemo = (aulaId) => {
  */
 export const useTareasPorDocenteDemo = (docenteId) => {
   return useDemoQuery({
-    queryKey: ['tareas', 'docente', docenteId],
+    queryKey: ["tareas", "docente", docenteId],
     queryFn: async () => {
-      const tareas = mockData.tareas.filter(t => t.docenteId === docenteId);
-      
-      return tareas.map(tarea => ({
+      const tareas = mockData.tareas.filter((t) => t.docenteId === docenteId);
+
+      return tareas.map((tarea) => ({
         ...tarea,
+        // Convertir propiedades al formato esperado por el componente
+        fechaEntrega: tarea.fechaVencimiento,
+        fechaAsignacion: tarea.fechaCreacion,
+        aulaInfo: {
+          grado:
+            mockData.grados.find((g) => g.id === tarea.gradoId)?.nombre ||
+            "Sin grado",
+          seccion:
+            mockData.aulas.find((a) => a.id === tarea.aulaId)?.nombre ||
+            "Sin sección",
+        },
+        estado: tarea.estado.toLowerCase(), // 'ACTIVO' -> 'activa'
+        prioridad: Math.random() > 0.5 ? "alta" : "media",
+        totalEstudiantes: mockData.estudiantes.filter(
+          (e) => e.aulaId === tarea.aulaId
+        ).length,
+        entregadas: Math.floor(Math.random() * 15) + 1,
+        pendientes: Math.floor(Math.random() * 5),
         estadisticas: {
-          totalEstudiantes: 15,
+          totalEstudiantes: mockData.estudiantes.filter(
+            (e) => e.aulaId === tarea.aulaId
+          ).length,
           entregadas: Math.floor(Math.random() * 15) + 1,
           pendientes: Math.floor(Math.random() * 5),
-          vencidas: Math.floor(Math.random() * 3)
-        }
+          vencidas: Math.floor(Math.random() * 3),
+        },
       }));
     },
     enabled: !!docenteId,
-    defaultData: []
+    defaultData: [],
   });
 };
 
@@ -101,14 +132,14 @@ export const useCrearTareaDemo = () => {
         id: Date.now().toString(),
         ...tareaData,
         fechaCreacion: new Date().toISOString(),
-        estado: 'ACTIVO'
+        estado: "ACTIVO",
       };
-      console.log('🎭 Demo: Creando tarea', nuevaTarea);
+      console.log("🎭 Demo: Creando tarea", nuevaTarea);
       return nuevaTarea;
     },
     onSuccess: (data) => {
-      console.log('🎭 Demo: Tarea creada exitosamente', data);
-    }
+      console.log("🎭 Demo: Tarea creada exitosamente", data);
+    },
   });
 };
 
@@ -117,10 +148,10 @@ export const useCrearTareaDemo = () => {
  */
 export const useActualizarTareaDemo = () => {
   return useDemoMutation({
-    mutationFn: createDemoMutationFn('update', 'tareas'),
+    mutationFn: createDemoMutationFn("update", "tareas"),
     onSuccess: (data) => {
-      console.log('🎭 Demo: Tarea actualizada exitosamente', data);
-    }
+      console.log("🎭 Demo: Tarea actualizada exitosamente", data);
+    },
   });
 };
 
@@ -129,10 +160,10 @@ export const useActualizarTareaDemo = () => {
  */
 export const useEliminarTareaDemo = () => {
   return useDemoMutation({
-    mutationFn: createDemoMutationFn('delete', 'tareas'),
+    mutationFn: createDemoMutationFn("delete", "tareas"),
     onSuccess: (data) => {
-      console.log('🎭 Demo: Tarea eliminada exitosamente', data);
-    }
+      console.log("🎭 Demo: Tarea eliminada exitosamente", data);
+    },
   });
 };
 
@@ -148,15 +179,15 @@ export const useEntregarTareaDemo = () => {
         estudianteId,
         fechaEntrega: new Date().toISOString(),
         archivo: archivo || null,
-        comentarios: comentarios || '',
-        estado: 'ENTREGADA'
+        comentarios: comentarios || "",
+        estado: "ENTREGADA",
       };
-      console.log('🎭 Demo: Entregando tarea', entrega);
+      console.log("🎭 Demo: Entregando tarea", entrega);
       return entrega;
     },
     onSuccess: (data) => {
-      console.log('🎭 Demo: Tarea entregada exitosamente', data);
-    }
+      console.log("🎭 Demo: Tarea entregada exitosamente", data);
+    },
   });
 };
 
@@ -171,13 +202,13 @@ export const useCalificarTareaDemo = () => {
         calificacion,
         comentarios,
         fechaCalificacion: new Date().toISOString(),
-        calificadoPor: '2' // ID del docente demo
+        calificadoPor: "2", // ID del docente demo
       };
-      console.log('🎭 Demo: Calificando tarea', calificacionData);
+      console.log("🎭 Demo: Calificando tarea", calificacionData);
       return calificacionData;
     },
     onSuccess: (data) => {
-      console.log('🎭 Demo: Tarea calificada exitosamente', data);
-    }
+      console.log("🎭 Demo: Tarea calificada exitosamente", data);
+    },
   });
 };

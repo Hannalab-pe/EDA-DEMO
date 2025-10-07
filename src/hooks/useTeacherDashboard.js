@@ -1,5 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Users, GraduationCap, BookOpen, Target, Calendar, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useMemo } from "react";
+import {
+  Users,
+  GraduationCap,
+  BookOpen,
+  Target,
+  Calendar,
+  TrendingUp,
+} from "lucide-react";
 
 /**
  * Hook personalizado para el dashboard de docente
@@ -10,151 +17,140 @@ export const useTeacherDashboard = () => {
     aulas: {
       total: 0,
       data: [],
-      loading: true
+      loading: true,
     },
     estudiantes: {
       total: 0,
       porAula: {},
-      loading: true
+      loading: true,
     },
     estadisticas: {
       asistenciaPromedio: 0,
       evaluacionesCompletadas: 0,
       metasCompletadas: 0,
-      loading: true
-    }
+      loading: true,
+    },
   });
 
   const [error, setError] = useState(null);
 
-  // Función para obtener aulas asignadas al profesor
+  // Función para obtener aulas asignadas al profesor (DEMO VERSION)
   const fetchAulasProfesor = async () => {
     try {
-      const authStorage = localStorage.getItem('auth-storage');
-      if (!authStorage) {
-        throw new Error('No se encontró información de autenticación');
-      }
+      console.log("🎭 Demo: Cargando aulas del profesor...");
 
-      const authData = JSON.parse(authStorage);
-      const entidadId = authData.state?.user?.entidadId;
+      // Simular delay de red
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (!entidadId) {
-        throw new Error('No se encontró ID de entidad');
-      }
-
-      const token = authData.state?.token;
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-
-      const response = await fetch(`${API_BASE_URL}/trabajador/aulas/${entidadId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      // Datos mockup de aulas para el profesor Carlos Ruiz
+      const mockAulas = [
+        {
+          id: 1,
+          id_aula: 1,
+          nombre: "Inicial 3 años",
+          grado: "Inicial 3 años",
+          seccion: "A",
+          capacidad: 20,
+          descripcion: "Aula Amarilla - Inicial 3 años",
         },
-      });
+        {
+          id: 2,
+          id_aula: 2,
+          nombre: "Inicial 4 años",
+          grado: "Inicial 4 años",
+          seccion: "B",
+          capacidad: 22,
+          descripcion: "Aula Verde - Inicial 4 años",
+        },
+      ];
 
-      if (!response.ok) {
-        throw new Error('Error al obtener aulas del profesor');
-      }
+      setDashboardData((prev) => ({
+        ...prev,
+        aulas: {
+          total: mockAulas.length,
+          data: mockAulas,
+          loading: false,
+        },
+      }));
 
-      const data = await response.json();
-
-      if (data.success && data.aulas) {
-        setDashboardData(prev => ({
-          ...prev,
-          aulas: {
-            total: data.aulas.length,
-            data: data.aulas,
-            loading: false
-          }
-        }));
-
-        // Obtener estudiantes de cada aula
-        await fetchEstudiantesPorAula(data.aulas);
-      } else {
-        setDashboardData(prev => ({
-          ...prev,
-          aulas: {
-            total: 0,
-            data: [],
-            loading: false
-          }
-        }));
-      }
+      // Obtener estudiantes de cada aula
+      await fetchEstudiantesPorAula(mockAulas);
     } catch (error) {
-      console.error('Error obteniendo aulas del profesor:', error);
+      console.error("Error obteniendo aulas del profesor:", error);
       setError(error.message);
-      setDashboardData(prev => ({
+      setDashboardData((prev) => ({
         ...prev,
         aulas: {
           ...prev.aulas,
-          loading: false
-        }
+          loading: false,
+        },
       }));
     }
   };
 
-  // Función para obtener estudiantes por aula
+  // Función para obtener estudiantes por aula (DEMO VERSION)
   const fetchEstudiantesPorAula = async (aulas) => {
     try {
-      const authStorage = localStorage.getItem('auth-storage');
-      if (!authStorage) return;
+      console.log("🎭 Demo: Cargando estudiantes por aula...");
 
-      const authData = JSON.parse(authStorage);
-      const token = authData.state?.token;
-
-      if (!token) return;
-
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
+      // Simular delay de red
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       let totalEstudiantes = 0;
       const estudiantesPorAula = {};
 
+      // Datos mockup de estudiantes por aula
+      const mockEstudiantes = {
+        1: [
+          // Aula 1 - Inicial 3 años
+          { id: 1, nombre: "Ana", apellido: "García", edad: 3 },
+          { id: 2, nombre: "Luis", apellido: "Martínez", edad: 3 },
+          { id: 3, nombre: "Sofía", apellido: "López", edad: 3 },
+          { id: 4, nombre: "Carlos", apellido: "Rodríguez", edad: 3 },
+          { id: 5, nombre: "María", apellido: "Fernández", edad: 3 },
+          { id: 6, nombre: "Diego", apellido: "Morales", edad: 3 },
+          { id: 7, nombre: "Valentina", apellido: "Herrera", edad: 3 },
+          { id: 8, nombre: "Sebastián", apellido: "Ruiz", edad: 3 },
+        ],
+        2: [
+          // Aula 2 - Inicial 4 años
+          { id: 9, nombre: "Isabella", apellido: "Castro", edad: 4 },
+          { id: 10, nombre: "Mateo", apellido: "Vargas", edad: 4 },
+          { id: 11, nombre: "Camila", apellido: "Torres", edad: 4 },
+          { id: 12, nombre: "Santiago", apellido: "Jiménez", edad: 4 },
+          { id: 13, nombre: "Lucía", apellido: "Mendoza", edad: 4 },
+          { id: 14, nombre: "Nicolás", apellido: "Paredes", edad: 4 },
+          { id: 15, nombre: "Emma", apellido: "Silva", edad: 4 },
+          { id: 16, nombre: "Andrés", apellido: "Rojas", edad: 4 },
+          { id: 17, nombre: "Martina", apellido: "Peña", edad: 4 },
+          { id: 18, nombre: "Gabriel", apellido: "Vega", edad: 4 },
+        ],
+      };
+
       for (const aula of aulas) {
-        try {
-          const aulaId = aula.id_aula || aula.idAula || aula.id;
+        const aulaId = aula.id_aula || aula.idAula || aula.id;
+        const estudiantes = mockEstudiantes[aulaId] || [];
 
-          const response = await fetch(`${API_BASE_URL}/estudiante/aula/${aulaId}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.estudiantes) {
-              estudiantesPorAula[aulaId] = data.estudiantes;
-              totalEstudiantes += data.estudiantes.length;
-            }
-          }
-        } catch (error) {
-          console.error(`Error obteniendo estudiantes del aula ${aula.id_aula}:`, error);
-        }
+        estudiantesPorAula[aulaId] = estudiantes;
+        totalEstudiantes += estudiantes.length;
       }
 
-      setDashboardData(prev => ({
+      setDashboardData((prev) => ({
         ...prev,
         estudiantes: {
           total: totalEstudiantes,
           porAula: estudiantesPorAula,
-          loading: false
-        }
+          loading: false,
+        },
       }));
-
     } catch (error) {
-      console.error('Error obteniendo estudiantes por aula:', error);
-      setDashboardData(prev => ({
+      console.error("Error obteniendo estudiantes por aula:", error);
+      setDashboardData((prev) => ({
         ...prev,
         estudiantes: {
           ...prev.estudiantes,
-          loading: false
-        }
+          loading: false,
+        },
       }));
     }
   };
@@ -167,14 +163,14 @@ export const useTeacherDashboard = () => {
     const evaluacionesCompletadas = Math.floor(Math.random() * 20) + 10; // 10-29
     const metasCompletadas = Math.floor(Math.random() * 10) + 5; // 5-14
 
-    setDashboardData(prev => ({
+    setDashboardData((prev) => ({
       ...prev,
       estadisticas: {
         asistenciaPromedio,
         evaluacionesCompletadas,
         metasCompletadas,
-        loading: false
-      }
+        loading: false,
+      },
     }));
   };
 
@@ -188,70 +184,75 @@ export const useTeacherDashboard = () => {
   const refreshData = async () => {
     try {
       setError(null);
-      setDashboardData(prev => ({
+      setDashboardData((prev) => ({
         ...prev,
         aulas: { ...prev.aulas, loading: true },
         estudiantes: { ...prev.estudiantes, loading: true },
-        estadisticas: { ...prev.estadisticas, loading: true }
+        estadisticas: { ...prev.estadisticas, loading: true },
       }));
 
       await fetchAulasProfesor();
       calcularEstadisticas();
     } catch (error) {
-      setError('Error al refrescar los datos del dashboard');
-      console.error('Error refreshing teacher dashboard data:', error);
+      setError("Error al refrescar los datos del dashboard");
+      console.error("Error refreshing teacher dashboard data:", error);
     }
   };
 
   // Memoizar estadísticas para el dashboard
-  const stats = useMemo(() => [
-    {
-      title: "Mis Estudiantes",
-      value: dashboardData.estudiantes.total.toString(),
-      icon: Users,
-      color: "#3B82F6",
-      change: dashboardData.estudiantes.loading ? "..." : "+2 nuevos",
-      loading: dashboardData.estudiantes.loading
-    },
-    {
-      title: "Aulas Asignadas",
-      value: dashboardData.aulas.total.toString(),
-      icon: GraduationCap,
-      color: "#10B981",
-      change: "Activas",
-      loading: dashboardData.aulas.loading
-    },
-    {
-      title: "Asistencia Promedio",
-      value: `${dashboardData.estadisticas.asistenciaPromedio}%`,
-      icon: TrendingUp,
-      color: "#F59E0B",
-      change: dashboardData.estadisticas.loading ? "..." : "+3% esta semana",
-      loading: dashboardData.estadisticas.loading
-    },
-    {
-      title: "Metas Completadas",
-      value: `${dashboardData.estadisticas.metasCompletadas}/15`,
-      icon: Target,
-      color: "#8B5CF6",
-      change: `${Math.round((dashboardData.estadisticas.metasCompletadas / 15) * 100)}% progreso`,
-      loading: dashboardData.estadisticas.loading
-    },
-  ], [dashboardData]);
+  const stats = useMemo(
+    () => [
+      {
+        title: "Mis Estudiantes",
+        value: dashboardData.estudiantes.total.toString(),
+        icon: Users,
+        color: "#3B82F6",
+        change: dashboardData.estudiantes.loading ? "..." : "+2 nuevos",
+        loading: dashboardData.estudiantes.loading,
+      },
+      {
+        title: "Aulas Asignadas",
+        value: dashboardData.aulas.total.toString(),
+        icon: GraduationCap,
+        color: "#10B981",
+        change: "Activas",
+        loading: dashboardData.aulas.loading,
+      },
+      {
+        title: "Asistencia Promedio",
+        value: `${dashboardData.estadisticas.asistenciaPromedio}%`,
+        icon: TrendingUp,
+        color: "#F59E0B",
+        change: dashboardData.estadisticas.loading ? "..." : "+3% esta semana",
+        loading: dashboardData.estadisticas.loading,
+      },
+      {
+        title: "Metas Completadas",
+        value: `${dashboardData.estadisticas.metasCompletadas}/15`,
+        icon: Target,
+        color: "#8B5CF6",
+        change: `${Math.round(
+          (dashboardData.estadisticas.metasCompletadas / 15) * 100
+        )}% progreso`,
+        loading: dashboardData.estadisticas.loading,
+      },
+    ],
+    [dashboardData]
+  );
 
   // Datos para gráficos
   const chartData = useMemo(() => {
-    const aulasData = dashboardData.aulas.data.map(aula => {
+    const aulasData = dashboardData.aulas.data.map((aula) => {
       const aulaId = aula.id_aula || aula.idAula || aula.id;
       const estudiantesAula = dashboardData.estudiantes.porAula[aulaId] || [];
-      const grado = aula.grado || aula.nombre || 'Sin grado';
-      const seccion = aula.seccion || 'A';
+      const grado = aula.grado || aula.nombre || "Sin grado";
+      const seccion = aula.seccion || "A";
 
       return {
         name: `${grado} - ${seccion}`,
         estudiantes: estudiantesAula.length,
         capacidad: aula.capacidad || 25,
-        disponibles: (aula.capacidad || 25) - estudiantesAula.length
+        disponibles: (aula.capacidad || 25) - estudiantesAula.length,
       };
     });
 
@@ -265,13 +266,16 @@ export const useTeacherDashboard = () => {
     chartData,
 
     // Estados de carga
-    loading: dashboardData.aulas.loading || dashboardData.estudiantes.loading || dashboardData.estadisticas.loading,
+    loading:
+      dashboardData.aulas.loading ||
+      dashboardData.estudiantes.loading ||
+      dashboardData.estadisticas.loading,
 
     // Funciones
     refreshData,
 
     // Error handling
-    error
+    error,
   };
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
   Plus,
   Search,
@@ -23,25 +23,31 @@ import {
   ChevronDown,
   MoreVertical,
   RefreshCw,
-  Loader2
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useTareasTrabajador } from '../../../hooks/useTareasTrabajador';
-import CrearTareaModal from './modales/CrearTareaModal';
-import EditarTareaModal from './modales/EditarTareaModal';
-import DetallesTareaModal from './modales/DetallesTareaModal';
-import EliminarTareaModal from './modales/EliminarTareaModal';
-import VerEntregasModal from './modales/VerEntregasModal';
-import TareaCompletaModal from './modales/TareaCompletaModal';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  useTareasPorDocenteDemo,
+  useCrearTareaDemo,
+  useActualizarTareaDemo,
+  useEliminarTareaDemo,
+} from "../../../hooks/demo/useTareasDemo";
+import { useAuthStore } from "../../../store";
+import CrearTareaModal from "./modales/CrearTareaModal";
+import EditarTareaModal from "./modales/EditarTareaModal";
+import DetallesTareaModal from "./modales/DetallesTareaModal";
+import EliminarTareaModal from "./modales/EliminarTareaModal";
+import VerEntregasModal from "./modales/VerEntregasModal";
+import TareaCompletaModal from "./modales/TareaCompletaModal";
 
 const Tareas = () => {
   // Estados
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('todas');
-  const [filterMateria, setFilterMateria] = useState('todas');
-  const [sortBy, setSortBy] = useState('fecha_vencimiento');
-  const [viewMode, setViewMode] = useState('tarjetas'); // 'tarjetas' o 'tabla'
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("todas");
+  const [filterMateria, setFilterMateria] = useState("todas");
+  const [sortBy, setSortBy] = useState("fecha_vencimiento");
+  const [viewMode, setViewMode] = useState("tarjetas"); // 'tarjetas' o 'tabla'
+
   // Estados de modales
   const [showCrearModal, setShowCrearModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
@@ -50,75 +56,101 @@ const Tareas = () => {
   const [showTareaCompletaModal, setShowTareaCompletaModal] = useState(false);
   const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
 
-  // Hook para obtener tareas del trabajador
+  const { user } = useAuthStore();
+
+  // Hook para obtener tareas del trabajador (versión demo)
   const {
-    tareas,
-    loading,
+    data: tareas = [],
+    isLoading: loading,
     error,
-    refrescarTareas,
-    crearTarea,
-    actualizarTarea,
-    eliminarTarea
-  } = useTareasTrabajador();
+    refetch: refrescarTareas,
+  } = useTareasPorDocenteDemo(user?.id);
+
+  // Hooks de mutación demo
+  const crearTareaMutation = useCrearTareaDemo();
+  const actualizarTareaMutation = useActualizarTareaDemo();
+  const eliminarTareaMutation = useEliminarTareaDemo();
 
   // Manejar la creación exitosa de una tarea
   const handleTareaCreada = async (tareaData) => {
     try {
-      console.log('✅ [TAREAS] Iniciando creación de tarea:', tareaData);
-      await crearTarea(tareaData);
+      console.log("✅ [TAREAS] Iniciando creación de tarea:", tareaData);
+      await crearTareaMutation.mutateAsync(tareaData);
       setShowCrearModal(false);
+      toast.success("Tarea creada exitosamente");
+      refrescarTareas();
     } catch (error) {
-      console.error('❌ [TAREAS] Error al crear tarea:', error);
+      console.error("❌ [TAREAS] Error al crear tarea:", error);
+      toast.error("Error al crear la tarea");
     }
   };
 
   // Manejar actualización de tarea
   const handleTareaActualizada = async (idTarea, tareaData) => {
     try {
-      console.log('✅ [TAREAS] Iniciando actualización de tarea:', idTarea, tareaData);
-      await actualizarTarea(idTarea, tareaData);
+      console.log(
+        "✅ [TAREAS] Iniciando actualización de tarea:",
+        idTarea,
+        tareaData
+      );
+      await actualizarTareaMutation.mutateAsync({
+        id: idTarea,
+        data: tareaData,
+      });
       setShowEditarModal(false);
       setTareaSeleccionada(null);
+      toast.success("Tarea actualizada exitosamente");
+      refrescarTareas();
     } catch (error) {
-      console.error('❌ [TAREAS] Error al actualizar tarea:', error);
+      console.error("❌ [TAREAS] Error al actualizar tarea:", error);
+      toast.error("Error al actualizar la tarea");
     }
   };
 
   // Manejar eliminación de tarea
   const handleTareaEliminada = async (idTarea) => {
     try {
-      console.log('✅ [TAREAS] Iniciando eliminación de tarea:', idTarea);
-      await eliminarTarea(idTarea);
+      console.log("✅ [TAREAS] Iniciando eliminación de tarea:", idTarea);
+      await eliminarTareaMutation.mutateAsync(idTarea);
       setShowEliminarModal(false);
       setTareaSeleccionada(null);
+      toast.success("Tarea eliminada exitosamente");
+      refrescarTareas();
     } catch (error) {
-      console.error('❌ [TAREAS] Error al eliminar tarea:', error);
+      console.error("❌ [TAREAS] Error al eliminar tarea:", error);
+      toast.error("Error al eliminar la tarea");
     }
   };
 
   // Filtrar y ordenar tareas
   const tareasFiltradas = useMemo(() => {
-    let filtered = tareas.filter(tarea => {
-      const matchesSearch = tarea.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           tarea.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           tarea.materia.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = filterStatus === 'todas' || tarea.estado === filterStatus;
-      const matchesMateria = filterMateria === 'todas' || tarea.materia === filterMateria;
-      
+    let filtered = tareas.filter((tarea) => {
+      const matchesSearch =
+        tarea.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tarea.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tarea.materia.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        filterStatus === "todas" || tarea.estado === filterStatus;
+      const matchesMateria =
+        filterMateria === "todas" || tarea.materia === filterMateria;
+
       return matchesSearch && matchesStatus && matchesMateria;
     });
 
     // Ordenar
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'fecha_vencimiento':
-          return new Date(a.fechaVencimiento || a.fechaEntrega) - new Date(b.fechaVencimiento || b.fechaEntrega);
-        case 'fecha_creacion':
+        case "fecha_vencimiento":
+          return (
+            new Date(a.fechaVencimiento || a.fechaEntrega) -
+            new Date(b.fechaVencimiento || b.fechaEntrega)
+          );
+        case "fecha_creacion":
           return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
-        case 'titulo':
+        case "titulo":
           return a.titulo.localeCompare(b.titulo);
-        case 'materia':
+        case "materia":
           return a.materia.localeCompare(b.materia);
         default:
           return 0;
@@ -131,9 +163,9 @@ const Tareas = () => {
   // Estadísticas
   const estadisticas = useMemo(() => {
     const total = tareas.length;
-    const activas = tareas.filter(t => t.estado === 'activa').length;
-    const vencidas = tareas.filter(t => t.estado === 'vencida').length;
-    const borradores = tareas.filter(t => t.estado === 'borrador').length;
+    const activas = tareas.filter((t) => t.estado === "activa").length;
+    const vencidas = tareas.filter((t) => t.estado === "vencida").length;
+    const borradores = tareas.filter((t) => t.estado === "borrador").length;
     const totalEntregadas = tareas.reduce((acc, t) => acc + t.entregadas, 0);
     const totalPendientes = tareas.reduce((acc, t) => acc + t.pendientes, 0);
 
@@ -144,63 +176,68 @@ const Tareas = () => {
       borradores,
       totalEntregadas,
       totalPendientes,
-      porcentajeEntrega: totalEntregadas + totalPendientes > 0 
-        ? Math.round((totalEntregadas / (totalEntregadas + totalPendientes)) * 100) 
-        : 0
+      porcentajeEntrega:
+        totalEntregadas + totalPendientes > 0
+          ? Math.round(
+              (totalEntregadas / (totalEntregadas + totalPendientes)) * 100
+            )
+          : 0,
     };
   }, [tareas]);
 
   const getEstadoInfo = (estado) => {
     switch (estado) {
-      case 'activa':
+      case "activa":
         return {
-          label: 'Activa',
-          color: 'bg-green-100 text-green-800',
-          icon: CheckCircle
+          label: "Activa",
+          color: "bg-green-100 text-green-800",
+          icon: CheckCircle,
         };
-      case 'vencida':
+      case "vencida":
         return {
-          label: 'Vencida',
-          color: 'bg-red-100 text-red-800',
-          icon: XCircle
+          label: "Vencida",
+          color: "bg-red-100 text-red-800",
+          icon: XCircle,
         };
-      case 'borrador':
+      case "borrador":
         return {
-          label: 'Borrador',
-          color: 'bg-gray-100 text-gray-800',
-          icon: FileText
+          label: "Borrador",
+          color: "bg-gray-100 text-gray-800",
+          icon: FileText,
         };
       default:
         return {
-          label: 'Sin estado',
-          color: 'bg-gray-100 text-gray-800',
-          icon: AlertCircle
+          label: "Sin estado",
+          color: "bg-gray-100 text-gray-800",
+          icon: AlertCircle,
         };
     }
   };
 
   const getPrioridadColor = (prioridad) => {
     switch (prioridad) {
-      case 'alta':
-        return 'text-red-600';
-      case 'media':
-        return 'text-yellow-600';
-      case 'baja':
-        return 'text-green-600';
+      case "alta":
+        return "text-red-600";
+      case "media":
+        return "text-yellow-600";
+      case "baja":
+        return "text-green-600";
       default:
-        return 'text-gray-600';
+        return "text-gray-600";
     }
   };
 
   const formatFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return new Date(fecha).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
-  const materias = [...new Set(tareas.map(t => t.materia).filter(m => m && m.trim()))];
+  const materias = [
+    ...new Set(tareas.map((t) => t.materia).filter((m) => m && m.trim())),
+  ];
 
   return (
     <div className="space-y-6">
@@ -208,8 +245,12 @@ const Tareas = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Gestión de Tareas</h1>
-            <p className="text-gray-600">Administra y haz seguimiento a las tareas de tus estudiantes</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Gestión de Tareas
+            </h1>
+            <p className="text-gray-600">
+              Administra y haz seguimiento a las tareas de tus estudiantes
+            </p>
             {error && (
               <div className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2">
                 {error}
@@ -222,7 +263,9 @@ const Tareas = () => {
               disabled={loading}
               className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+              />
               <span>Refrescar</span>
             </button>
             <button
@@ -242,7 +285,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-600">Total</p>
-                <p className="text-2xl font-bold text-blue-700">{estadisticas.total}</p>
+                <p className="text-2xl font-bold text-blue-700">
+                  {estadisticas.total}
+                </p>
               </div>
               <FileText className="h-8 w-8 text-blue-600" />
             </div>
@@ -252,7 +297,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-green-600">Activas</p>
-                <p className="text-2xl font-bold text-green-700">{estadisticas.activas}</p>
+                <p className="text-2xl font-bold text-green-700">
+                  {estadisticas.activas}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
@@ -262,7 +309,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-red-600">Vencidas</p>
-                <p className="text-2xl font-bold text-red-700">{estadisticas.vencidas}</p>
+                <p className="text-2xl font-bold text-red-700">
+                  {estadisticas.vencidas}
+                </p>
               </div>
               <XCircle className="h-8 w-8 text-red-600" />
             </div>
@@ -272,7 +321,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Borradores</p>
-                <p className="text-2xl font-bold text-gray-700">{estadisticas.borradores}</p>
+                <p className="text-2xl font-bold text-gray-700">
+                  {estadisticas.borradores}
+                </p>
               </div>
               <FileText className="h-8 w-8 text-gray-600" />
             </div>
@@ -282,7 +333,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-purple-600">Entregadas</p>
-                <p className="text-2xl font-bold text-purple-700">{estadisticas.totalEntregadas}</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {estadisticas.totalEntregadas}
+                </p>
               </div>
               <Upload className="h-8 w-8 text-purple-600" />
             </div>
@@ -292,7 +345,9 @@ const Tareas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-yellow-600">% Entrega</p>
-                <p className="text-2xl font-bold text-yellow-700">{estadisticas.porcentajeEntrega}%</p>
+                <p className="text-2xl font-bold text-yellow-700">
+                  {estadisticas.porcentajeEntrega}%
+                </p>
               </div>
               <Target className="h-8 w-8 text-yellow-600" />
             </div>
@@ -324,10 +379,18 @@ const Tareas = () => {
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              <option key="todas" value="todas">Todos los estados</option>
-              <option key="activa" value="activa">Activas</option>
-              <option key="vencida" value="vencida">Vencidas</option>
-              <option key="borrador" value="borrador">Borradores</option>
+              <option key="todas" value="todas">
+                Todos los estados
+              </option>
+              <option key="activa" value="activa">
+                Activas
+              </option>
+              <option key="vencida" value="vencida">
+                Vencidas
+              </option>
+              <option key="borrador" value="borrador">
+                Borradores
+              </option>
             </select>
           </div>
 
@@ -338,9 +401,15 @@ const Tareas = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              <option key="fecha_vencimiento" value="fecha_vencimiento">Por vencimiento</option>
-              <option key="fecha_creacion" value="fecha_creacion">Por creación</option>
-              <option key="titulo" value="titulo">Por título</option>
+              <option key="fecha_vencimiento" value="fecha_vencimiento">
+                Por vencimiento
+              </option>
+              <option key="fecha_creacion" value="fecha_creacion">
+                Por creación
+              </option>
+              <option key="titulo" value="titulo">
+                Por título
+              </option>
             </select>
           </div>
         </div>
@@ -354,21 +423,21 @@ const Tareas = () => {
           </div>
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => setViewMode('tarjetas')}
+              onClick={() => setViewMode("tarjetas")}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'tarjetas'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                viewMode === "tarjetas"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
               }`}
             >
               Tarjetas
             </button>
             <button
-              onClick={() => setViewMode('tabla')}
+              onClick={() => setViewMode("tabla")}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'tabla'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                viewMode === "tabla"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
               }`}
             >
               Tabla
@@ -382,8 +451,12 @@ const Tareas = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando tareas...</h3>
-            <p className="text-gray-600">Obteniendo las tareas del profesor desde el servidor</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Cargando tareas...
+            </h3>
+            <p className="text-gray-600">
+              Obteniendo las tareas del profesor desde el servidor
+            </p>
           </div>
         </div>
       ) : tareasFiltradas.length === 0 ? (
@@ -391,13 +464,14 @@ const Tareas = () => {
           <div className="flex flex-col items-center justify-center">
             <FileText className="w-16 h-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {tareas.length === 0 ? 'No tienes tareas creadas' : 'No se encontraron tareas'}
+              {tareas.length === 0
+                ? "No tienes tareas creadas"
+                : "No se encontraron tareas"}
             </h3>
             <p className="text-gray-600 text-center mb-6">
-              {tareas.length === 0 
-                ? 'Comienza creando tu primera tarea para asignar a tus estudiantes'
-                : 'Intenta ajustar los filtros para encontrar las tareas que buscas'
-              }
+              {tareas.length === 0
+                ? "Comienza creando tu primera tarea para asignar a tus estudiantes"
+                : "Intenta ajustar los filtros para encontrar las tareas que buscas"}
             </p>
             {tareas.length === 0 && (
               <button
@@ -410,14 +484,17 @@ const Tareas = () => {
             )}
           </div>
         </div>
-      ) : viewMode === 'tarjetas' ? (
+      ) : viewMode === "tarjetas" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tareasFiltradas.map((tarea) => {
             const estadoInfo = getEstadoInfo(tarea.estado);
             const EstadoIcon = estadoInfo.icon;
 
             return (
-              <div key={tarea.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div
+                key={tarea.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              >
                 <div className="p-6">
                   {/* Header de la tarjeta */}
                   <div className="flex items-start justify-between mb-4">
@@ -426,29 +503,36 @@ const Tareas = () => {
                         {tarea.titulo}
                       </h3>
                       <div className="flex items-center space-x-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoInfo.color}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoInfo.color}`}
+                        >
                           <EstadoIcon className="w-3 h-3 mr-1" />
                           {estadoInfo.label}
                         </span>
                         {tarea.prioridad && (
-                          <span className={`text-xs font-medium ${getPrioridadColor(tarea.prioridad)}`}>
+                          <span
+                            className={`text-xs font-medium ${getPrioridadColor(
+                              tarea.prioridad
+                            )}`}
+                          >
                             ● {tarea.prioridad.toUpperCase()}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="relative">
-    
-                    </div>
+                    <div className="relative"></div>
                   </div>
 
                   {/* Información de la tarea */}
                   <div className="space-y-3 mb-4">
                     <div className="flex items-center text-sm text-gray-600">
                       <BookOpen className="w-4 h-4 mr-2" />
-                      <span>{tarea.aulaInfo?.grado || 'Sin grado'} - {tarea.aulaInfo?.seccion || 'Sin sección'}</span>
+                      <span>
+                        {tarea.aulaInfo?.grado || "Sin grado"} -{" "}
+                        {tarea.aulaInfo?.seccion || "Sin sección"}
+                      </span>
                     </div>
-                    
+
                     <div className="flex items-center text-sm text-gray-600">
                       <Calendar className="w-4 h-4 mr-2" />
                       <span>Vence: {formatFecha(tarea.fechaEntrega)}</span>
@@ -456,16 +540,18 @@ const Tareas = () => {
 
                     <div className="flex items-center text-sm text-gray-600">
                       <Users className="w-4 h-4 mr-2" />
-                      <span>{tarea.entregadas}/{tarea.totalEstudiantes} entregadas</span>
+                      <span>
+                        {tarea.entregadas}/{tarea.totalEstudiantes} entregadas
+                      </span>
                     </div>
 
                     <div className="flex items-center text-sm text-gray-600">
                       <Clock className="w-4 h-4 mr-2" />
-                      <span>Asignada: {formatFecha(tarea.fechaAsignacion)}</span>
+                      <span>
+                        Asignada: {formatFecha(tarea.fechaAsignacion)}
+                      </span>
                     </div>
                   </div>
-
-                 
 
                   {/* Acciones */}
                   <div className="flex space-x-2">
@@ -537,24 +623,34 @@ const Tareas = () => {
                 {tareasFiltradas.map((tarea) => {
                   const estadoInfo = getEstadoInfo(tarea.estado);
                   const EstadoIcon = estadoInfo.icon;
-                  const porcentaje = Math.round((tarea.entregadas / tarea.totalEstudiantes) * 100);
+                  const porcentaje = Math.round(
+                    (tarea.entregadas / tarea.totalEstudiantes) * 100
+                  );
 
                   return (
                     <tr key={tarea.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{tarea.titulo}</div>
-                          <div className="text-sm text-gray-500">{tarea.grado}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {tarea.titulo}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {tarea.grado}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <BookOpen className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-900">{tarea.materia}</span>
+                          <span className="text-sm text-gray-900">
+                            {tarea.materia}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoInfo.color}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoInfo.color}`}
+                        >
                           <EstadoIcon className="w-3 h-3 mr-1" />
                           {estadoInfo.label}
                         </span>
@@ -566,12 +662,14 @@ const Tareas = () => {
                         <div className="flex items-center">
                           <div className="flex-1">
                             <div className="flex justify-between text-sm text-gray-600 mb-1">
-                              <span>{tarea.entregadas}/{tarea.totalEstudiantes}</span>
+                              <span>
+                                {tarea.entregadas}/{tarea.totalEstudiantes}
+                              </span>
                               <span>{porcentaje}%</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
+                              <div
+                                className="bg-blue-600 h-2 rounded-full"
                                 style={{ width: `${porcentaje}%` }}
                               ></div>
                             </div>
@@ -620,12 +718,12 @@ const Tareas = () => {
       )}
 
       {/* Modales */}
-      <CrearTareaModal 
-        isOpen={showCrearModal} 
-        onClose={() => setShowCrearModal(false)} 
+      <CrearTareaModal
+        isOpen={showCrearModal}
+        onClose={() => setShowCrearModal(false)}
         onSave={handleTareaCreada}
       />
-      
+
       <EditarTareaModal
         isOpen={showEditarModal}
         onClose={() => setShowEditarModal(false)}
