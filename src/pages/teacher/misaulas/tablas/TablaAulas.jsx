@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  MapPin, 
-  Calendar, 
+import React, { useState, useEffect } from "react";
+import {
+  Users,
+  MapPin,
+  Calendar,
   Clock,
   BookOpen,
   AlertCircle,
   Loader2,
   Eye,
-  GraduationCap
-} from 'lucide-react';
-import { toast } from 'sonner';
-import aulaService from '../../../../services/aulaService';
+  GraduationCap,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const TablaAulas = ({ onVerEstudiantes }) => {
   const [aulas, setAulas] = useState([]);
@@ -26,42 +25,42 @@ const TablaAulas = ({ onVerEstudiantes }) => {
   const cargarAulas = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Obtener idTrabajador del localStorage
-      const authStorage = localStorage.getItem('auth-storage');
-      const authData = JSON.parse(authStorage);
-      const idTrabajador = authData?.state?.user?.entidadId;
+      console.log("🔍 Cargando aulas para demo...");
 
-      if (!idTrabajador) {
-        throw new Error('No se pudo obtener el ID del trabajador');
-      }
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      console.log('🔍 Cargando aulas para trabajador:', idTrabajador);
-      
-      const response = await aulaService.getAulasByTrabajador(idTrabajador);
-      
-      console.log('✅ Respuesta de aulas:', response);
-      
-      if (response.success && response.aulas) {
-        setAulas(response.aulas);
+      // Generar datos demo de aulas sin depender de autenticación
+      const { mockData } = await import("../../../../data/mockData.js");
+
+      // Para demo, mostrar todas las aulas o filtrar por un docente específico
+      const aulasDemo = mockData.aulas.filter(
+        (aula) => aula.estado === "ACTIVO"
+      );
+
+      console.log("✅ Aulas cargadas (DEMO):", aulasDemo.length);
+
+      if (aulasDemo.length > 0) {
+        setAulas(aulasDemo);
+        toast.success(`${aulasDemo.length} aulas cargadas correctamente`);
       } else {
         setAulas([]);
-        toast.info('No tienes aulas asignadas');
+        toast.info("No hay aulas disponibles");
       }
-      
     } catch (err) {
-      console.error('❌ Error al cargar aulas:', err);
-      setError(err.message || 'Error al cargar las aulas');
-      toast.error('Error al cargar las aulas');
+      console.error("❌ Error al cargar aulas (DEMO):", err);
+      setError("Error al cargar las aulas");
+      toast.error("Error al cargar las aulas");
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerEstudiantes = (aula) => {
-    console.log('👀 Ver estudiantes clickeado:', aula);
-    console.log('🆔 ID del aula:', aula.id_aula);
+    console.log("👀 Ver estudiantes clickeado:", aula);
+    console.log("🆔 ID del aula:", aula.id_aula);
     if (onVerEstudiantes) {
       onVerEstudiantes(aula);
     }
@@ -69,14 +68,14 @@ const TablaAulas = ({ onVerEstudiantes }) => {
 
   const getEstadoColor = (estado) => {
     switch (estado?.toLowerCase()) {
-      case 'activa':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'inactiva':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'mantenimiento':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case "activa":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "inactiva":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "mantenimiento":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -84,7 +83,9 @@ const TablaAulas = ({ onVerEstudiantes }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando mis aulas...</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Cargando mis aulas...
+        </h3>
         <p className="text-gray-600">Obteniendo las aulas asignadas</p>
       </div>
     );
@@ -94,7 +95,9 @@ const TablaAulas = ({ onVerEstudiantes }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar aulas</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Error al cargar aulas
+        </h3>
         <p className="text-gray-600 text-center mb-4">{error}</p>
         <button
           onClick={cargarAulas}
@@ -110,9 +113,12 @@ const TablaAulas = ({ onVerEstudiantes }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <BookOpen className="w-16 h-16 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No tienes aulas asignadas</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          No tienes aulas asignadas
+        </h3>
         <p className="text-gray-600 text-center">
-          Aún no tienes aulas asignadas. Contacta con la administración para obtener tus asignaciones.
+          Aún no tienes aulas asignadas. Contacta con la administración para
+          obtener tus asignaciones.
         </p>
       </div>
     );
@@ -123,7 +129,10 @@ const TablaAulas = ({ onVerEstudiantes }) => {
       {/* Grid de cards de aulas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {(aulas || []).map((aula, index) => (
-          <div key={aula.idAula || `aula-${index}`} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div
+            key={aula.idAula || `aula-${index}`}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+          >
             <div className="p-6">
               {/* Header de la card */}
               <div className="flex items-start justify-between mb-4">
@@ -139,8 +148,6 @@ const TablaAulas = ({ onVerEstudiantes }) => {
 
               {/* Información del aula */}
               <div className="space-y-3 mb-4">
-
-
                 {aula.ubicacion && (
                   <div className="flex items-center text-sm text-gray-600">
                     <MapPin className="w-4 h-4 mr-2" />
@@ -152,7 +159,9 @@ const TablaAulas = ({ onVerEstudiantes }) => {
               {/* Equipamiento (si existe) */}
               {aula.equipamiento && (
                 <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Equipamiento:</p>
+                  <p className="text-sm font-medium text-gray-700 mb-1">
+                    Equipamiento:
+                  </p>
                   <p className="text-sm text-gray-600">{aula.equipamiento}</p>
                 </div>
               )}

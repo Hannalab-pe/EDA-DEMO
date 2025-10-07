@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useTareasEstudianteDemo } from './useTareasEstudianteDemo';
+import { useState, useEffect } from "react";
+import { useTareasEstudianteDemo } from "./useTareasEstudianteDemo";
 
 /**
  * Hook personalizado DEMO para el dashboard de padres
  * Proporciona datos consolidados para el panel familiar usando datos mock
  */
 export const useParentDashboardDemo = () => {
-  const { tareas, loading: tareasLoading, error: tareasError, refrescarTareas } = useTareasEstudianteDemo();
+  const {
+    tareas,
+    loading: tareasLoading,
+    error: tareasError,
+    refrescarTareas,
+  } = useTareasEstudianteDemo();
   const [dashboardData, setDashboardData] = useState({
     tareas: [],
     estadisticas: {
@@ -14,8 +19,8 @@ export const useParentDashboardDemo = () => {
       tareasCompletadas: 0,
       tareasPendientes: 0,
       tareasVencidas: 0,
-      promedioCompletitud: 0
-    }
+      promedioCompletitud: 0,
+    },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,17 +29,18 @@ export const useParentDashboardDemo = () => {
   useEffect(() => {
     if (tareas && Array.isArray(tareas)) {
       const totalTareas = tareas.length;
-      const tareasCompletadas = tareas.filter(tarea =>
-        tarea.status === 'completed' || tarea.realizoTarea
+      const tareasCompletadas = tareas.filter(
+        (tarea) => tarea.status === "completed" || tarea.realizoTarea
       ).length;
-      const tareasPendientes = tareas.filter(tarea =>
-        tarea.status === 'pending' && !tarea.isOverdue
+      const tareasPendientes = tareas.filter(
+        (tarea) => tarea.status === "pending" && !tarea.isOverdue
       ).length;
-      const tareasVencidas = tareas.filter(tarea => tarea.isOverdue).length;
+      const tareasVencidas = tareas.filter((tarea) => tarea.isOverdue).length;
 
-      const promedioCompletitud = totalTareas > 0
-        ? Math.round((tareasCompletadas / totalTareas) * 100)
-        : 0;
+      const promedioCompletitud =
+        totalTareas > 0
+          ? Math.round((tareasCompletadas / totalTareas) * 100)
+          : 0;
 
       setDashboardData({
         tareas,
@@ -43,8 +49,8 @@ export const useParentDashboardDemo = () => {
           tareasCompletadas,
           tareasPendientes,
           tareasVencidas,
-          promedioCompletitud
-        }
+          promedioCompletitud,
+        },
       });
     }
   }, [tareas]);
@@ -68,7 +74,7 @@ export const useParentDashboardDemo = () => {
     error,
     refreshData,
     tareas: dashboardData.tareas,
-    estadisticas: dashboardData.estadisticas
+    estadisticas: dashboardData.estadisticas,
   };
 };
 

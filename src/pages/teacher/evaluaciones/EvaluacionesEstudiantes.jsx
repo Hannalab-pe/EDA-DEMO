@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Calendar, BookOpen, FileText, UserCheck, Edit } from 'lucide-react';
-import { toast } from 'sonner';
-import CrearEvaluacionModal from './modales/CrearEvaluacionModal';
-import EvaluarEstudianteModal from './modales/EvaluarEstudianteModal';
+import React, { useState, useEffect } from "react";
+import {
+  Plus,
+  Calendar,
+  BookOpen,
+  FileText,
+  UserCheck,
+  Edit,
+} from "lucide-react";
+import { toast } from "sonner";
+import CrearEvaluacionModal from "./modales/CrearEvaluacionModal";
+import EvaluarEstudianteModal from "./modales/EvaluarEstudianteModal";
 
 const EvaluacionesEstudiantes = () => {
   const [evaluaciones, setEvaluaciones] = useState([]);
@@ -12,79 +19,46 @@ const EvaluacionesEstudiantes = () => {
   const [isEvaluarModalOpen, setIsEvaluarModalOpen] = useState(false);
   const [selectedEvaluacion, setSelectedEvaluacion] = useState(null);
 
-  // Obtener evaluaciones del profesor
+  // Obtener evaluaciones del profesor (DEMO)
   const fetchEvaluaciones = async () => {
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      console.log("🔍 Cargando evaluaciones (DEMO)");
 
-      if (!token) {
-        toast.error('No se encontró token de autenticación');
-        return;
-      }
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const response = await fetch('https://nidopro.up.railway.app/api/v1/evaluacion', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Importar datos demo
+      const { mockData } = await import("../../../data/mockData.js");
 
-      if (!response.ok) {
-        throw new Error('Error al obtener evaluaciones');
-      }
+      // Para este demo, mostrar todas las evaluaciones
+      setEvaluaciones(mockData.evaluaciones);
 
-      const data = await response.json();
-
-      if (data.success) {
-        setEvaluaciones(data.info.data || []);
-      } else {
-        toast.error(data.message || 'Error al obtener evaluaciones');
-      }
+      console.log(
+        "✅ Evaluaciones cargadas (DEMO):",
+        mockData.evaluaciones.length
+      );
+      toast.success("Evaluaciones cargadas correctamente");
     } catch (error) {
-      console.error('Error fetching evaluaciones:', error);
-      toast.error('Error al cargar evaluaciones');
+      console.error("Error loading evaluaciones (DEMO):", error);
+      toast.error("Error al cargar evaluaciones");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Obtener cursos disponibles
+  // Obtener cursos disponibles (DEMO)
   const fetchCursos = async () => {
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      console.log("🔍 Cargando cursos (DEMO)");
 
-      if (!token) {
-        toast.error('No se encontró token de autenticación');
-        return;
-      }
+      // Importar datos demo
+      const { mockData } = await import("../../../data/mockData.js");
+      setCursos(mockData.cursos);
 
-      const response = await fetch('https://nidopro.up.railway.app/api/v1/curso', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al obtener cursos');
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        setCursos(data.info.data || []);
-      } else {
-        toast.error(data.message || 'Error al obtener cursos');
-      }
+      console.log("✅ Cursos cargados (DEMO):", mockData.cursos.length);
     } catch (error) {
-      console.error('Error fetching cursos:', error);
-      toast.error('Error al cargar cursos');
+      console.error("Error loading cursos (DEMO):", error);
+      toast.error("Error al cargar cursos");
     }
   };
 
@@ -95,12 +69,12 @@ const EvaluacionesEstudiantes = () => {
 
   // Función para formatear fecha
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -144,7 +118,9 @@ const EvaluacionesEstudiantes = () => {
     return (
       <div className="flex flex-col justify-center items-center min-h-64 px-4">
         <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600 text-sm sm:text-base mt-2">Cargando evaluaciones...</span>
+        <span className="ml-3 text-gray-600 text-sm sm:text-base mt-2">
+          Cargando evaluaciones...
+        </span>
       </div>
     );
   }
@@ -154,7 +130,9 @@ const EvaluacionesEstudiantes = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Evaluaciones de Estudiantes</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Evaluaciones de Estudiantes
+          </h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Gestiona las evaluaciones que has creado para tus estudiantes
           </p>
@@ -213,21 +191,28 @@ const EvaluacionesEstudiantes = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {evaluaciones.map((evaluacion) => (
-                    <tr key={evaluacion.idEvaluacion} className="hover:bg-gray-50">
+                    <tr
+                      key={evaluacion.idEvaluacion}
+                      className="hover:bg-gray-50"
+                    >
                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                          <span className="text-xs sm:text-sm">{formatDate(evaluacion.fecha)}</span>
+                          <span className="text-xs sm:text-sm">
+                            {formatDate(evaluacion.fecha)}
+                          </span>
                         </div>
                       </td>
                       <td className="px-3 sm:px-6 py-4 text-sm text-gray-900">
                         <div className="max-w-xs truncate">
-                          <span className="text-xs sm:text-sm">{evaluacion.descripcion}</span>
+                          <span className="text-xs sm:text-sm">
+                            {evaluacion.descripcion}
+                          </span>
                         </div>
                       </td>
                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {evaluacion.tipoEvaluacion || 'EXAMEN'}
+                          {evaluacion.tipoEvaluacion || "EXAMEN"}
                         </span>
                       </td>
                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -281,8 +266,12 @@ const EvaluacionesEstudiantes = () => {
           <div className="flex items-center">
             <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Total Evaluaciones</p>
-              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{evaluaciones.length}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Total Evaluaciones
+              </p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
+                {evaluaciones.length}
+              </p>
             </div>
           </div>
         </div>
@@ -290,8 +279,12 @@ const EvaluacionesEstudiantes = () => {
           <div className="flex items-center">
             <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Cursos Disponibles</p>
-              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{cursos.length}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Cursos Disponibles
+              </p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
+                {cursos.length}
+              </p>
             </div>
           </div>
         </div>
@@ -299,13 +292,20 @@ const EvaluacionesEstudiantes = () => {
           <div className="flex items-center">
             <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Evaluaciones este mes</p>
+              <p className="text-sm font-medium text-gray-600">
+                Evaluaciones este mes
+              </p>
               <p className="text-xl sm:text-2xl font-semibold text-gray-900">
-                {evaluaciones.filter(e => {
-                  const fecha = new Date(e.fecha);
-                  const ahora = new Date();
-                  return fecha.getMonth() === ahora.getMonth() && fecha.getFullYear() === ahora.getFullYear();
-                }).length}
+                {
+                  evaluaciones.filter((e) => {
+                    const fecha = new Date(e.fecha);
+                    const ahora = new Date();
+                    return (
+                      fecha.getMonth() === ahora.getMonth() &&
+                      fecha.getFullYear() === ahora.getFullYear()
+                    );
+                  }).length
+                }
               </p>
             </div>
           </div>

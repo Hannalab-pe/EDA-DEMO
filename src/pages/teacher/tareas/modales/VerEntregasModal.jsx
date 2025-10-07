@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { 
-  X, 
-  CheckCircle, 
-  Clock, 
-  Users, 
-  PaperclipIcon, 
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import {
+  X,
+  CheckCircle,
+  Clock,
+  Users,
+  PaperclipIcon,
   FileText,
   AlertCircle,
   Download,
   Eye,
   Calendar,
   Target,
-  Loader2
-} from 'lucide-react';
-import { toast } from 'sonner';
-import tareaService from '../../../../services/tareaService';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tabActiva, setTabActiva] = useState('entregadas'); // 'entregadas' o 'pendientes'
+  const [tabActiva, setTabActiva] = useState("entregadas"); // 'entregadas' o 'pendientes'
 
   // Cargar entregas cuando se abre el modal
   useEffect(() => {
@@ -32,7 +31,7 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
       // Limpiar datos cuando se cierra el modal
       setEntregas([]);
       setError(null);
-      setTabActiva('entregadas');
+      setTabActiva("entregadas");
       setLoading(false);
     }
   }, [isOpen, tarea]);
@@ -40,20 +39,70 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
   const cargarEntregas = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      console.log('🔍 Cargando entregas para tarea:', tarea.idTarea);
-      
-      const response = await tareaService.obtenerEntregasPorTarea(tarea.idTarea);
-      
-      console.log('✅ Entregas cargadas:', response);
-      console.log('📊 Datos de entregas:', response.entregas);
-      setEntregas(response.entregas || []);
-      
+      console.log("🎭 Demo: Cargando entregas para tarea:", tarea.idTarea);
+
+      // Simular carga
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // Generar entregas demo
+      const entregasDemo = [
+        {
+          idTareaEntrega: 1,
+          estudianteId: "1",
+          estudiante: {
+            nombre: "Sofía",
+            apellido: "Pérez",
+            foto: "👧",
+            idEstudiante: "1",
+          },
+          realizoTarea: true,
+          fechaEntrega: new Date().toISOString(),
+          observaciones: "Excelente trabajo realizado con creatividad",
+          archivoUrl: null,
+          estado: "entregado",
+        },
+        {
+          idTareaEntrega: 2,
+          estudianteId: "2",
+          estudiante: {
+            nombre: "Carlos",
+            apellido: "Mendoza",
+            foto: "👦",
+            idEstudiante: "2",
+          },
+          realizoTarea: false,
+          fechaEntrega: null,
+          observaciones: "Pendiente de entrega",
+          archivoUrl: null,
+          estado: "pendiente",
+        },
+        {
+          idTareaEntrega: 3,
+          estudianteId: "3",
+          estudiante: {
+            nombre: "María",
+            apellido: "González",
+            foto: "👧",
+            idEstudiante: "3",
+          },
+          realizoTarea: true,
+          fechaEntrega: new Date(
+            Date.now() - 24 * 60 * 60 * 1000
+          ).toISOString(),
+          observaciones: "Buen esfuerzo, puede mejorar la presentación",
+          archivoUrl: null,
+          estado: "entregado",
+        },
+      ];
+
+      console.log("✅ Entregas demo cargadas:", entregasDemo);
+      setEntregas(entregasDemo);
     } catch (err) {
-      console.error('❌ Error al cargar entregas:', err);
-      setError(err.message || 'Error al cargar las entregas');
-      toast.error('Error al cargar las entregas de la tarea');
+      console.error("❌ Error al cargar entregas:", err);
+      setError(err.message || "Error al cargar las entregas");
+      toast.error("Error al cargar las entregas de la tarea");
     } finally {
       setLoading(false);
     }
@@ -63,31 +112,37 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
     // Limpiar inmediatamente para evitar que se vea contenido mientras se cierra
     setEntregas([]);
     setError(null);
-    setTabActiva('entregadas');
+    setTabActiva("entregadas");
     setLoading(false);
     onClose();
   };
 
   // Filtrar entregas - considerar tanto realizoTarea como estado
-  const entregasRealizadas = isOpen ? entregas.filter(entrega => 
-    entrega.realizoTarea === true || entrega.estado === 'entregado'
-  ) : [];
-  const entregasPendientes = isOpen ? entregas.filter(entrega => 
-    entrega.realizoTarea === false && entrega.estado !== 'entregado'
-  ) : [];
+  const entregasRealizadas = isOpen
+    ? entregas.filter(
+        (entrega) =>
+          entrega.realizoTarea === true || entrega.estado === "entregado"
+      )
+    : [];
+  const entregasPendientes = isOpen
+    ? entregas.filter(
+        (entrega) =>
+          entrega.realizoTarea === false && entrega.estado !== "entregado"
+      )
+    : [];
 
   // Debug logs (solo si el modal está abierto)
   if (isOpen && entregas.length > 0) {
-    console.log('🔍 Debug entregas:', {
+    console.log("🔍 Debug entregas:", {
       total: entregas.length,
       entregasRealizadas: entregasRealizadas.length,
       entregasPendientes: entregasPendientes.length,
-      entregas: entregas.map(e => ({
+      entregas: entregas.map((e) => ({
         id: e.idTareaEntrega,
         realizoTarea: e.realizoTarea,
         estado: e.estado,
-        nombre: e.idEstudiante2?.nombre
-      }))
+        nombre: e.idEstudiante2?.nombre,
+      })),
     });
   }
 
@@ -95,14 +150,17 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
   const totalEstudiantes = entregas.length;
   const totalEntregadas = entregasRealizadas.length;
   const totalPendientes = entregasPendientes.length;
-  const porcentajeEntrega = totalEstudiantes > 0 ? Math.round((totalEntregadas / totalEstudiantes) * 100) : 0;
+  const porcentajeEntrega =
+    totalEstudiantes > 0
+      ? Math.round((totalEntregadas / totalEstudiantes) * 100)
+      : 0;
 
   const formatFecha = (fecha) => {
-    if (!fecha) return 'Sin fecha';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    if (!fecha) return "Sin fecha";
+    return new Date(fecha).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -145,7 +203,10 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                       <div className="flex flex-wrap items-center gap-4 text-indigo-100">
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4" />
-                          <span>{tarea.aulaInfo?.grado || 'Sin grado'} - {tarea.aulaInfo?.seccion || 'Sin sección'}</span>
+                          <span>
+                            {tarea.aulaInfo?.grado || "Sin grado"} -{" "}
+                            {tarea.aulaInfo?.seccion || "Sin sección"}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4" />
@@ -153,7 +214,10 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                         </div>
                         <div className="flex items-center space-x-2">
                           <Target className="w-4 h-4" />
-                          <span>{totalEntregadas}/{totalEstudiantes} entregas ({porcentajeEntrega}%)</span>
+                          <span>
+                            {totalEntregadas}/{totalEstudiantes} entregas (
+                            {porcentajeEntrega}%)
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -171,13 +235,19 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando entregas...</h3>
-                      <p className="text-gray-600">Obteniendo información de las entregas de la tarea</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Cargando entregas...
+                      </h3>
+                      <p className="text-gray-600">
+                        Obteniendo información de las entregas de la tarea
+                      </p>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar entregas</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Error al cargar entregas
+                      </h3>
                       <p className="text-gray-600 text-center mb-4">{error}</p>
                       <button
                         onClick={cargarEntregas}
@@ -194,38 +264,54 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                           <div className="flex items-center">
                             <Users className="w-8 h-8 text-blue-600 mr-3" />
                             <div>
-                              <p className="text-blue-800 font-semibold text-lg">{totalEstudiantes}</p>
-                              <p className="text-blue-600 text-sm">Total estudiantes</p>
+                              <p className="text-blue-800 font-semibold text-lg">
+                                {totalEstudiantes}
+                              </p>
+                              <p className="text-blue-600 text-sm">
+                                Total estudiantes
+                              </p>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <div className="flex items-center">
                             <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
                             <div>
-                              <p className="text-green-800 font-semibold text-lg">{totalEntregadas}</p>
-                              <p className="text-green-600 text-sm">Entregadas</p>
+                              <p className="text-green-800 font-semibold text-lg">
+                                {totalEntregadas}
+                              </p>
+                              <p className="text-green-600 text-sm">
+                                Entregadas
+                              </p>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                           <div className="flex items-center">
                             <Clock className="w-8 h-8 text-yellow-600 mr-3" />
                             <div>
-                              <p className="text-yellow-800 font-semibold text-lg">{totalPendientes}</p>
-                              <p className="text-yellow-600 text-sm">Pendientes</p>
+                              <p className="text-yellow-800 font-semibold text-lg">
+                                {totalPendientes}
+                              </p>
+                              <p className="text-yellow-600 text-sm">
+                                Pendientes
+                              </p>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                           <div className="flex items-center">
                             <Target className="w-8 h-8 text-purple-600 mr-3" />
                             <div>
-                              <p className="text-purple-800 font-semibold text-lg">{porcentajeEntrega}%</p>
-                              <p className="text-purple-600 text-sm">Completado</p>
+                              <p className="text-purple-800 font-semibold text-lg">
+                                {porcentajeEntrega}%
+                              </p>
+                              <p className="text-purple-600 text-sm">
+                                Completado
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -235,11 +321,11 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                       <div className="border-b border-gray-200 mb-6">
                         <nav className="-mb-px flex space-x-8">
                           <button
-                            onClick={() => setTabActiva('entregadas')}
+                            onClick={() => setTabActiva("entregadas")}
                             className={`py-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-                              tabActiva === 'entregadas'
-                                ? 'border-green-500 text-green-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                              tabActiva === "entregadas"
+                                ? "border-green-500 text-green-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                           >
                             <div className="flex items-center space-x-2">
@@ -248,11 +334,11 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                             </div>
                           </button>
                           <button
-                            onClick={() => setTabActiva('pendientes')}
+                            onClick={() => setTabActiva("pendientes")}
                             className={`py-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-                              tabActiva === 'pendientes'
-                                ? 'border-yellow-500 text-yellow-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                              tabActiva === "pendientes"
+                                ? "border-yellow-500 text-yellow-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                           >
                             <div className="flex items-center space-x-2">
@@ -265,39 +351,54 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
 
                       {/* Contenido de tabs */}
                       <div className="max-h-96 overflow-y-auto">
-                        {tabActiva === 'entregadas' ? (
+                        {tabActiva === "entregadas" ? (
                           <div className="space-y-4">
                             {entregasRealizadas.length > 0 ? (
                               <div className="grid gap-4">
                                 {entregasRealizadas.map((entrega) => (
-                                  <div key={entrega.idTareaEntrega} className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                  <div
+                                    key={entrega.idTareaEntrega}
+                                    className="bg-green-50 border border-green-200 rounded-lg p-4"
+                                  >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center space-x-3">
                                         <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                                           <span className="text-green-600 font-semibold text-sm">
-                                            {entrega.idEstudiante2?.nombre?.charAt(0)}{entrega.idEstudiante2?.apellido?.charAt(0)}
+                                            {entrega.idEstudiante2?.nombre?.charAt(
+                                              0
+                                            )}
+                                            {entrega.idEstudiante2?.apellido?.charAt(
+                                              0
+                                            )}
                                           </span>
                                         </div>
                                         <div>
                                           <p className="font-medium text-gray-900">
-                                            {entrega.idEstudiante2?.nombre} {entrega.idEstudiante2?.apellido}
+                                            {entrega.idEstudiante2?.nombre}{" "}
+                                            {entrega.idEstudiante2?.apellido}
                                           </p>
                                           <p className="text-sm text-gray-600">
-                                            DNI: {entrega.idEstudiante2?.nroDocumento}
+                                            DNI:{" "}
+                                            {
+                                              entrega.idEstudiante2
+                                                ?.nroDocumento
+                                            }
                                           </p>
                                         </div>
                                       </div>
                                       <div className="text-right">
                                         <div className="flex items-center text-green-600 mb-1">
                                           <CheckCircle className="w-4 h-4 mr-1" />
-                                          <span className="text-sm font-medium">Entregada</span>
+                                          <span className="text-sm font-medium">
+                                            Entregada
+                                          </span>
                                         </div>
                                         <p className="text-xs text-gray-500">
                                           {formatFecha(entrega.fechaEntrega)}
                                         </p>
                                       </div>
                                     </div>
-                                    
+
                                     {entrega.archivoUrl && (
                                       <div className="mt-3 flex items-center justify-between bg-white rounded-lg p-3 border">
                                         <div className="flex items-center text-sm text-gray-600">
@@ -316,11 +417,15 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                                         </div>
                                       </div>
                                     )}
-                                    
+
                                     {entrega.observaciones && (
                                       <div className="mt-3 p-3 bg-white rounded-lg border">
-                                        <p className="text-sm font-medium text-gray-700 mb-1">Observaciones:</p>
-                                        <p className="text-sm text-gray-600">{entrega.observaciones}</p>
+                                        <p className="text-sm font-medium text-gray-700 mb-1">
+                                          Observaciones:
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                          {entrega.observaciones}
+                                        </p>
                                       </div>
                                     )}
                                   </div>
@@ -331,8 +436,12 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                   <CheckCircle className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">No hay entregas realizadas</h3>
-                                <p className="text-gray-500">Aún ningún estudiante ha entregado esta tarea</p>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                  No hay entregas realizadas
+                                </h3>
+                                <p className="text-gray-500">
+                                  Aún ningún estudiante ha entregado esta tarea
+                                </p>
                               </div>
                             )}
                           </div>
@@ -341,30 +450,46 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                             {entregasPendientes.length > 0 ? (
                               <div className="grid gap-4">
                                 {entregasPendientes.map((entrega) => (
-                                  <div key={entrega.idTareaEntrega} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                  <div
+                                    key={entrega.idTareaEntrega}
+                                    className="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+                                  >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center space-x-3">
                                         <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
                                           <span className="text-yellow-600 font-semibold text-sm">
-                                            {entrega.idEstudiante2?.nombre?.charAt(0)}{entrega.idEstudiante2?.apellido?.charAt(0)}
+                                            {entrega.idEstudiante2?.nombre?.charAt(
+                                              0
+                                            )}
+                                            {entrega.idEstudiante2?.apellido?.charAt(
+                                              0
+                                            )}
                                           </span>
                                         </div>
                                         <div>
                                           <p className="font-medium text-gray-900">
-                                            {entrega.idEstudiante2?.nombre} {entrega.idEstudiante2?.apellido}
+                                            {entrega.idEstudiante2?.nombre}{" "}
+                                            {entrega.idEstudiante2?.apellido}
                                           </p>
                                           <p className="text-sm text-gray-600">
-                                            DNI: {entrega.idEstudiante2?.nroDocumento}
+                                            DNI:{" "}
+                                            {
+                                              entrega.idEstudiante2
+                                                ?.nroDocumento
+                                            }
                                           </p>
                                         </div>
                                       </div>
                                       <div className="text-right">
                                         <div className="flex items-center text-yellow-600 mb-1">
                                           <Clock className="w-4 h-4 mr-1" />
-                                          <span className="text-sm font-medium">Pendiente</span>
+                                          <span className="text-sm font-medium">
+                                            Pendiente
+                                          </span>
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                          Vence: {formatFecha(entrega.fechaEntrega)}
+                                          Vence:{" "}
+                                          {formatFecha(entrega.fechaEntrega)}
                                         </p>
                                       </div>
                                     </div>
@@ -376,8 +501,12 @@ const VerEntregasModal = ({ isOpen, onClose, tarea }) => {
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                   <CheckCircle className="w-8 h-8 text-green-400" />
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">¡Excelente!</h3>
-                                <p className="text-gray-500">Todos los estudiantes han entregado la tarea</p>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                  ¡Excelente!
+                                </h3>
+                                <p className="text-gray-500">
+                                  Todos los estudiantes han entregado la tarea
+                                </p>
                               </div>
                             )}
                           </div>

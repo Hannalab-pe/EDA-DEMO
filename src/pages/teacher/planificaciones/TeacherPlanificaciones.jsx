@@ -1,156 +1,109 @@
-import React, { useState, useMemo, useEffect } from "react";
-import ModalAgregarPlanificacion from "../../admin/planificaciones/modales/ModalAgregarPlanificacion";
-import { usePlanificacionesTrabajadorDemo } from "../../../hooks/demo/usePlanificacionesDemo";
-import { useAuthStore } from "../../../store/useAuthStore";
+import React, { useState } from "react";
+import { toast } from "sonner";
 import { formatFechaEvaluacion } from "../../../utils/dateUtils";
+import { mockData } from "../../../data/mockData";
 
 const TeacherPlanificaciones = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { user } = useAuthStore();
+  const [planificaciones, setPlanificaciones] = useState(
+    mockData.planificaciones
+  );
 
-  // Obtener el idTrabajador directamente del user.entidadId
-  const idTrabajadorUsuario = user?.entidadId || user?.id;
-
-  // Usar el hook demo para obtener planificaciones del trabajador
-  const {
-    data: planificaciones = [],
-    isLoading,
-    error,
-    refetch,
-  } = usePlanificacionesTrabajadorDemo(idTrabajadorUsuario);
-
-  // Debug: Monitorear cambios en el estado del modal
-  useEffect(() => {
-    console.log("📊 Estado del modal cambió:", {
-      isModalOpen,
-      idTrabajadorUsuario,
-    });
-  }, [isModalOpen, idTrabajadorUsuario]);
-  const planificacionesFiltradas = planificaciones || [];
-
-  if (!idTrabajadorUsuario) {
-    return <div className="text-gray-500 text-center py-10">Cargando...</div>;
-  }
+  // Simular función de agregar planificación
+  const handleAgregarPlanificacion = () => {
+    console.log('�️ Botón "Agregar Planificación" clickeado (DEMO)');
+    toast.success("Funcionalidad de planificaciones en modo demo");
+    // En una versión real, aquí se abriría el modal
+  };
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">
-          Mis Planificaciones
+          Mis Planificaciones (Demo)
         </h2>
         <button
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold shadow"
-          onClick={() => {
-            console.log('🖱️ Botón "Agregar Planificación" clickeado');
-            setIsModalOpen(true);
-            console.log("📂 Estado isModalOpen establecido a:", true);
-          }}
+          onClick={handleAgregarPlanificacion}
         >
           + Agregar Planificación
         </button>
       </div>
-      <ModalAgregarPlanificacion
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={refetch}
-      />
-      {/* Renderizar cards de planificaciones filtradas con mejor diseño */}
-      {!idTrabajadorUsuario ? (
-        <div className="text-gray-500 text-center py-10">Cargando...</div>
-      ) : isLoading ? (
-        <div className="text-gray-500 text-center py-10">
-          Cargando planificaciones...
-        </div>
-      ) : error ? (
-        <div className="text-red-500 text-center py-10">
-          Error al cargar planificaciones: {error}
-        </div>
-      ) : planificaciones && planificaciones.length > 0 ? (
+
+      {/* Renderizar planificaciones demo */}
+      {planificaciones && planificaciones.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
           {planificaciones.map((plan) => (
             <div
-              key={plan.idPlanificacion}
+              key={plan.id}
               className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 flex flex-col justify-between hover:shadow-2xl transition-shadow duration-200"
             >
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-blue-600 text-2xl font-bold">
-                    {plan.tipoPlanificacion?.charAt(0) || "P"}
-                  </span>
+                  <span className="text-blue-600 text-2xl font-bold">📋</span>
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-xl text-blue-800">
-                    {plan.tipoPlanificacion}
+                    {plan.titulo}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {formatFechaEvaluacion(plan.fechaCreacion)}
-                  </div>
+                  <div className="text-sm text-gray-500">{plan.estado}</div>
                 </div>
               </div>
 
               <div className="mb-4 text-gray-700">
                 <div className="font-medium text-gray-800 mb-1">
-                  Fecha de planificación:
+                  Descripción:
                 </div>
+                <div className="text-sm">{plan.descripcion}</div>
+              </div>
+
+              <div className="mb-4 text-gray-700">
+                <div className="font-medium text-gray-800 mb-1">Fechas:</div>
                 <div className="text-sm">
-                  {formatFechaEvaluacion(plan.fechaPlanificacion)}
+                  Del {plan.fechaInicio} al {plan.fechaFin}
                 </div>
               </div>
 
               <div className="mb-4">
-                <div className="font-medium text-gray-800 mb-2">
-                  Información del Aula:
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">
-                      Sección:
+                <div className="font-medium text-gray-800 mb-2">Materias:</div>
+                <div className="flex flex-wrap gap-1">
+                  {plan.materias?.map((materia, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                    >
+                      {materia}
                     </span>
-                    <span className="text-sm font-bold text-green-700">
-                      {plan.aula?.seccion}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">
-                      Estudiantes:
-                    </span>
-                    <span className="text-sm font-bold text-blue-700">
-                      {plan.aula?.cantidadEstudiantes || "N/A"}
-                    </span>
-                  </div>
+                  ))}
                 </div>
               </div>
 
-              {plan.observaciones && (
-                <div className="mb-4">
-                  <div className="font-medium text-gray-800 mb-2">
-                    Observaciones:
-                  </div>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 leading-relaxed">
-                    {plan.observaciones}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
-                <a
-                  href={plan.archivoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline font-semibold hover:text-blue-800 transition-colors"
+              <div className="border-t pt-4">
+                <button
+                  onClick={() => toast.info("Ver detalles en modo demo")}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                 >
-                  Ver archivo
-                </a>
-                <span className="text-xs px-3 py-1 rounded-full font-bold bg-blue-100 text-blue-700">
-                  Activo
-                </span>
+                  Ver Detalles
+                </button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-gray-500 text-center py-10">
-          No hay planificaciones registradas.
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-6xl mb-4">📋</div>
+          <h3 className="text-xl font-medium text-gray-700 mb-2">
+            No hay planificaciones
+          </h3>
+          <p className="text-gray-500 mb-6">
+            Comienza creando tu primera planificación
+          </p>
+          <button
+            onClick={handleAgregarPlanificacion}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
+          >
+            + Crear Planificación
+          </button>
         </div>
       )}
     </div>

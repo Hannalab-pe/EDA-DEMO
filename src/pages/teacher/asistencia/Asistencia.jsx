@@ -43,12 +43,12 @@ const Asistencia = () => {
     registrarAsistencia,
     loadingRegistro,
     tieneAulas,
-  } = useAsistenciaProfesor();
+  } = useAsistenciaProfesorDemo();
 
   // Función auxiliar para obtener el ID del aula de manera segura
   const getAulaId = (aula) => {
     if (!aula) return null;
-    return aula.id_aula || aula.idAula || aula.id || aula.idAula;
+    return aula.id_aula || aula.idAula || aula.id;
   };
 
   // Hook para obtener estudiantes del aula seleccionada
@@ -57,7 +57,7 @@ const Asistencia = () => {
     isLoading: loadingEstudiantes,
     error: errorEstudiantes,
     refetch: refetchEstudiantes,
-  } = useEstudiantesAula(getAulaId(selectedAula));
+  } = useEstudiantesAulaDemo(getAulaId(selectedAula));
 
   // Hook para obtener asistencias existentes por aula y fecha
   const {
@@ -65,7 +65,7 @@ const Asistencia = () => {
     isLoading: loadingAsistenciasExistentes,
     error: errorAsistenciasExistentes,
     refetch: refetchAsistenciasExistentes,
-  } = useAsistenciasPorAulaYFecha(getAulaId(selectedAula), selectedDate);
+  } = useAsistenciasPorAulaYFechaDemo(getAulaId(selectedAula), selectedDate);
 
   // Debug: Mostrar errores si existen
   useEffect(() => {
@@ -108,14 +108,9 @@ const Asistencia = () => {
     }
   }, [getAulaId(selectedAula), selectedDate]);
 
-  // Procesar datos de estudiantes y asistencias
-  const estudiantes =
-    estudiantesData?.estudiantes || estudiantesData?.data || [];
-  const asistenciasRegistradas =
-    asistenciasExistentes?.info?.data ||
-    asistenciasExistentes?.asistencias ||
-    asistenciasExistentes?.data ||
-    [];
+  // Procesar datos de estudiantes y asistencias - DEMO VERSION
+  const estudiantes = estudiantesData || [];
+  const asistenciasRegistradas = asistenciasExistentes || [];
   const tieneAsistenciasRegistradas = asistenciasRegistradas.length > 0;
 
   // DEBUG: Ver estructura de estudiantes

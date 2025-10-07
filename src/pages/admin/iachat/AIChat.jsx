@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   Send,
   Bot,
@@ -22,50 +22,71 @@ import {
   DollarSign,
   School,
   FileText,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      type: 'ai',
-      content: '👩‍💼 ¡Hola Directora! Soy tu **Asistente Educativo EDA** especializado en jardines infantiles.\n\n🎨 Estoy aquí para ayudarte con:\n• Desarrollo infantil y actividades lúdicas\n• Mejora continua de profesores\n• Comunicación efectiva con padres\n• Gestión de conflictos en el aula\n• Planes de mejora educativa\n• Salud y seguridad infantil\n• Organización de eventos especiales\n• Evaluación del desarrollo infantil\n\n🎯 **¿En qué puedo ayudarte hoy?** Como directora de kinder, sé que tienes muchos desafíos diarios. ¡Estoy aquí para apoyarte!',
-      timestamp: new Date(Date.now() - 60000)
-    }
+      type: "ai",
+      content:
+        "👩‍💼 ¡Hola Directora! Soy tu **Asistente Educativo EDA** especializado en jardines infantiles.\n\n🎨 Estoy aquí para ayudarte con:\n• Desarrollo infantil y actividades lúdicas\n• Mejora continua de profesores\n• Comunicación efectiva con padres\n• Gestión de conflictos en el aula\n• Planes de mejora educativa\n• Salud y seguridad infantil\n• Organización de eventos especiales\n• Evaluación del desarrollo infantil\n\n🎯 **¿En qué puedo ayudarte hoy?** Como directora de kinder, sé que tienes muchos desafíos diarios. ¡Estoy aquí para apoyarte!",
+      timestamp: new Date(Date.now() - 60000),
+    },
   ]);
 
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
-  const [apiStatus, setApiStatus] = useState('checking'); // 'checking', 'connected', 'error'
+  const [apiStatus, setApiStatus] = useState("checking"); // 'checking', 'connected', 'error'
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Función para generar respuestas demo de AI
   const getDemoAIResponse = (userMessage) => {
     const message = userMessage.toLowerCase();
-    
-    if (message.includes('profesor') || message.includes('maestr') || message.includes('docent')) {
+
+    if (
+      message.includes("profesor") ||
+      message.includes("maestr") ||
+      message.includes("docent")
+    ) {
       return `👩‍🏫 **Estrategias para Mejorar el Desempeño Docente**\n\n🎯 **Capacitación Continua:**\n• Talleres mensuales de metodologías lúdicas\n• Certificaciones en desarrollo infantil\n• Intercambio de experiencias entre maestros\n\n📊 **Evaluación y Feedback:**\n• Observaciones de clase estructuradas\n• Reuniones individuales semanales\n• Reconocimiento público de logros\n\n🌟 **Motivación y Bienestar:**\n• Programa de incentivos por desempeño\n• Espacios de relajación y descanso\n• Celebración de fechas especiales\n\n¿Te gustaría profundizar en alguna de estas estrategias?`;
     }
-    
-    if (message.includes('padre') || message.includes('familia') || message.includes('apoderado')) {
+
+    if (
+      message.includes("padre") ||
+      message.includes("familia") ||
+      message.includes("apoderado")
+    ) {
       return `👨‍👩‍👧‍👦 **Mejorando la Comunicación con Padres**\n\n💬 **Canales de Comunicación:**\n• App móvil para mensajes instantáneos\n• Reuniones virtuales mensuales\n• Boletines informativos semanales\n\n📱 **Herramientas Digitales:**\n• Fotos y videos del progreso diario\n• Reportes de actividades en tiempo real\n• Agenda digital de eventos\n\n🤝 **Participación Activa:**\n• Talleres para padres sobre desarrollo infantil\n• Actividades familiares en el jardín\n• Comités de padres colaboradores\n\n¿Qué aspecto te interesa implementar primero?`;
     }
-    
-    if (message.includes('actividad') || message.includes('juego') || message.includes('lúdic')) {
+
+    if (
+      message.includes("actividad") ||
+      message.includes("juego") ||
+      message.includes("lúdic")
+    ) {
       return `🎨 **Actividades Lúdicas para Desarrollo Integral**\n\n🧠 **Desarrollo Cognitivo:**\n• Juegos de memoria con colores y formas\n• Rompecabezas adaptados por edad\n• Cuentos interactivos con preguntas\n\n🤸‍♀️ **Desarrollo Motor:**\n• Circuitos de psicomotricidad\n• Bailes y canciones con movimientos\n• Actividades de arte manual\n\n💭 **Desarrollo Emocional:**\n• Teatro de emociones\n• Rincón de la calma\n• Juegos cooperativos\n\n🎯 **Para 3-5 años:** Todas adaptables por nivel de dificultad.\n\n¿Necesitas ideas específicas para algún grupo de edad?`;
     }
-    
-    if (message.includes('conflict') || message.includes('problema') || message.includes('disciplina')) {
+
+    if (
+      message.includes("conflict") ||
+      message.includes("problema") ||
+      message.includes("disciplina")
+    ) {
       return `🕊️ **Gestión de Conflictos en el Aula**\n\n🔍 **Prevención:**\n• Reglas claras y visuales\n• Rutinas estructuradas\n• Espacios bien organizados\n\n⚖️ **Resolución:**\n• Técnica del semáforo emocional\n• Tiempo de reflexión guiada\n• Mediación entre niños\n\n👥 **Trabajo en Equipo:**\n• Círculos de conversación\n• Actividades de empatía\n• Reconocimiento de comportamientos positivos\n\n📋 **Seguimiento:**\n• Registro de incidentes\n• Comunicación con padres\n• Planes de mejora individualizados\n\n¿Hay algún tipo de conflicto específico que quieres abordar?`;
     }
-    
-    if (message.includes('salud') || message.includes('seguridad') || message.includes('higiene')) {
+
+    if (
+      message.includes("salud") ||
+      message.includes("seguridad") ||
+      message.includes("higiene")
+    ) {
       return `🏥 **Salud y Seguridad Infantil**\n\n🧼 **Protocolos de Higiene:**\n• Lavado de manos cada 2 horas\n• Desinfección de juguetes diaria\n• Control de temperatura al ingreso\n\n🚨 **Medidas de Seguridad:**\n• Simulacros mensuales de evacuación\n• Botiquín completo y actualizado\n• Personal capacitado en primeros auxilios\n\n🍎 **Alimentación Saludable:**\n• Menús nutritivos balanceados\n• Control de alergias alimentarias\n• Educación sobre hábitos saludables\n\n📋 **Documentación:**\n• Fichas médicas actualizadas\n• Registro de incidentes\n• Comunicación inmediata con padres\n\n¿Necesitas ayuda con algún protocolo específico?`;
     }
-    
+
     // Respuesta genérica
     return `🤖 **¡Excelente pregunta!**\n\nComo tu asistente educativo especializado en jardines infantiles, estoy aquí para ayudarte con cualquier desafío administrativo o pedagógico.\n\n🎯 **Temas en los que puedo ayudarte:**\n• Gestión de personal docente\n• Comunicación con padres de familia\n• Actividades pedagógicas innovadoras\n• Resolución de conflictos\n• Planificación educativa\n• Salud y seguridad\n• Gestión financiera\n• Eventos y celebraciones\n\n💡 **Consejo:** Sé más específico en tu consulta para darte una respuesta más detallada y práctica.\n\n¿En qué área específica necesitas mi apoyo hoy?`;
   };
@@ -74,7 +95,7 @@ const AIChat = () => {
   useEffect(() => {
     const checkApiStatus = () => {
       // Siempre configurado en modo demo
-      setApiStatus('connected');
+      setApiStatus("connected");
     };
 
     checkApiStatus();
@@ -92,33 +113,39 @@ const AIChat = () => {
     {
       icon: Users,
       title: "Mejorar profesores",
-      prompt: "Como directora de kinder, ¿qué estrategias puedo implementar para mejorar el desempeño de mis profesores? Necesito ideas prácticas para capacitación, motivación y desarrollo profesional continuo."
+      prompt:
+        "Como directora de kinder, ¿qué estrategias puedo implementar para mejorar el desempeño de mis profesores? Necesito ideas prácticas para capacitación, motivación y desarrollo profesional continuo.",
     },
     {
       icon: Target,
       title: "Actividades lúdicas",
-      prompt: "Ayúdame a crear un plan mensual de actividades lúdicas para niños de 3-5 años. Quiero actividades que promuevan el desarrollo cognitivo, motor y social, adaptadas a cada edad."
+      prompt:
+        "Ayúdame a crear un plan mensual de actividades lúdicas para niños de 3-5 años. Quiero actividades que promuevan el desarrollo cognitivo, motor y social, adaptadas a cada edad.",
     },
     {
       icon: MessageSquare,
       title: "Comunicación con padres",
-      prompt: "Necesito estrategias efectivas para mejorar la comunicación con los padres de familia. ¿Cómo puedo crear un sistema de comunicación que mantenga informados a los padres sobre el progreso de sus hijos?"
+      prompt:
+        "Necesito estrategias efectivas para mejorar la comunicación con los padres de familia. ¿Cómo puedo crear un sistema de comunicación que mantenga informados a los padres sobre el progreso de sus hijos?",
     },
     {
       icon: BookOpen,
       title: "Desarrollo infantil",
-      prompt: "Como directora, ¿cómo puedo asegurar que nuestro currículo cubra todas las áreas del desarrollo infantil? Necesito un checklist de hitos importantes para cada edad y formas de evaluarlos."
+      prompt:
+        "Como directora, ¿cómo puedo asegurar que nuestro currículo cubra todas las áreas del desarrollo infantil? Necesito un checklist de hitos importantes para cada edad y formas de evaluarlos.",
     },
     {
       icon: Lightbulb,
       title: "Gestión de conflictos",
-      prompt: "Los conflictos entre niños son comunes en el kinder. ¿Qué técnicas de resolución de conflictos puedo enseñar a mis profesores para manejar situaciones difíciles en el aula?"
+      prompt:
+        "Los conflictos entre niños son comunes en el kinder. ¿Qué técnicas de resolución de conflictos puedo enseñar a mis profesores para manejar situaciones difíciles en el aula?",
     },
     {
       icon: Calendar,
       title: "Eventos especiales",
-      prompt: "Estoy planeando el festival de fin de año. ¿Qué ideas tienes para actividades divertidas, seguras y educativas que involucren a toda la comunidad educativa?"
-    }
+      prompt:
+        "Estoy planeando el festival de fin de año. ¿Qué ideas tienes para actividades divertidas, seguras y educativas que involucren a toda la comunidad educativa?",
+    },
   ];
 
   const simulateAIResponse = async (userMessage) => {
@@ -134,32 +161,31 @@ const AIChat = () => {
       // Agregar respuesta a los mensajes
       const newAiMessage = {
         id: Date.now(),
-        type: 'ai',
+        type: "ai",
         content: aiResponse,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, newAiMessage]);
+      setMessages((prev) => [...prev, newAiMessage]);
 
       // Actualizar historial de conversación
-      setConversationHistory(prev => [
+      setConversationHistory((prev) => [
         ...prev,
-        { role: 'user', content: userMessage },
-        { role: 'assistant', content: aiResponse }
+        { role: "user", content: userMessage },
+        { role: "assistant", content: aiResponse },
       ]);
-
     } catch (error) {
-      console.error('Error getting AI response:', error);
+      console.error("Error getting AI response:", error);
 
       // Mensaje de error amigable
       const errorMessage = {
         id: Date.now(),
-        type: 'ai',
+        type: "ai",
         content: `❌ **Disculpa, hay un problema temporal**\n\nNo pude procesar tu consulta en este momento. Esto puede deberse a:\n\n🔧 Configuración de API pendiente\n🌐 Problemas de conectividad\n⚡ Límites de uso alcanzados\n\n💡 **Mientras tanto:**\n• Usa las consultas frecuentes\n• Intenta reformular tu pregunta\n• Contacta al soporte técnico\n\n¿Te gustaría intentar con una pregunta más específica?`,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     }
 
     setIsTyping(false);
@@ -171,13 +197,13 @@ const AIChat = () => {
     // Agregar mensaje del usuario
     const userMessage = {
       id: Date.now(),
-      type: 'user',
+      type: "user",
       content: messageContent,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setNewMessage('');
+    setMessages((prev) => [...prev, userMessage]);
+    setNewMessage("");
 
     // Obtener respuesta de IA
     await simulateAIResponse(messageContent);
@@ -191,18 +217,19 @@ const AIChat = () => {
     setMessages([
       {
         id: 1,
-        type: 'ai',
-        content: '🔄 **Conversación reiniciada**\n\n👩‍💼 ¡Hola de nuevo Directora! Soy tu **Asistente Educativo EDA**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?',
-        timestamp: new Date()
-      }
+        type: "ai",
+        content:
+          "🔄 **Conversación reiniciada**\n\n👩‍💼 ¡Hola de nuevo Directora! Soy tu **Asistente Educativo EDA**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?",
+        timestamp: new Date(),
+      },
     ]);
     setConversationHistory([]);
   };
 
   const formatTime = (date) => {
-    return date.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -211,7 +238,11 @@ const AIChat = () => {
   };
 
   return (
-    <div className={`flex flex-col ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : 'h-full'}`}>
+    <div
+      className={`flex flex-col ${
+        isFullscreen ? "fixed inset-0 z-50 bg-white" : "h-full"
+      }`}
+    >
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-3 md:p-4">
         <div className="flex items-center justify-between">
@@ -222,23 +253,31 @@ const AIChat = () => {
             <div className="min-w-0 flex-1">
               <h1 className="text-base md:text-lg font-semibold text-gray-900 flex items-center space-x-2 truncate">
                 <span>Asistente Educativo Kinder</span>
-                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full hidden sm:inline">ChatGPT</span>
+                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full hidden sm:inline">
+                  ChatGPT
+                </span>
               </h1>
               <div className="flex items-center space-x-2">
-                {apiStatus === 'connected' && (
+                {apiStatus === "connected" && (
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="w-3 h-3 text-green-500" />
-                    <span className="text-xs md:text-sm text-green-600 truncate">En línea • Listo para ayudar</span>
+                    <span className="text-xs md:text-sm text-green-600 truncate">
+                      En línea • Listo para ayudar
+                    </span>
                   </div>
                 )}
-                {apiStatus === 'error' && (
+                {apiStatus === "error" && (
                   <div className="flex items-center space-x-1">
                     <AlertCircle className="w-3 h-3 text-orange-500" />
-                    <span className="text-xs md:text-sm text-orange-600">Configuración pendiente</span>
+                    <span className="text-xs md:text-sm text-orange-600">
+                      Configuración pendiente
+                    </span>
                   </div>
                 )}
-                {apiStatus === 'checking' && (
-                  <span className="text-xs md:text-sm text-gray-500">Verificando conexión...</span>
+                {apiStatus === "checking" && (
+                  <span className="text-xs md:text-sm text-gray-500">
+                    Verificando conexión...
+                  </span>
                 )}
               </div>
             </div>
@@ -248,9 +287,17 @@ const AIChat = () => {
             <button
               onClick={toggleFullscreen}
               className="p-1.5 md:p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-              title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+              title={
+                isFullscreen
+                  ? "Salir de pantalla completa"
+                  : "Pantalla completa"
+              }
             >
-              {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+              {isFullscreen ? (
+                <Minimize className="w-4 h-4" />
+              ) : (
+                <Maximize className="w-4 h-4" />
+              )}
             </button>
             <button
               onClick={clearConversation}
@@ -269,7 +316,9 @@ const AIChat = () => {
       {/* Quick Prompts */}
       {false && (
         <div className="bg-gray-50 p-4 border-b border-gray-200">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Consultas Frecuentes:</h3>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">
+            Consultas Frecuentes:
+          </h3>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
             {quickPrompts.map((prompt, index) => {
               const IconComponent = prompt.icon;
@@ -293,16 +342,26 @@ const AIChat = () => {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${
+              message.type === "user" ? "justify-end" : "justify-start"
+            }`}
           >
-            <div className={`flex space-x-2 md:space-x-3 max-w-[85%] md:max-w-3xl ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+            <div
+              className={`flex space-x-2 md:space-x-3 max-w-[85%] md:max-w-3xl ${
+                message.type === "user"
+                  ? "flex-row-reverse space-x-reverse"
+                  : ""
+              }`}
+            >
               {/* Avatar */}
-              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                message.type === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-              }`}>
-                {message.type === 'user' ? (
+              <div
+                className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  message.type === "user"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                }`}
+              >
+                {message.type === "user" ? (
                   <User className="w-3 h-3 md:w-4 md:h-4" />
                 ) : (
                   <Bot className="w-3 h-3 md:w-4 md:h-4" />
@@ -310,23 +369,28 @@ const AIChat = () => {
               </div>
 
               {/* Message Bubble */}
-              <div className={`rounded-2xl p-3 md:p-4 ${
-                message.type === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-200 text-gray-900'
-              }`}>
+              <div
+                className={`rounded-2xl p-3 md:p-4 ${
+                  message.type === "user"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white border border-gray-200 text-gray-900"
+                }`}
+              >
                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
                   {/* Render basic markdown formatting */}
-                  {message.content.split('\n').map((line, index) => {
+                  {message.content.split("\n").map((line, index) => {
                     // Handle bold text **text**
-                    if (line.includes('**')) {
+                    if (line.includes("**")) {
                       const parts = line.split(/(\*\*.*?\*\*)/g);
                       return (
-                        <div key={index} className={index > 0 ? 'mt-2' : ''}>
+                        <div key={index} className={index > 0 ? "mt-2" : ""}>
                           {parts.map((part, partIndex) => {
-                            if (part.startsWith('**') && part.endsWith('**')) {
+                            if (part.startsWith("**") && part.endsWith("**")) {
                               return (
-                                <strong key={partIndex} className="font-semibold">
+                                <strong
+                                  key={partIndex}
+                                  className="font-semibold"
+                                >
                                   {part.slice(2, -2)}
                                 </strong>
                               );
@@ -337,7 +401,7 @@ const AIChat = () => {
                       );
                     }
                     // Handle bullet points
-                    if (line.startsWith('•') || line.startsWith('-')) {
+                    if (line.startsWith("•") || line.startsWith("-")) {
                       return (
                         <div key={index} className="ml-2 mt-1">
                           {line}
@@ -354,15 +418,17 @@ const AIChat = () => {
                     }
                     // Regular lines
                     return (
-                      <div key={index} className={index > 0 ? 'mt-2' : ''}>
-                        {line || '\u00A0'}
+                      <div key={index} className={index > 0 ? "mt-2" : ""}>
+                        {line || "\u00A0"}
                       </div>
                     );
                   })}
                 </div>
-                <div className={`text-xs mt-2 ${
-                  message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
-                }`}>
+                <div
+                  className={`text-xs mt-2 ${
+                    message.type === "user" ? "text-blue-100" : "text-gray-400"
+                  }`}
+                >
                   {formatTime(message.timestamp)}
                 </div>
               </div>
@@ -380,8 +446,14 @@ const AIChat = () => {
               <div className="bg-white border border-gray-200 rounded-2xl p-3 md:p-4">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -400,7 +472,7 @@ const AIChat = () => {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage();
                   }
@@ -408,7 +480,7 @@ const AIChat = () => {
                 placeholder="Pregúntame sobre educación infantil, profesores, actividades..."
                 className="w-full p-3 pr-12 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 max-h-32 text-sm md:text-base"
                 rows="1"
-                style={{ minHeight: '44px' }}
+                style={{ minHeight: "44px" }}
               />
             </div>
           </div>
@@ -418,8 +490,8 @@ const AIChat = () => {
             disabled={!newMessage.trim() || isTyping}
             className={`p-3 rounded-lg transition-colors flex-shrink-0 ${
               newMessage.trim() && !isTyping
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
             <Send className="w-4 h-4 md:w-5 md:h-5" />
@@ -427,17 +499,19 @@ const AIChat = () => {
         </div>
 
         <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-          <span className="hidden sm:inline">Presiona Enter para enviar, Shift+Enter para nueva línea</span>
+          <span className="hidden sm:inline">
+            Presiona Enter para enviar, Shift+Enter para nueva línea
+          </span>
           <span className="sm:hidden">Enter para enviar</span>
           <div className="flex items-center space-x-2">
-            {apiStatus === 'connected' && (
+            {apiStatus === "connected" && (
               <span className="flex items-center space-x-1 text-green-600">
                 <CheckCircle className="w-3 h-3" />
                 <span className="hidden sm:inline">ChatGPT Conectado</span>
                 <span className="sm:hidden">Conectado</span>
               </span>
             )}
-            {apiStatus === 'error' && (
+            {apiStatus === "error" && (
               <span className="flex items-center space-x-1 text-orange-600">
                 <AlertCircle className="w-3 h-3" />
                 <span className="hidden sm:inline">API no configurada</span>

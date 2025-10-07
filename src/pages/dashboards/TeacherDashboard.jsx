@@ -241,10 +241,10 @@ const TeacherDashboard = () => {
 
     try {
       // Demo: Solo verificar que las contraseñas coincidan
-      console.log('🎭 [DEMO] Cambiando contraseña sin backend...');
-      
+      console.log("🎭 [DEMO] Cambiando contraseña sin backend...");
+
       // Simular delay mínimo
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Actualizar el estado del usuario para indicar que ya cambió la contraseña
       updateUser({ ...user, cambioContrasena: true });

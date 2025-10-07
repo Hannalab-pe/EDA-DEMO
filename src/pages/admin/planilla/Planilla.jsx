@@ -1,6 +1,6 @@
 // src/pages/admin/planilla/Planilla.jsx
-import React, { useState, useMemo, useEffect } from 'react';
-import { useAuthStore } from '../../../store';
+import React, { useState, useMemo, useEffect } from "react";
+import { useAuthStore } from "../../../store";
 import {
   Users,
   Search,
@@ -13,9 +13,9 @@ import {
   Plus,
   CheckSquare,
   Square,
-  Send
-} from 'lucide-react';
-import { toast } from 'sonner';
+  Send,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const Planilla = () => {
   // Obtener fecha actual para valores por defecto
@@ -26,8 +26,8 @@ const Planilla = () => {
   // Estados para filtros
   const [selectedMes, setSelectedMes] = useState(currentMonth.toString());
   const [selectedAnio, setSelectedAnio] = useState(currentYear.toString());
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Estados para selección de trabajadores
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTrabajadores, setSelectedTrabajadores] = useState([]);
@@ -48,10 +48,10 @@ const Planilla = () => {
   const loadTrabajadoresDemo = async () => {
     try {
       setLoading(true);
-      
+
       // Simular carga de datos
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const trabajadoresDemo = [
         {
           idTrabajador: 1,
@@ -59,10 +59,10 @@ const Planilla = () => {
           apellido: "García López",
           tipoContrato: "PLANILLA",
           cargo: "Directora",
-          sueldo: 3500.00,
+          sueldo: 3500.0,
           estado: "ACTIVO",
           planillaGenerada: false,
-          fechaIngreso: "2024-01-15"
+          fechaIngreso: "2024-01-15",
         },
         {
           idTrabajador: 2,
@@ -70,10 +70,10 @@ const Planilla = () => {
           apellido: "Mendoza Silva",
           tipoContrato: "PLANILLA",
           cargo: "Profesora Principal",
-          sueldo: 2800.00,
+          sueldo: 2800.0,
           estado: "ACTIVO",
           planillaGenerada: false,
-          fechaIngreso: "2024-02-01"
+          fechaIngreso: "2024-02-01",
         },
         {
           idTrabajador: 3,
@@ -81,17 +81,17 @@ const Planilla = () => {
           apellido: "Ruiz Torres",
           tipoContrato: "PLANILLA",
           cargo: "Profesor de Educación Física",
-          sueldo: 2500.00,
+          sueldo: 2500.0,
           estado: "ACTIVO",
           planillaGenerada: true,
-          fechaIngreso: "2024-01-20"
-        }
+          fechaIngreso: "2024-01-20",
+        },
       ];
-      
+
       setTrabajadores(trabajadoresDemo);
       setError(null);
     } catch (error) {
-      console.error('Error loading trabajadores demo:', error);
+      console.error("Error loading trabajadores demo:", error);
       setError(error);
     } finally {
       setLoading(false);
@@ -102,16 +102,18 @@ const Planilla = () => {
   useEffect(() => {
     loadTrabajadoresDemo();
   }, [selectedMes, selectedAnio]);
-  }, [selectedMes, selectedAnio]);
 
   // Filtrar trabajadores por búsqueda local
   const filteredTrabajadores = useMemo(() => {
     if (!searchTerm) return trabajadores;
-    return trabajadores.filter(trabajador =>
-      trabajador.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trabajador.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trabajador.nroDocumento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trabajador.correo?.toLowerCase().includes(searchTerm.toLowerCase())
+    return trabajadores.filter(
+      (trabajador) =>
+        trabajador.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trabajador.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trabajador.nroDocumento
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        trabajador.correo?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [trabajadores, searchTerm]);
 
@@ -119,16 +121,16 @@ const Planilla = () => {
   const handleRefresh = async () => {
     try {
       await refetch();
-      toast.success('Datos actualizados correctamente');
+      toast.success("Datos actualizados correctamente");
     } catch (error) {
-      toast.error('Error al actualizar los datos');
+      toast.error("Error al actualizar los datos");
     }
   };
 
   // Función para cambiar período
   const handlePeriodoChange = async () => {
     if (!selectedMes || !selectedAnio) {
-      toast.error('Debe seleccionar mes y año');
+      toast.error("Debe seleccionar mes y año");
       return;
     }
     await refetch();
@@ -148,10 +150,12 @@ const Planilla = () => {
 
   // Función para seleccionar/deseleccionar trabajador
   const handleToggleTrabajador = (trabajador) => {
-    setSelectedTrabajadores(prev => {
-      const isSelected = prev.some(t => t.idTrabajador === trabajador.idTrabajador);
+    setSelectedTrabajadores((prev) => {
+      const isSelected = prev.some(
+        (t) => t.idTrabajador === trabajador.idTrabajador
+      );
       if (isSelected) {
-        return prev.filter(t => t.idTrabajador !== trabajador.idTrabajador);
+        return prev.filter((t) => t.idTrabajador !== trabajador.idTrabajador);
       } else {
         return [...prev, trabajador];
       }
@@ -170,100 +174,123 @@ const Planilla = () => {
   // Función para crear planilla con trabajadores seleccionados
   const handleCreatePlanilla = async () => {
     if (selectedTrabajadores.length === 0) {
-      toast.error('Debe seleccionar al menos un trabajador');
+      toast.error("Debe seleccionar al menos un trabajador");
       return;
     }
 
     // Obtener entidadId - primero del store, luego del localStorage
-    console.log('🔍 Verificando información del usuario...');
-    console.log('📋 user del store:', user);
-    
+    console.log("🔍 Verificando información del usuario...");
+    console.log("📋 user del store:", user);
+
     let entidadId = user?.entidadId;
-    
-    if (!entidadId) {
-      console.log('⚠️ No se encontró entidadId en el store, intentando localStorage...');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log('📋 userData del localStorage:', userData);
-      entidadId = userData?.entidadId;
-    }
-    
-    console.log('🆔 entidadId final:', entidadId);
 
     if (!entidadId) {
-      console.error('❌ No se pudo encontrar entidadId ni en store ni en localStorage');
-      console.log('🔍 Store user keys:', user ? Object.keys(user) : 'user is null');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log('🔍 localStorage user keys:', Object.keys(userData));
-      toast.error('No se pudo obtener la información del usuario');
+      console.log(
+        "⚠️ No se encontró entidadId en el store, intentando localStorage..."
+      );
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      console.log("📋 userData del localStorage:", userData);
+      entidadId = userData?.entidadId;
+    }
+
+    console.log("🆔 entidadId final:", entidadId);
+
+    if (!entidadId) {
+      console.error(
+        "❌ No se pudo encontrar entidadId ni en store ni en localStorage"
+      );
+      console.log(
+        "🔍 Store user keys:",
+        user ? Object.keys(user) : "user is null"
+      );
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      console.log("🔍 localStorage user keys:", Object.keys(userData));
+      toast.error("No se pudo obtener la información del usuario");
       return;
     }
 
     // Calcular fecha de pago programada (último día del mes)
     // JavaScript usa meses 0-11, así que restamos 1 al mes seleccionado
-    const fechaPagoProgramada = new Date(parseInt(selectedAnio), parseInt(selectedMes) - 1, 0);
-    const fechaPagoString = fechaPagoProgramada.toISOString().split('T')[0];
-    
-    console.log('📅 Fecha de pago calculada:', {
+    const fechaPagoProgramada = new Date(
+      parseInt(selectedAnio),
+      parseInt(selectedMes) - 1,
+      0
+    );
+    const fechaPagoString = fechaPagoProgramada.toISOString().split("T")[0];
+
+    console.log("📅 Fecha de pago calculada:", {
       selectedMes,
       selectedAnio,
       mesJS: parseInt(selectedMes) - 1,
       fechaPagoProgramada,
-      fechaPagoString
+      fechaPagoString,
     });
 
     const payload = {
       mes: parseInt(selectedMes),
       anio: parseInt(selectedAnio),
       fechaPagoProgramada: fechaPagoString,
-      trabajadores: selectedTrabajadores.map(t => t.idTrabajador),
-      generadoPor: entidadId
+      trabajadores: selectedTrabajadores.map((t) => t.idTrabajador),
+      generadoPor: entidadId,
     };
 
     // Validar que tenemos todos los datos necesarios
     if (!entidadId) {
-      console.error('❌ No se pudo obtener entidadId para crear la planilla');
-      toast.error('No se pudo obtener la información del usuario. Por favor, recarga la página e intenta nuevamente.');
+      console.error("❌ No se pudo obtener entidadId para crear la planilla");
+      toast.error(
+        "No se pudo obtener la información del usuario. Por favor, recarga la página e intenta nuevamente."
+      );
       return;
     }
 
     if (selectedTrabajadores.length === 0) {
-      console.error('❌ No hay trabajadores seleccionados');
-      toast.error('Debe seleccionar al menos un trabajador para crear la planilla');
+      console.error("❌ No hay trabajadores seleccionados");
+      toast.error(
+        "Debe seleccionar al menos un trabajador para crear la planilla"
+      );
       return;
     }
 
-    console.log('📤 Enviando payload a crear planilla:', payload);
-    console.log('👥 Detalles de trabajadores seleccionados:', {
+    console.log("📤 Enviando payload a crear planilla:", payload);
+    console.log("👥 Detalles de trabajadores seleccionados:", {
       cantidad: selectedTrabajadores.length,
-      trabajadores: selectedTrabajadores.map(t => ({ idTrabajador: t.idTrabajador, nombre: t.nombre, apellido: t.apellido }))
+      trabajadores: selectedTrabajadores.map((t) => ({
+        idTrabajador: t.idTrabajador,
+        nombre: t.nombre,
+        apellido: t.apellido,
+      })),
     });
-    console.log('🆔 entidadId usado:', entidadId);
+    console.log("🆔 entidadId usado:", entidadId);
 
     setIsCreatingPlanilla(true);
     try {
       // Simular creación exitosa de planilla
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('✅ Planilla creada exitosamente (demo)');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      toast.success(`Planilla creada exitosamente con ${selectedTrabajadores.length} trabajadores`);
-      
+      console.log("✅ Planilla creada exitosamente (demo)");
+
+      toast.success(
+        `Planilla creada exitosamente con ${selectedTrabajadores.length} trabajadores`
+      );
+
       // Marcar trabajadores como planilla generada
-      setTrabajadores(prev => prev.map(t => 
-        selectedTrabajadores.some(st => st.idTrabajador === t.idTrabajador) 
-          ? { ...t, planillaGenerada: true }
-          : t
-      ));
-      
+      setTrabajadores((prev) =>
+        prev.map((t) =>
+          selectedTrabajadores.some((st) => st.idTrabajador === t.idTrabajador)
+            ? { ...t, planillaGenerada: true }
+            : t
+        )
+      );
+
       // Limpiar selección y salir del modo selección
       setIsSelectionMode(false);
       setSelectedTrabajadores([]);
-      
+
       // Refrescar datos
       await refetch();
     } catch (error) {
-      console.error('❌ Error al crear planilla:', error);
-      toast.error('Error al crear la planilla. Intenta nuevamente.');
+      console.error("❌ Error al crear planilla:", error);
+      toast.error("Error al crear la planilla. Intenta nuevamente.");
     } finally {
       setIsCreatingPlanilla(false);
     }
@@ -294,7 +321,7 @@ const Planilla = () => {
             Error al cargar los datos
           </h3>
           <p className="text-gray-600 mb-4">
-            {error.message || 'Ha ocurrido un error inesperado'}
+            {error.message || "Ha ocurrido un error inesperado"}
           </p>
           <button
             onClick={handleRefresh}
@@ -312,7 +339,9 @@ const Planilla = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Planillas</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Gestión de Planillas
+          </h1>
           <p className="text-gray-600 mt-1">
             Trabajadores con contrato de planilla - {selectedMes}/{selectedAnio}
           </p>
@@ -334,7 +363,9 @@ const Planilla = () => {
                 disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                />
                 Actualizar
               </button>
             </>
@@ -364,7 +395,9 @@ const Planilla = () => {
               </button>
               <button
                 onClick={handleCreatePlanilla}
-                disabled={selectedTrabajadores.length === 0 || isCreatingPlanilla}
+                disabled={
+                  selectedTrabajadores.length === 0 || isCreatingPlanilla
+                }
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 {isCreatingPlanilla ? (
@@ -389,8 +422,12 @@ const Planilla = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Trabajadores</p>
-              <p className="text-2xl font-bold text-gray-900">{trabajadores.length}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Total Trabajadores
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {trabajadores.length}
+              </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
               <Users className="w-6 h-6 text-blue-600" />
@@ -405,8 +442,12 @@ const Planilla = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Período Actual</p>
-              <p className="text-2xl font-bold text-gray-900">{selectedMes}/{selectedAnio}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Período Actual
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {selectedMes}/{selectedAnio}
+              </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
               <Calendar className="w-6 h-6 text-green-600" />
@@ -421,9 +462,11 @@ const Planilla = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Estado del Sistema</p>
+              <p className="text-sm font-medium text-gray-600">
+                Estado del Sistema
+              </p>
               <p className="text-2xl font-bold text-gray-900">
-                {loading ? 'Cargando...' : 'Activo'}
+                {loading ? "Cargando..." : "Activo"}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -507,13 +550,14 @@ const Planilla = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                {isSelectionMode ? 'Seleccionar Trabajadores para Planilla' : 'Trabajadores con Contrato Planilla'}
+                {isSelectionMode
+                  ? "Seleccionar Trabajadores para Planilla"
+                  : "Trabajadores con Contrato Planilla"}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                {isSelectionMode 
+                {isSelectionMode
                   ? `${selectedTrabajadores.length} de ${filteredTrabajadores.length} trabajadores seleccionados`
-                  : `${filteredTrabajadores.length} trabajadores encontrados`
-                }
+                  : `${filteredTrabajadores.length} trabajadores encontrados`}
               </p>
             </div>
           </div>
@@ -523,7 +567,9 @@ const Planilla = () => {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">Cargando trabajadores...</span>
+              <span className="ml-2 text-gray-600">
+                Cargando trabajadores...
+              </span>
             </div>
           ) : filteredTrabajadores.length === 0 ? (
             <div className="text-center py-12">
@@ -532,7 +578,8 @@ const Planilla = () => {
                 No hay trabajadores con contrato planilla
               </h3>
               <p className="text-gray-600">
-                No se encontraron trabajadores para el período {selectedMes}/{selectedAnio}
+                No se encontraron trabajadores para el período {selectedMes}/
+                {selectedAnio}
               </p>
             </div>
           ) : (
@@ -567,13 +614,18 @@ const Planilla = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredTrabajadores.map((trabajador) => (
-                    <tr key={trabajador.idTrabajador} className="hover:bg-gray-50">
+                    <tr
+                      key={trabajador.idTrabajador}
+                      className="hover:bg-gray-50"
+                    >
                       {/* Checkbox de selección */}
                       {isSelectionMode && (
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
                             type="checkbox"
-                            checked={selectedTrabajadores.some(t => t.idTrabajador === trabajador.idTrabajador)}
+                            checked={selectedTrabajadores.some(
+                              (t) => t.idTrabajador === trabajador.idTrabajador
+                            )}
                             onChange={() => handleToggleTrabajador(trabajador)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
@@ -585,7 +637,8 @@ const Planilla = () => {
                           <div className="flex-shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                               <span className="text-sm font-medium text-gray-700">
-                                {trabajador.nombre?.charAt(0)}{trabajador.apellido?.charAt(0)}
+                                {trabajador.nombre?.charAt(0)}
+                                {trabajador.apellido?.charAt(0)}
                               </span>
                             </div>
                           </div>
@@ -620,31 +673,38 @@ const Planilla = () => {
                       {/* Contrato */}
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {trabajador.contratoTrabajadors3?.[0]?.numeroContrato || 'Sin contrato'}
+                          {trabajador.contratoTrabajadors3?.[0]
+                            ?.numeroContrato || "Sin contrato"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {trabajador.contratoTrabajadors3?.[0]?.cargoContrato || ''}
+                          {trabajador.contratoTrabajadors3?.[0]
+                            ?.cargoContrato || ""}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {trabajador.contratoTrabajadors3?.[0]?.lugarTrabajo || ''}
+                          {trabajador.contratoTrabajadors3?.[0]?.lugarTrabajo ||
+                            ""}
                         </div>
                       </td>
 
                       {/* Sueldo */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          S/ {trabajador.contratoTrabajadors3?.[0]?.sueldoContratado || '0.00'}
+                          S/{" "}
+                          {trabajador.contratoTrabajadors3?.[0]
+                            ?.sueldoContratado || "0.00"}
                         </div>
                       </td>
 
                       {/* Estado */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          trabajador.estaActivo
-                            ? 'text-green-700 bg-green-100'
-                            : 'text-red-700 bg-red-100'
-                        }`}>
-                          {trabajador.estaActivo ? 'Activo' : 'Inactivo'}
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            trabajador.estaActivo
+                              ? "text-green-700 bg-green-100"
+                              : "text-red-700 bg-red-100"
+                          }`}
+                        >
+                          {trabajador.estaActivo ? "Activo" : "Inactivo"}
                         </span>
                       </td>
                     </tr>

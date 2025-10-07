@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { 
-  X, 
-  Users, 
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import {
+  X,
+  Users,
   User,
   Phone,
   Mail,
@@ -13,35 +13,33 @@ import {
   Search,
   BookOpen,
   MapPin,
-  Hash
-} from 'lucide-react';
-import { toast } from 'sonner';
-import aulaService from '../../../../services/aulaService';
+  Hash,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
   const [estudiantes, setEstudiantes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Debug: Log del objeto aula cuando cambie
   useEffect(() => {
     if (aula) {
-      console.log('🏫 Objeto aula recibido:', aula);
-      console.log('🆔 Propiedades del aula:', Object.keys(aula));
+      console.log("🏫 Objeto aula recibido:", aula);
+      console.log("🆔 Propiedades del aula:", Object.keys(aula));
     }
   }, [aula]);
 
   // Cargar estudiantes cuando se abre el modal
   useEffect(() => {
-    
-    if (isOpen && aula?.id_aula) {
+    if (isOpen && aula?.id) {
       cargarEstudiantes();
     } else if (!isOpen) {
       // Limpiar datos cuando se cierra el modal
       setEstudiantes([]);
       setError(null);
-      setSearchTerm('');
+      setSearchTerm("");
       setLoading(false);
     } else {
     }
@@ -50,25 +48,28 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
   const cargarEstudiantes = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      console.log('🔍 Cargando estudiantes para aula:', aula.id_aula);
-      
-      const response = await aulaService.obtenerEstudiantesPorAula(aula.id_aula);
-      
-      console.log('✅ Respuesta de estudiantes:', response);
-      
-      if (response.success && response.estudiantes) {
-        setEstudiantes(response.estudiantes);
+      console.log("🔍 Cargando estudiantes para aula (DEMO):", aula.id);
+
+      // Generar datos demo de estudiantes para el aula
+      const { mockData } = await import("../../../../data/mockData.js");
+      const estudiantesDelAula = mockData.estudiantes.filter(
+        (estudiante) => estudiante.aulaId === aula.id
+      );
+
+      console.log("✅ Estudiantes del aula (DEMO):", estudiantesDelAula);
+
+      if (estudiantesDelAula.length > 0) {
+        setEstudiantes(estudiantesDelAula);
       } else {
         setEstudiantes([]);
-        toast.info('No hay estudiantes en esta aula');
+        toast.info("No hay estudiantes en esta aula");
       }
-      
     } catch (err) {
-      console.error('❌ Error al cargar estudiantes:', err);
-      setError(err.message || 'Error al cargar los estudiantes');
-      toast.error('Error al cargar los estudiantes del aula');
+      console.error("❌ Error al cargar estudiantes:", err);
+      setError(err.message || "Error al cargar los estudiantes");
+      toast.error("Error al cargar los estudiantes del aula");
     } finally {
       setLoading(false);
     }
@@ -78,15 +79,15 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
     // Limpiar inmediatamente para evitar que se vea contenido mientras se cierra
     setEstudiantes([]);
     setError(null);
-    setSearchTerm('');
+    setSearchTerm("");
     setLoading(false);
     onClose();
   };
 
   // Filtrar estudiantes por término de búsqueda
-  const estudiantesFiltrados = estudiantes.filter(estudiante => {
+  const estudiantesFiltrados = estudiantes.filter((estudiante) => {
     if (!searchTerm) return true;
-    
+
     const term = searchTerm.toLowerCase();
     return (
       estudiante.nombre?.toLowerCase().includes(term) ||
@@ -97,11 +98,11 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
   });
 
   const formatFecha = (fecha) => {
-    if (!fecha) return 'No especificada';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    if (!fecha) return "No especificada";
+    return new Date(fecha).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -144,12 +145,16 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                       <div className="flex flex-wrap items-center gap-4 text-blue-100">
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4" />
-                          <span>{aula.cantidadEstudiantes || 0} estudiantes</span>
+                          <span>
+                            {aula.cantidadEstudiantes || 0} estudiantes
+                          </span>
                         </div>
                         {aula.capacidadMaxima && (
                           <div className="flex items-center space-x-2">
                             <AlertCircle className="w-4 h-4" />
-                            <span>Capacidad máxima: {aula.capacidadMaxima}</span>
+                            <span>
+                              Capacidad máxima: {aula.capacidadMaxima}
+                            </span>
                           </div>
                         )}
                         {aula.ubicacion && (
@@ -174,13 +179,19 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando estudiantes...</h3>
-                      <p className="text-gray-600">Obteniendo la lista de estudiantes del aula</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Cargando estudiantes...
+                      </h3>
+                      <p className="text-gray-600">
+                        Obteniendo la lista de estudiantes del aula
+                      </p>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar estudiantes</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Error al cargar estudiantes
+                      </h3>
                       <p className="text-gray-600 text-center mb-4">{error}</p>
                       <button
                         onClick={cargarEstudiantes}
@@ -196,11 +207,15 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                           <div className="flex items-center space-x-4">
                             <div className="bg-blue-50 rounded-lg px-4 py-2">
-                              <span className="text-blue-800 font-semibold">{estudiantes.length}</span>
-                              <span className="text-blue-600 text-sm ml-1">estudiantes</span>
+                              <span className="text-blue-800 font-semibold">
+                                {estudiantes.length}
+                              </span>
+                              <span className="text-blue-600 text-sm ml-1">
+                                estudiantes
+                              </span>
                             </div>
                           </div>
-                          
+
                           {/* Búsqueda */}
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -220,31 +235,36 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                         <div className="text-center py-12">
                           <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                           <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            {searchTerm ? 'No se encontraron estudiantes' : 'No hay estudiantes en esta aula'}
+                            {searchTerm
+                              ? "No se encontraron estudiantes"
+                              : "No hay estudiantes en esta aula"}
                           </h3>
                           <p className="text-gray-500">
-                            {searchTerm 
-                              ? 'Intenta con otros términos de búsqueda'
-                              : 'Esta aula aún no tiene estudiantes asignados'
-                            }
+                            {searchTerm
+                              ? "Intenta con otros términos de búsqueda"
+                              : "Esta aula aún no tiene estudiantes asignados"}
                           </p>
                         </div>
                       ) : (
                         <div className="grid gap-4 max-h-96 overflow-y-auto">
                           {estudiantesFiltrados.map((estudiante, index) => (
-                            <div key={estudiante.idEstudiante || index} className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div
+                              key={estudiante.idEstudiante || index}
+                              className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                            >
                               <div className="flex items-center space-x-4">
                                 {/* Avatar */}
                                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                                   {estudiante.imagen_estudiante ? (
-                                    <img 
-                                      src={estudiante.imagen_estudiante} 
+                                    <img
+                                      src={estudiante.imagen_estudiante}
                                       alt={`${estudiante.nombre} ${estudiante.apellido}`}
                                       className="w-12 h-12 rounded-full object-cover"
                                     />
                                   ) : (
                                     <span className="text-blue-600 font-semibold text-sm">
-                                      {estudiante.nombre?.charAt(0)}{estudiante.apellido?.charAt(0)}
+                                      {estudiante.nombre?.charAt(0)}
+                                      {estudiante.apellido?.charAt(0)}
                                     </span>
                                   )}
                                 </div>
@@ -254,18 +274,23 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                       <h4 className="font-medium text-gray-900 truncate">
-                                        {estudiante.nombre} {estudiante.apellido}
+                                        {estudiante.nombre}{" "}
+                                        {estudiante.apellido}
                                       </h4>
                                       <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-600">
                                         {estudiante.nroDocumento && (
                                           <div className="flex items-center space-x-1">
                                             <Hash className="w-3 h-3" />
-                                            <span>{estudiante.tipoDocumento || 'DNI'}: {estudiante.nroDocumento}</span>
+                                            <span>
+                                              {estudiante.tipoDocumento ||
+                                                "DNI"}
+                                              : {estudiante.nroDocumento}
+                                            </span>
                                           </div>
                                         )}
                                       </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                                       <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                                         #{index + 1}
@@ -277,7 +302,8 @@ const EstudiantesAulaModal = ({ isOpen, onClose, aula }) => {
                                   {estudiante.observaciones && (
                                     <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
                                       <p className="text-yellow-800">
-                                        <strong>Observaciones:</strong> {estudiante.observaciones}
+                                        <strong>Observaciones:</strong>{" "}
+                                        {estudiante.observaciones}
                                       </p>
                                     </div>
                                   )}

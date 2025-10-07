@@ -1,36 +1,37 @@
-import React, { useState } from 'react';
-import { X, Shield, Save, Loader2 } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { X, Shield, Save, Loader2 } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
   const [formData, setFormData] = useState({
-    nombreSeguro: '',
-    descripcion: '',
-    porcentajeDescuento: '',
-    montoFijo: '',
+    nombreSeguro: "",
+    descripcion: "",
+    porcentajeDescuento: "",
+    montoFijo: "",
     esObligatorio: false,
     estaActivo: true,
-    tipoCalculo: 'PORCENTAJE'
+    tipoCalculo: "PORCENTAJE",
   });
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleTipoCalculoChange = (tipoCalculo) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       tipoCalculo,
       // Limpiar los campos opuestos cuando se cambia el tipo
-      porcentajeDescuento: tipoCalculo === 'PORCENTAJE' ? prev.porcentajeDescuento : '',
-      montoFijo: tipoCalculo === 'MONTO_FIJO' ? prev.montoFijo : ''
+      porcentajeDescuento:
+        tipoCalculo === "PORCENTAJE" ? prev.porcentajeDescuento : "",
+      montoFijo: tipoCalculo === "MONTO_FIJO" ? prev.montoFijo : "",
     }));
   };
 
@@ -39,63 +40,76 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
 
     // Validaciones
     if (!formData.nombreSeguro.trim()) {
-      toast.error('El nombre del seguro es obligatorio');
+      toast.error("El nombre del seguro es obligatorio");
       return;
     }
 
     if (!formData.descripcion.trim()) {
-      toast.error('La descripción es obligatoria');
+      toast.error("La descripción es obligatoria");
       return;
     }
 
-    if (formData.tipoCalculo === 'PORCENTAJE' && !formData.porcentajeDescuento) {
-      toast.error('El porcentaje de descuento es obligatorio para este tipo de cálculo');
+    if (
+      formData.tipoCalculo === "PORCENTAJE" &&
+      !formData.porcentajeDescuento
+    ) {
+      toast.error(
+        "El porcentaje de descuento es obligatorio para este tipo de cálculo"
+      );
       return;
     }
 
-    if (formData.tipoCalculo === 'MONTO_FIJO' && !formData.montoFijo) {
-      toast.error('El monto fijo es obligatorio para este tipo de cálculo');
+    if (formData.tipoCalculo === "MONTO_FIJO" && !formData.montoFijo) {
+      toast.error("El monto fijo es obligatorio para este tipo de cálculo");
       return;
     }
 
     setLoading(true);
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-      const token = localStorage.getItem('token') || JSON.parse(localStorage.getItem('auth-storage'))?.state?.token;
+      const API_BASE_URL =
+        import.meta.env.VITE_API_URL || "https://nidopro.up.railway.app/api/v1";
+      const token =
+        localStorage.getItem("token") ||
+        JSON.parse(localStorage.getItem("auth-storage"))?.state?.token;
 
       // Preparar los datos para enviar
       const dataToSend = {
         nombreSeguro: formData.nombreSeguro.trim(),
         descripcion: formData.descripcion.trim(),
-        porcentajeDescuento: formData.tipoCalculo === 'PORCENTAJE' ? parseFloat(formData.porcentajeDescuento).toFixed(2) : null,
-        montoFijo: formData.tipoCalculo === 'MONTO_FIJO' ? parseFloat(formData.montoFijo).toFixed(2) : null,
+        porcentajeDescuento:
+          formData.tipoCalculo === "PORCENTAJE"
+            ? parseFloat(formData.porcentajeDescuento).toFixed(2)
+            : null,
+        montoFijo:
+          formData.tipoCalculo === "MONTO_FIJO"
+            ? parseFloat(formData.montoFijo).toFixed(2)
+            : null,
         esObligatorio: formData.esObligatorio,
         estaActivo: formData.estaActivo,
-        tipoCalculo: formData.tipoCalculo
+        tipoCalculo: formData.tipoCalculo,
       };
 
       // Simular creación exitosa del seguro
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success('Tipo de seguro creado exitosamente');
+      toast.success("Tipo de seguro creado exitosamente");
       onTipoSeguroCreado();
       onClose();
 
       // Reset form
       setFormData({
-        nombreSeguro: '',
-        descripcion: '',
-        porcentajeDescuento: '',
-        montoFijo: '',
+        nombreSeguro: "",
+        descripcion: "",
+        porcentajeDescuento: "",
+        montoFijo: "",
         esObligatorio: false,
         estaActivo: true,
-        tipoCalculo: 'PORCENTAJE'
+        tipoCalculo: "PORCENTAJE",
       });
-
     } catch (error) {
-      console.error('Error creating tipo seguro:', error);
-      toast.error(error.message || 'Error al crear el tipo de seguro');
+      console.error("Error creating tipo seguro:", error);
+      toast.error(error.message || "Error al crear el tipo de seguro");
     } finally {
       setLoading(false);
     }
@@ -199,28 +213,36 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
                             type="radio"
                             name="tipoCalculo"
                             value="PORCENTAJE"
-                            checked={formData.tipoCalculo === 'PORCENTAJE'}
-                            onChange={() => handleTipoCalculoChange('PORCENTAJE')}
+                            checked={formData.tipoCalculo === "PORCENTAJE"}
+                            onChange={() =>
+                              handleTipoCalculoChange("PORCENTAJE")
+                            }
                             className="mr-2 text-blue-600 focus:ring-blue-500"
                           />
-                          <span className="text-sm text-gray-700">Porcentaje</span>
+                          <span className="text-sm text-gray-700">
+                            Porcentaje
+                          </span>
                         </label>
                         <label className="flex items-center">
                           <input
                             type="radio"
                             name="tipoCalculo"
                             value="MONTO_FIJO"
-                            checked={formData.tipoCalculo === 'MONTO_FIJO'}
-                            onChange={() => handleTipoCalculoChange('MONTO_FIJO')}
+                            checked={formData.tipoCalculo === "MONTO_FIJO"}
+                            onChange={() =>
+                              handleTipoCalculoChange("MONTO_FIJO")
+                            }
                             className="mr-2 text-blue-600 focus:ring-blue-500"
                           />
-                          <span className="text-sm text-gray-700">Monto Fijo</span>
+                          <span className="text-sm text-gray-700">
+                            Monto Fijo
+                          </span>
                         </label>
                       </div>
                     </div>
 
                     {/* Porcentaje de Descuento */}
-                    {formData.tipoCalculo === 'PORCENTAJE' && (
+                    {formData.tipoCalculo === "PORCENTAJE" && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Porcentaje de Descuento *
@@ -238,19 +260,23 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
                             placeholder="9.00"
                             required
                           />
-                          <span className="absolute right-3 top-2 text-gray-500">%</span>
+                          <span className="absolute right-3 top-2 text-gray-500">
+                            %
+                          </span>
                         </div>
                       </div>
                     )}
 
                     {/* Monto Fijo */}
-                    {formData.tipoCalculo === 'MONTO_FIJO' && (
+                    {formData.tipoCalculo === "MONTO_FIJO" && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Monto Fijo *
                         </label>
                         <div className="relative">
-                          <span className="absolute left-3 top-2 text-gray-500">S/</span>
+                          <span className="absolute left-3 top-2 text-gray-500">
+                            S/
+                          </span>
                           <input
                             type="number"
                             name="montoFijo"
@@ -276,7 +302,9 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
                           onChange={handleInputChange}
                           className="mr-2 text-blue-600 focus:ring-blue-500 rounded"
                         />
-                        <span className="text-sm text-gray-700">Es obligatorio</span>
+                        <span className="text-sm text-gray-700">
+                          Es obligatorio
+                        </span>
                       </label>
                     </div>
 
@@ -290,7 +318,9 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
                           onChange={handleInputChange}
                           className="mr-2 text-blue-600 focus:ring-blue-500 rounded"
                         />
-                        <span className="text-sm text-gray-700">Está activo</span>
+                        <span className="text-sm text-gray-700">
+                          Está activo
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -311,7 +341,9 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center space-x-2"
                     >
                       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                      <span>{loading ? 'Creando...' : 'Crear Tipo de Seguro'}</span>
+                      <span>
+                        {loading ? "Creando..." : "Crear Tipo de Seguro"}
+                      </span>
                     </button>
                   </div>
                 </form>

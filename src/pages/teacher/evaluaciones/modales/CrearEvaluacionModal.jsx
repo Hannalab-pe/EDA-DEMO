@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { X, Calendar, FileText, BookOpen, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { X, Calendar, FileText, BookOpen, Save } from "lucide-react";
+import { toast } from "sonner";
 
-const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }) => {
+const CrearEvaluacionModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  evaluacion,
+  cursos,
+}) => {
   const [formData, setFormData] = useState({
-    fecha: '',
-    descripcion: '',
-    tipoEvaluacion: 'EXAMEN',
-    idCurso: ''
+    fecha: "",
+    descripcion: "",
+    tipoEvaluacion: "EXAMEN",
+    idCurso: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -20,18 +26,20 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
       if (evaluacion) {
         // Si estamos editando, cargar los datos de la evaluación
         setFormData({
-          fecha: evaluacion.fecha ? new Date(evaluacion.fecha).toISOString().split('T')[0] : '',
-          descripcion: evaluacion.descripcion || '',
-          tipoEvaluacion: evaluacion.tipoEvaluacion || 'EXAMEN',
-          idCurso: evaluacion.idCurso || ''
+          fecha: evaluacion.fecha
+            ? new Date(evaluacion.fecha).toISOString().split("T")[0]
+            : "",
+          descripcion: evaluacion.descripcion || "",
+          tipoEvaluacion: evaluacion.tipoEvaluacion || "EXAMEN",
+          idCurso: evaluacion.idCurso || "",
         });
       } else {
         // Si estamos creando, resetear el formulario
         setFormData({
-          fecha: new Date().toISOString().split('T')[0], // Fecha actual por defecto
-          descripcion: '',
-          tipoEvaluacion: 'EXAMEN',
-          idCurso: ''
+          fecha: new Date().toISOString().split("T")[0], // Fecha actual por defecto
+          descripcion: "",
+          tipoEvaluacion: "EXAMEN",
+          idCurso: "",
         });
       }
       setErrors({});
@@ -41,16 +49,16 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
   // Función para manejar cambios en los inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -62,24 +70,24 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
     // Si estamos editando, solo validar descripción
     if (evaluacion) {
       if (!formData.descripcion.trim()) {
-        newErrors.descripcion = 'La descripción es requerida';
+        newErrors.descripcion = "La descripción es requerida";
       }
     } else {
       // Si estamos creando, validar todos los campos
       if (!formData.fecha) {
-        newErrors.fecha = 'La fecha es requerida';
+        newErrors.fecha = "La fecha es requerida";
       }
 
       if (!formData.descripcion.trim()) {
-        newErrors.descripcion = 'La descripción es requerida';
+        newErrors.descripcion = "La descripción es requerida";
       }
 
       if (!formData.idCurso) {
-        newErrors.idCurso = 'Debe seleccionar un curso';
+        newErrors.idCurso = "Debe seleccionar un curso";
       }
 
       if (!formData.tipoEvaluacion) {
-        newErrors.tipoEvaluacion = 'El tipo de evaluación es requerido';
+        newErrors.tipoEvaluacion = "El tipo de evaluación es requerido";
       }
     }
 
@@ -87,75 +95,35 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
     return Object.keys(newErrors).length === 0;
   };
 
-  // Función para manejar el envío del formulario
+  // Función para manejar el envío del formulario (DEMO)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Por favor, complete todos los campos requeridos');
+      toast.error("Por favor, complete todos los campos requeridos");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      console.log("💾 Guardando evaluación (DEMO):", formData);
 
-      if (!token) {
-        toast.error('No se encontró token de autenticación');
-        return;
-      }
+      // Simular delay de guardado
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Preparar los datos para enviar
-      const dataToSend = evaluacion
-        ? {
-            descripcion: formData.descripcion.trim()
-          }
-        : {
-            fecha: formData.fecha,
-            descripcion: formData.descripcion.trim(),
-            tipoEvaluacion: formData.tipoEvaluacion,
-            idCurso: formData.idCurso
-          };
+      // Simular éxito del guardado
+      toast.success(
+        evaluacion
+          ? "Evaluación actualizada correctamente"
+          : "Evaluación creada correctamente"
+      );
 
-      // Determinar si es creación o edición
-      const url = evaluacion
-        ? `https://nidopro.up.railway.app/api/v1/evaluacion/${evaluacion.idEvaluacion}`
-        : 'https://nidopro.up.railway.app/api/v1/evaluacion';
-
-      const method = evaluacion ? 'PATCH' : 'POST';
-
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al guardar la evaluación');
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success(
-          evaluacion
-            ? 'Evaluación actualizada correctamente'
-            : 'Evaluación creada correctamente'
-        );
-        onSuccess();
-      } else {
-        toast.error(data.message || 'Error al guardar la evaluación');
-      }
+      onSuccess();
+      onClose();
     } catch (error) {
-      console.error('Error saving evaluacion:', error);
-      toast.error(error.message || 'Error al guardar la evaluación');
+      console.error("Error saving evaluacion (DEMO):", error);
+      toast.error("Error al guardar la evaluación");
     } finally {
       setIsSubmitting(false);
     }
@@ -194,7 +162,9 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                 >
                   <span className="flex items-center">
                     <FileText className="w-5 h-5 mr-2 text-green-600" />
-                    {evaluacion ? 'Editar Descripción de Evaluación' : 'Crear Nueva Evaluación'}
+                    {evaluacion
+                      ? "Editar Descripción de Evaluación"
+                      : "Crear Nueva Evaluación"}
                   </span>
                   <button
                     type="button"
@@ -208,7 +178,9 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                 {evaluacion && (
                   <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
                     <p className="text-sm text-blue-700">
-                      💡 Solo puedes editar la descripción de la evaluación. Los otros campos están bloqueados para mantener la integridad de los datos.
+                      💡 Solo puedes editar la descripción de la evaluación. Los
+                      otros campos están bloqueados para mantener la integridad
+                      de los datos.
                     </p>
                   </div>
                 )}
@@ -217,7 +189,10 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                   <div className="space-y-4">
                     {/* Fecha */}
                     <div>
-                      <label htmlFor="fecha" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="fecha"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Fecha *
                       </label>
                       <div className="relative">
@@ -229,22 +204,29 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                           onChange={handleInputChange}
                           disabled={evaluacion ? true : false}
                           className={`w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            evaluacion ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                            evaluacion
+                              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                              : ""
                           } ${
-                            errors.fecha ? 'border-red-500' : 'border-gray-300'
+                            errors.fecha ? "border-red-500" : "border-gray-300"
                           }`}
-                          min={new Date().toISOString().split('T')[0]} // No permitir fechas pasadas
+                          min={new Date().toISOString().split("T")[0]} // No permitir fechas pasadas
                         />
                         <Calendar className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
                       {errors.fecha && (
-                        <p className="mt-1 text-sm text-red-600">{errors.fecha}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.fecha}
+                        </p>
                       )}
                     </div>
 
                     {/* Descripción */}
                     <div>
-                      <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="descripcion"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Descripción *
                       </label>
                       <textarea
@@ -254,18 +236,25 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                         onChange={handleInputChange}
                         rows={3}
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          errors.descripcion ? 'border-red-500' : 'border-gray-300'
+                          errors.descripcion
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         placeholder="Describe la evaluación..."
                       />
                       {errors.descripcion && (
-                        <p className="mt-1 text-sm text-red-600">{errors.descripcion}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.descripcion}
+                        </p>
                       )}
                     </div>
 
                     {/* Tipo de Evaluación */}
                     <div>
-                      <label htmlFor="tipoEvaluacion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="tipoEvaluacion"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Tipo de Evaluación *
                       </label>
                       <select
@@ -275,9 +264,13 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                         onChange={handleInputChange}
                         disabled={evaluacion ? true : false}
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          evaluacion ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                          evaluacion
+                            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                            : ""
                         } ${
-                          errors.tipoEvaluacion ? 'border-red-500' : 'border-gray-300'
+                          errors.tipoEvaluacion
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                       >
                         <option value="EXAMEN">Examen</option>
@@ -287,13 +280,18 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                         <option value="QUIZ">Quiz</option>
                       </select>
                       {errors.tipoEvaluacion && (
-                        <p className="mt-1 text-sm text-red-600">{errors.tipoEvaluacion}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.tipoEvaluacion}
+                        </p>
                       )}
                     </div>
 
                     {/* Curso */}
                     <div>
-                      <label htmlFor="idCurso" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="idCurso"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Curso *
                       </label>
                       <div className="relative">
@@ -304,9 +302,13 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                           onChange={handleInputChange}
                           disabled={evaluacion ? true : false}
                           className={`w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            evaluacion ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                            evaluacion
+                              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                              : ""
                           } ${
-                            errors.idCurso ? 'border-red-500' : 'border-gray-300'
+                            errors.idCurso
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         >
                           <option value="">Seleccionar curso...</option>
@@ -319,7 +321,9 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                         <BookOpen className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
                       {errors.idCurso && (
-                        <p className="mt-1 text-sm text-red-600">{errors.idCurso}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.idCurso}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -347,7 +351,7 @@ const CrearEvaluacionModal = ({ isOpen, onClose, onSuccess, evaluacion, cursos }
                       ) : (
                         <>
                           <Save className="w-4 h-4 mr-2" />
-                          {evaluacion ? 'Actualizar' : 'Crear'}
+                          {evaluacion ? "Actualizar" : "Crear"}
                         </>
                       )}
                     </button>

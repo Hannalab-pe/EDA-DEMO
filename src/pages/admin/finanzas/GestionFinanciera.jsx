@@ -1,98 +1,100 @@
-import React, { useState, useEffect } from 'react'
-import { 
-  DollarSign, 
-  GraduationCap, 
-  CreditCard, 
+import React, { useState, useEffect } from "react";
+import {
+  DollarSign,
+  GraduationCap,
+  CreditCard,
   Users,
   Loader2,
-  RefreshCw
-} from 'lucide-react'
-import { toast } from 'sonner'
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const GestionFinanciera = () => {
   const [saldoData, setSaldoData] = useState({
     saldo: 0,
     ingresos: 0,
-    egresos: 0
-  })
-  const [loadingSaldo, setLoadingSaldo] = useState(false)
+    egresos: 0,
+  });
+  const [loadingSaldo, setLoadingSaldo] = useState(false);
 
   // Cargar datos del saldo al montar el componente
   useEffect(() => {
-    cargarSaldoCaja()
-  }, [])
+    cargarSaldoCaja();
+  }, []);
 
   const cargarSaldoCaja = async () => {
-    setLoadingSaldo(true)
+    setLoadingSaldo(true);
     try {
-      console.log('🔄 Cargando saldo de caja (demo)...')
-      
+      console.log("🔄 Cargando saldo de caja (demo)...");
+
       // Simular carga de datos demo
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const responseDemo = {
         success: true,
-        saldo: 15750.50,
-        ingresos: 28900.00,
-        egresos: 13149.50
-      }
-      
+        saldo: 15750.5,
+        ingresos: 28900.0,
+        egresos: 13149.5,
+      };
+
       if (responseDemo.success) {
         setSaldoData({
           saldo: responseDemo.saldo,
           ingresos: responseDemo.ingresos,
-          egresos: responseDemo.egresos
-        })
-        console.log('✅ Saldo cargado (demo):', responseDemo)
+          egresos: responseDemo.egresos,
+        });
+        console.log("✅ Saldo cargado (demo):", responseDemo);
       }
     } catch (error) {
-      console.error('❌ Error al cargar saldo:', error)
-      toast.error('Error al cargar el saldo de caja')
+      console.error("❌ Error al cargar saldo:", error);
+      toast.error("Error al cargar el saldo de caja");
     } finally {
-      setLoadingSaldo(false)
+      setLoadingSaldo(false);
     }
-  }
+  };
 
   const formatMonto = (monto) => {
-    return `S/ ${parseFloat(monto || 0).toFixed(2)}`
-  }
+    return `S/ ${parseFloat(monto || 0).toFixed(2)}`;
+  };
 
   const financialActions = [
     {
-      id: 'movimientos-caja',
-      title: 'Crear Nuevo Movimiento de Caja',
-      description: 'Registrar ingresos y egresos de caja',
+      id: "movimientos-caja",
+      title: "Crear Nuevo Movimiento de Caja",
+      description: "Registrar ingresos y egresos de caja",
       icon: DollarSign,
-      component: 'MovimientosCaja',
-      bgColor: 'bg-blue-200',
-      hoverBg: 'hover:bg-blue-200'
+      component: "MovimientosCaja",
+      bgColor: "bg-blue-200",
+      hoverBg: "hover:bg-blue-200",
     },
     {
-      id: 'pagos-pensiones',
-      title: 'Confirmar Pagos de Pensión',
-      description: 'Verificar y confirmar pagos de pensiones mensuales',
+      id: "pagos-pensiones",
+      title: "Confirmar Pagos de Pensión",
+      description: "Verificar y confirmar pagos de pensiones mensuales",
       icon: GraduationCap,
-      component: 'PagosPensiones',
-      bgColor: 'bg-green-200',
-      hoverBg: 'hover:bg-green-200'
+      component: "PagosPensiones",
+      bgColor: "bg-green-200",
+      hoverBg: "hover:bg-green-200",
     },
     {
-      id: 'pagos-planillas',
-      title: 'Aprobar Planillas Mensuales',
-      description: 'Revisar y aprobar planillas de pago de trabajadores',
+      id: "pagos-planillas",
+      title: "Aprobar Planillas Mensuales",
+      description: "Revisar y aprobar planillas de pago de trabajadores",
       icon: Users,
-      component: 'PagosPlanillas',
-      bgColor: 'bg-orange-200',
-      hoverBg: 'hover:bg-orange-200'
-    }
-  ]
+      component: "PagosPlanillas",
+      bgColor: "bg-orange-200",
+      hoverBg: "hover:bg-orange-200",
+    },
+  ];
 
   const handleActionClick = (action) => {
     // Emitir evento personalizado para cambiar la vista en el AdminDashboard
-    window.dispatchEvent(new CustomEvent('changeFinanceView', { 
-      detail: { component: action.component } 
-    }))
-  }
+    window.dispatchEvent(
+      new CustomEvent("changeFinanceView", {
+        detail: { component: action.component },
+      })
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -108,7 +110,7 @@ const GestionFinanciera = () => {
                 Administra todos los aspectos financieros de la institución
               </p>
             </div>
-            
+
             {/* Botón refrescar */}
             <button
               onClick={cargarSaldoCaja}
@@ -128,8 +130,8 @@ const GestionFinanciera = () => {
         {/* Financial Actions Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {financialActions.map((action) => {
-            const IconComponent = action.icon
-            
+            const IconComponent = action.icon;
+
             return (
               <div
                 key={action.id}
@@ -146,17 +148,17 @@ const GestionFinanciera = () => {
                   <div className="mb-4 p-3 bg-white bg-opacity-20 rounded-full">
                     <IconComponent className="h-8 w-8" />
                   </div>
-                  
+
                   <h3 className="text-lg font-semibold mb-2 group-hover:text-gray-900">
                     {action.title}
                   </h3>
-                  
+
                   <p className="text-sm opacity-90 group-hover:opacity-900">
                     {action.description}
                   </p>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
 
@@ -167,7 +169,9 @@ const GestionFinanciera = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 Resumen Total
               </h3>
-              {loadingSaldo && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {loadingSaldo && (
+                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+              )}
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -185,9 +189,11 @@ const GestionFinanciera = () => {
               <hr className="my-2" />
               <div className="flex justify-between font-semibold">
                 <span>Balance:</span>
-                <span className={`${
-                  saldoData.saldo >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <span
+                  className={`${
+                    saldoData.saldo >= 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
                   {formatMonto(saldoData.saldo)}
                 </span>
               </div>
@@ -199,12 +205,16 @@ const GestionFinanciera = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 Saldo Actual
               </h3>
-              {loadingSaldo && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {loadingSaldo && (
+                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+              )}
             </div>
             <div className="text-center">
-              <div className={`text-3xl font-bold mb-1 ${
-                saldoData.saldo >= 0 ? 'text-blue-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`text-3xl font-bold mb-1 ${
+                  saldoData.saldo >= 0 ? "text-blue-600" : "text-red-600"
+                }`}
+              >
                 {formatMonto(saldoData.saldo)}
               </div>
               <div className="text-sm text-gray-600">disponible en caja</div>
@@ -213,7 +223,7 @@ const GestionFinanciera = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default GestionFinanciera
+export default GestionFinanciera;

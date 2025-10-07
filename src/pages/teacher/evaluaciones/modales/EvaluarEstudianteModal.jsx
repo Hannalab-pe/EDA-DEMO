@@ -1,80 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { X, UserCheck, Users, Award, FileText, Save, Bug, Eye } from 'lucide-react';
-import { toast } from 'sonner';
-import VerEstudiantesEvaluadosModal from './VerEstudiantesEvaluadosModal';
-
-// Configuración de la API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-
-// Función de debug para la consola
-window.debugAuthStorage = () => {
-  const authStorage = localStorage.getItem('auth-storage');
-  if (authStorage) {
-    const data = JSON.parse(authStorage);
-    console.log('=== DEBUG AUTH STORAGE ===');
-    console.log('Raw authStorage:', authStorage);
-    console.log('Parsed data:', data);
-    console.log('Token exists:', !!data.state?.token);
-    console.log('User ID:', data.state?.user?.id);
-    console.log('Entidad ID (correcto):', data.state?.user?.entidadId);
-    console.log('Entidad ID (incorrecto - no existe):', data.state?.entidadId);
-    console.log('User Entidad ID:', data.state?.user?.entidadId);
-    console.log('Full user object:', data.state?.user);
-    return data;
-  } else {
-    console.log('No auth-storage found in localStorage');
-    return null;
-  }
-};
-
-// Función para probar la API directamente
-window.testAulasAPI = async () => {
-  const data = window.debugAuthStorage();
-  if (!data) return;
-
-  const token = data.state?.token;
-  const entidadId = data.state?.user?.entidadId;
-
-  if (!token || !entidadId) {
-    console.error('Faltan token o entidadId');
-    return;
-  }
-
-  console.log('Probando API con entidadId:', entidadId);
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/trabajador/aulas/${entidadId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('API Response:', result);
-      return result;
-    } else {
-      const errorText = await response.text();
-      console.error('API Error:', errorText);
-      return { error: errorText };
-    }
-  } catch (error) {
-    console.error('Network error:', error);
-    return { error: error.message };
-  }
-};
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import {
+  X,
+  UserCheck,
+  Users,
+  Award,
+  FileText,
+  Save,
+  Bug,
+  Eye,
+} from "lucide-react";
+import { toast } from "sonner";
+import VerEstudiantesEvaluadosModal from "./VerEstudiantesEvaluadosModal";
 
 const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
   const [formData, setFormData] = useState({
-    calificacion: 'A',
-    observaciones: '',
-    idEvaluacion: '',
-    idEstudiante: ''
+    calificacion: "A",
+    observaciones: "",
+    idEvaluacion: "",
+    idEstudiante: "",
   });
   const [estudiantes, setEstudiantes] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,211 +33,157 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
   // Obtener aula del profesor
   const fetchAulaTrabajador = async () => {
     try {
-      const authStorage = localStorage.getItem('auth-storage');
-      if (!authStorage) {
-        console.error('No se encontró auth-storage en localStorage');
-        toast.error('No se encontró información de autenticación');
+      console.log("🔍 Obteniendo aula del trabajador (DEMO)");
+
+      // Importar datos demo
+      const { mockData } = await import("../../../../data/mockData.js");
+
+      // Para demo, usar el usuario autenticado (docente con ID "2")
+      const authStorage = localStorage.getItem("auth-storage");
+      let docenteId = "2"; // Default
+
+      if (authStorage) {
+        const authData = JSON.parse(authStorage);
+        docenteId = authData.state?.user?.entidadId || "2";
+      }
+
+      // Buscar aulas asignadas al docente
+      const aulasDocente = mockData.aulas.filter(
+        (aula) => aula.docenteId === docenteId
+      );
+
+      if (aulasDocente.length === 0) {
+        console.log("⚠️ No se encontraron aulas para el docente");
+        toast.info("No tienes aulas asignadas");
         return null;
       }
 
-      const authData = JSON.parse(authStorage);
-      console.log('Auth data:', authData);
+      const primeraAula = aulasDocente[0];
+      const idAula = primeraAula.id;
 
-      const token = authData.state?.token;
-      const entidadId = authData.state?.user?.entidadId;
-
-      console.log('Token:', token ? 'Presente' : 'Ausente');
-      console.log('EntidadId:', entidadId);
-
-      if (!token) {
-        console.error('No se encontró token');
-        toast.error('No se encontró token de autenticación');
-        return null;
-      }
-
-      if (!entidadId) {
-        console.error('No se encontró entidadId');
-        toast.error('No se encontró ID de entidad');
-        return null;
-      }
-
-      const userId = entidadId; // Usar directamente el entidadId
-      console.log('UserId a usar (entidadId):', userId);
-
-      // Usar el entidadId directamente
-      const endpoint = `${API_BASE_URL}/trabajador/aulas/${userId}`;
-      console.log('Endpoint:', endpoint);
-
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error('Error al obtener aulas del trabajador');
-      }
-
-      const data = await response.json();
-      console.log('API Response:', data);
-
-      // Si aún no funciona, mostrar información de debug
-      if (!data.success || !data.aulas || data.aulas.length === 0) {
-        return null;
-      }
-
-      // Extraer el id_aula de la primera aula asignada
-      const primeraAula = data.aulas[0];
-      const idAula = primeraAula.id_aula;
-      console.log('Aula encontrada:', primeraAula);
-      console.log('ID del aula a retornar:', idAula);
+      console.log("✅ Aula encontrada (DEMO):", primeraAula);
+      console.log("🆔 ID del aula:", idAula);
 
       // Guardar el idAula para el modal de estudiantes evaluados
       setCurrentIdAula(idAula);
 
       return idAula;
     } catch (error) {
-      console.error('Error en fetchAulaTrabajador:', error);
-      toast.error('Error al cargar información del aula');
+      console.error("❌ Error en fetchAulaTrabajador (DEMO):", error);
+      toast.error("Error al cargar información del aula");
       return null;
     }
   };
 
-  // Obtener estudiantes del aula
+  // Obtener estudiantes del aula (DEMO)
   const fetchEstudiantesAula = async (idAula) => {
     if (!idAula) {
-      console.error('No se recibió idAula');
+      console.error("No se recibió idAula");
       return;
     }
 
-    console.log('Obteniendo estudiantes del aula:', idAula);
+    console.log("🔍 Obteniendo estudiantes del aula (DEMO):", idAula);
     setIsLoadingEstudiantes(true);
+
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (!token) {
-        console.error('No se encontró token para estudiantes');
-        toast.error('No se encontró token de autenticación');
-        return;
-      }
+      // Importar datos demo
+      const { mockData } = await import("../../../../data/mockData.js");
 
-      const response = await fetch(`${API_BASE_URL}/estudiante/aula/${idAula}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Filtrar estudiantes por aula
+      const estudiantesDelAula = mockData.estudiantes.filter(
+        (estudiante) => estudiante.aulaId === idAula
+      );
 
-      console.log('Response estudiantes status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response estudiantes:', errorText);
-        throw new Error('Error al obtener estudiantes');
-      }
-
-      const data = await response.json();
-      console.log('API Response estudiantes:', data);
-
-      if (data.success) {
-        console.log('Estudiantes obtenidos:', data.estudiantes || []);
-        setEstudiantes(data.estudiantes || []);
-      } else {
-        console.error('Error en respuesta estudiantes:', data.message);
-        toast.error(data.message || 'Error al obtener estudiantes');
-      }
+      console.log(
+        "✅ Estudiantes obtenidos (DEMO):",
+        estudiantesDelAula.length
+      );
+      setEstudiantes(estudiantesDelAula);
     } catch (error) {
-      console.error('Error en fetchEstudiantesAula:', error);
-      toast.error('Error al cargar estudiantes');
+      console.error("❌ Error en fetchEstudiantesAula (DEMO):", error);
+      toast.error("Error al cargar estudiantes");
     } finally {
       setIsLoadingEstudiantes(false);
     }
   };
 
-  // Obtener libreta de calificaciones del aula
+  // Obtener libreta de calificaciones del aula (DEMO)
   const fetchLibretaCalificaciones = async (idAula) => {
     if (!idAula) {
-      console.error('No se recibió idAula para libreta');
+      console.error("No se recibió idAula para libreta");
       return;
     }
 
-    console.log('Obteniendo libreta de calificaciones del aula:', idAula);
+    console.log(
+      "🔍 Obteniendo libreta de calificaciones del aula (DEMO):",
+      idAula
+    );
+
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      if (!token) {
-        console.error('No se encontró token para libreta');
-        return;
-      }
+      // Importar datos demo
+      const { mockData } = await import("../../../../data/mockData.js");
 
-      const response = await fetch(`${API_BASE_URL}/nota/libreta-kinder/aula/${idAula}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      // Simular estudiantes que ya tienen calificaciones
+      const estudiantesConCalificaciones = new Set();
+      const libretasCompletas = [];
+
+      // Para demo, simular que algunos estudiantes ya están evaluados
+      const estudiantesDelAula = mockData.estudiantes.filter(
+        (estudiante) => estudiante.aulaId === idAula
+      );
+      const evaluacionesExistentes = mockData.evaluaciones.filter(
+        (evaluacion) =>
+          estudiantesDelAula.some((est) => est.id === evaluacion.estudianteId)
+      );
+
+      evaluacionesExistentes.forEach((evaluacion) => {
+        const estudiante = estudiantesDelAula.find(
+          (est) => est.id === evaluacion.estudianteId
+        );
+        if (estudiante) {
+          estudiantesConCalificaciones.add(estudiante.id);
+          libretasCompletas.push({
+            estudiante: {
+              idEstudiante: estudiante.id,
+              nombre: estudiante.nombre,
+              apellidos: estudiante.apellidos,
+            },
+            libreta: {
+              calificacion: evaluacion.calificacion,
+              observaciones: evaluacion.observaciones,
+            },
+          });
+        }
       });
 
-      console.log('Response libreta status:', response.status);
+      console.log(
+        "✅ Estudiantes ya evaluados (DEMO):",
+        Array.from(estudiantesConCalificaciones)
+      );
+      console.log("📊 Libretas completas (DEMO):", libretasCompletas.length);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response libreta:', errorText);
-        return;
-      }
-
-      const data = await response.json();
-      console.log('API Response libreta:', data);
-
-      if (data.success && data.info?.data?.libretas) {
-        // Extraer IDs de estudiantes que ya tienen calificaciones
-        const estudiantesConCalificaciones = new Set();
-        const libretasCompletas = [];
-
-        data.info.data.libretas.forEach((libreta) => {
-          if (libreta.estudiante && libreta.estudiante.idEstudiante) {
-            estudiantesConCalificaciones.add(libreta.estudiante.idEstudiante);
-            libretasCompletas.push({
-              estudiante: libreta.estudiante,
-              libreta: libreta.libreta
-            });
-          }
-        });
-
-        console.log('Estudiantes ya evaluados:', Array.from(estudiantesConCalificaciones));
-        console.log('Libretas completas:', libretasCompletas);
-
-        setEstudiantesEvaluados(estudiantesConCalificaciones);
-        setLibretaCalificaciones(libretasCompletas);
-
-        // Mostrar estadísticas
-        const stats = data.info.data.aula;
-        console.log(`Estadísticas: ${stats.estudiantesConCalificaciones}/${stats.totalEstudiantes} estudiantes evaluados`);
-      }
+      setEstudiantesEvaluados(estudiantesConCalificaciones);
+      setLibretaCalificaciones(libretasCompletas);
     } catch (error) {
-      console.error('Error en fetchLibretaCalificaciones:', error);
+      console.error("❌ Error en fetchLibretaCalificaciones (DEMO):", error);
     }
   };
 
   // Resetear formulario cuando se abre el modal
   useEffect(() => {
     if (isOpen && evaluacion) {
-      console.log('Abriendo modal de evaluación para:', evaluacion);
+      console.log("Abriendo modal de evaluación para:", evaluacion);
       setFormData({
-        calificacion: 'A',
-        observaciones: '',
-        idEvaluacion: evaluacion.idEvaluacion || '',
-        idEstudiante: ''
+        calificacion: "A",
+        observaciones: "",
+        idEvaluacion: evaluacion.idEvaluacion || "",
+        idEstudiante: "",
       });
       setErrors({});
       setEstudiantes([]);
@@ -301,13 +192,13 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
 
       // Obtener aula y estudiantes
       const loadData = async () => {
-        console.log('Iniciando carga de datos...');
+        console.log("Iniciando carga de datos...");
         const idAula = await fetchAulaTrabajador();
         if (idAula) {
           await fetchEstudiantesAula(idAula);
           await fetchLibretaCalificaciones(idAula);
         } else {
-          console.error('No se pudo obtener idAula');
+          console.error("No se pudo obtener idAula");
         }
       };
 
@@ -318,16 +209,16 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
   // Función para manejar cambios en los inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -337,15 +228,15 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
     const newErrors = {};
 
     if (!formData.idEstudiante) {
-      newErrors.idEstudiante = 'Debe seleccionar un estudiante';
+      newErrors.idEstudiante = "Debe seleccionar un estudiante";
     }
 
     if (!formData.calificacion) {
-      newErrors.calificacion = 'La calificación es requerida';
+      newErrors.calificacion = "La calificación es requerida";
     }
 
     if (!formData.observaciones.trim()) {
-      newErrors.observaciones = 'Las observaciones son requeridas';
+      newErrors.observaciones = "Las observaciones son requeridas";
     }
 
     setErrors(newErrors);
@@ -357,55 +248,24 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Por favor, complete todos los campos requeridos');
+      toast.error("Por favor, complete todos los campos requeridos");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')).state?.token
-        : null;
+      console.log("💾 Guardando evaluación del estudiante (DEMO):", formData);
 
-      if (!token) {
-        toast.error('No se encontró token de autenticación');
-        return;
-      }
+      // Simular delay de guardado
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Preparar los datos para enviar
-      const dataToSend = {
-        calificacion: formData.calificacion,
-        observaciones: formData.observaciones.trim(),
-        idEvaluacion: formData.idEvaluacion,
-        idEstudiante: formData.idEstudiante
-      };
-
-      const response = await fetch('https://nidopro.up.railway.app/api/v1/nota/kinder', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al guardar la evaluación del estudiante');
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Evaluación del estudiante guardada correctamente');
-        onClose();
-      } else {
-        toast.error(data.message || 'Error al guardar la evaluación del estudiante');
-      }
+      // Simular éxito del guardado
+      toast.success("Evaluación del estudiante guardada correctamente");
+      onClose();
     } catch (error) {
-      console.error('Error saving evaluacion estudiante:', error);
-      toast.error(error.message || 'Error al guardar la evaluación del estudiante');
+      console.error("❌ Error saving evaluacion estudiante (DEMO):", error);
+      toast.error("Error al guardar la evaluación del estudiante");
     } finally {
       setIsSubmitting(false);
     }
@@ -444,10 +304,11 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                 >
                   <span className="flex items-center">
                     <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
-                    <span className="text-sm sm:text-base">Evaluar Estudiante</span>
+                    <span className="text-sm sm:text-base">
+                      Evaluar Estudiante
+                    </span>
                   </span>
                   <div className="flex items-center space-x-1 sm:space-x-2">
-                    
                     <button
                       type="button"
                       className="text-gray-400 hover:text-gray-600 p-1"
@@ -467,11 +328,14 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                           <div className="flex items-center">
                             <Users className="w-4 h-4 text-blue-600 mr-2" />
                             <span className="text-sm font-medium text-blue-700">
-                              Estudiantes evaluados: {estudiantesEvaluados.size} de {estudiantes.length}
+                              Estudiantes evaluados: {estudiantesEvaluados.size}{" "}
+                              de {estudiantes.length}
                             </span>
                           </div>
                           <div className="text-xs text-blue-600">
-                            {estudiantesEvaluados.size === estudiantes.length ? '✅ Todos evaluados' : '⏳ Pendientes por evaluar'}
+                            {estudiantesEvaluados.size === estudiantes.length
+                              ? "✅ Todos evaluados"
+                              : "⏳ Pendientes por evaluar"}
                           </div>
                         </div>
                       </div>
@@ -480,10 +344,17 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                     {/* Información de la evaluación */}
                     {evaluacion && (
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Evaluación:</h4>
-                        <p className="text-sm text-gray-600">{evaluacion.descripcion}</p>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                          Evaluación:
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {evaluacion.descripcion}
+                        </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Tipo: {evaluacion.tipoEvaluacion} | Fecha: {new Date(evaluacion.fecha).toLocaleDateString('es-ES')}
+                          Tipo: {evaluacion.tipoEvaluacion} | Fecha:{" "}
+                          {new Date(evaluacion.fecha).toLocaleDateString(
+                            "es-ES"
+                          )}
                         </p>
                       </div>
                     )}
@@ -496,14 +367,19 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                           className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          Ver {estudiantesEvaluados.size} estudiante{estudiantesEvaluados.size !== 1 ? 's' : ''} ya evaluado{estudiantesEvaluados.size !== 1 ? 's' : ''}
+                          Ver {estudiantesEvaluados.size} estudiante
+                          {estudiantesEvaluados.size !== 1 ? "s" : ""} ya
+                          evaluado{estudiantesEvaluados.size !== 1 ? "s" : ""}
                         </button>
                       </div>
                     )}
 
                     {/* Estudiante */}
                     <div>
-                      <label htmlFor="idEstudiante" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="idEstudiante"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Estudiante *
                       </label>
                       <div className="relative">
@@ -514,17 +390,27 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                           onChange={handleInputChange}
                           disabled={isLoadingEstudiantes}
                           className={`w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                            errors.idEstudiante ? 'border-red-500' : 'border-gray-300'
+                            errors.idEstudiante
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         >
                           <option value="">
-                            {isLoadingEstudiantes ? 'Cargando estudiantes...' : 'Seleccionar estudiante...'}
+                            {isLoadingEstudiantes
+                              ? "Cargando estudiantes..."
+                              : "Seleccionar estudiante..."}
                           </option>
                           {estudiantes.map((estudiante) => {
-                            const yaEvaluado = estudiantesEvaluados.has(estudiante.idEstudiante);
+                            const yaEvaluado = estudiantesEvaluados.has(
+                              estudiante.idEstudiante
+                            );
                             return (
-                              <option key={estudiante.idEstudiante} value={estudiante.idEstudiante}>
-                                {estudiante.nombre} {estudiante.apellido} {yaEvaluado ? '✓ (Ya evaluado)' : ''}
+                              <option
+                                key={estudiante.idEstudiante}
+                                value={estudiante.idEstudiante}
+                              >
+                                {estudiante.nombre} {estudiante.apellido}{" "}
+                                {yaEvaluado ? "✓ (Ya evaluado)" : ""}
                               </option>
                             );
                           })}
@@ -532,13 +418,18 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                         <Users className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
                       {errors.idEstudiante && (
-                        <p className="mt-1 text-sm text-red-600">{errors.idEstudiante}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.idEstudiante}
+                        </p>
                       )}
                     </div>
 
                     {/* Calificación */}
                     <div>
-                      <label htmlFor="calificacion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="calificacion"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Calificación *
                       </label>
                       <div className="relative">
@@ -548,7 +439,9 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                           value={formData.calificacion}
                           onChange={handleInputChange}
                           className={`w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                            errors.calificacion ? 'border-red-500' : 'border-gray-300'
+                            errors.calificacion
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         >
                           <option value="A">A - Excelente</option>
@@ -560,13 +453,18 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                         <Award className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
                       {errors.calificacion && (
-                        <p className="mt-1 text-sm text-red-600">{errors.calificacion}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.calificacion}
+                        </p>
                       )}
                     </div>
 
                     {/* Observaciones */}
                     <div>
-                      <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="observaciones"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Observaciones *
                       </label>
                       <textarea
@@ -576,12 +474,16 @@ const EvaluarEstudianteModal = ({ isOpen, onClose, evaluacion }) => {
                         onChange={handleInputChange}
                         rows={4}
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                          errors.observaciones ? 'border-red-500' : 'border-gray-300'
+                          errors.observaciones
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         placeholder="Escribe tus observaciones sobre el desempeño del estudiante..."
                       />
                       {errors.observaciones && (
-                        <p className="mt-1 text-sm text-red-600">{errors.observaciones}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.observaciones}
+                        </p>
                       )}
                     </div>
                   </div>

@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Shield, Plus, DollarSign, Percent, CheckCircle, XCircle } from 'lucide-react';
-import CrearTipoSeguroModal from './modales/CrearTipoSeguroModal';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import {
+  Shield,
+  Plus,
+  DollarSign,
+  Percent,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import CrearTipoSeguroModal from "./modales/CrearTipoSeguroModal";
+import { toast } from "sonner";
 
 const Seguros = () => {
   const [modalCrearTipoSeguro, setModalCrearTipoSeguro] = useState(false);
@@ -16,47 +23,53 @@ const Seguros = () => {
   const fetchSeguros = async () => {
     try {
       setLoading(true);
-      
+
       // Simular datos demo de seguros
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
       const segurosDemo = [
         {
           idTipoSeguro: 1,
           nombre: "Seguro Básico Escolar",
-          descripcion: "Cobertura básica para actividades escolares y accidentes menores",
+          descripcion:
+            "Cobertura básica para actividades escolares y accidentes menores",
           porcentaje: 15.5,
-          monto: 150.00,
+          monto: 150.0,
           estado: "ACTIVO",
           fechaCreacion: "2024-01-15T10:00:00Z",
-          cobertura: "Accidentes escolares, primeros auxilios, medicamentos básicos"
+          cobertura:
+            "Accidentes escolares, primeros auxilios, medicamentos básicos",
         },
         {
           idTipoSeguro: 2,
           nombre: "Seguro Integral Premium",
-          descripcion: "Cobertura completa incluyendo hospitalización y cirugías menores",
+          descripcion:
+            "Cobertura completa incluyendo hospitalización y cirugías menores",
           porcentaje: 25.0,
-          monto: 350.00,
+          monto: 350.0,
           estado: "ACTIVO",
           fechaCreacion: "2024-01-20T14:30:00Z",
-          cobertura: "Hospitalización, cirugías menores, medicamentos, terapias"
+          cobertura:
+            "Hospitalización, cirugías menores, medicamentos, terapias",
         },
         {
           idTipoSeguro: 3,
           nombre: "Seguro Familiar",
-          descripcion: "Extensión de cobertura para padres y hermanos del estudiante",
+          descripcion:
+            "Extensión de cobertura para padres y hermanos del estudiante",
           porcentaje: 30.0,
-          monto: 500.00,
+          monto: 500.0,
           estado: "INACTIVO",
           fechaCreacion: "2024-02-01T09:15:00Z",
-          cobertura: "Cobertura familiar completa, emergencias, consultas médicas"
-        }
+          cobertura:
+            "Cobertura familiar completa, emergencias, consultas médicas",
+        },
       ];
-      
+
       setSeguros(segurosDemo);
     } catch (error) {
-      console.error('Error fetching seguros:', error);
-      toast.error('Error al cargar los tipos de seguro');
+      console.error("Error fetching seguros:", error);
+      toast.error("Error al cargar los tipos de seguro");
     } finally {
       setLoading(false);
     }
@@ -80,8 +93,12 @@ const Seguros = () => {
               <Shield className="w-8 h-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Gestión de Seguros</h1>
-              <p className="text-gray-600">Administra los tipos de seguro disponibles en el sistema</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Gestión de Seguros
+              </h1>
+              <p className="text-gray-600">
+                Administra los tipos de seguro disponibles en el sistema
+              </p>
             </div>
           </div>
 
@@ -99,8 +116,12 @@ const Seguros = () => {
       {/* Lista de Seguros */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Tipos de Seguro Registrados</h2>
-          <p className="text-sm text-gray-600 mt-1">Lista de todos los tipos de seguro configurados</p>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Tipos de Seguro Registrados
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Lista de todos los tipos de seguro configurados
+          </p>
         </div>
 
         <div className="p-6">
@@ -112,8 +133,12 @@ const Seguros = () => {
           ) : seguros.length === 0 ? (
             <div className="text-center py-12">
               <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay tipos de seguro registrados</h3>
-              <p className="text-gray-600 mb-4">Comienza creando tu primer tipo de seguro</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No hay tipos de seguro registrados
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Comienza creando tu primer tipo de seguro
+              </p>
               <button
                 onClick={handleCrearTipoSeguro}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -125,14 +150,19 @@ const Seguros = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {seguros.map((seguro) => (
-                <div key={seguro.idTipoSeguro || seguro.id} className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow">
+                <div
+                  key={seguro.idTipoSeguro || seguro.id}
+                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow"
+                >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-blue-100 rounded-lg">
                         <Shield className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{seguro.nombreSeguro}</h3>
+                        <h3 className="font-semibold text-gray-900">
+                          {seguro.nombreSeguro}
+                        </h3>
                         <div className="flex items-center space-x-2 mt-1">
                           {seguro.estaActivo ? (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -155,20 +185,26 @@ const Seguros = () => {
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-4">{seguro.descripcion}</p>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {seguro.descripcion}
+                  </p>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Tipo de Cálculo:</span>
-                      <span className="font-medium text-gray-900">{seguro.tipoCalculo}</span>
+                      <span className="font-medium text-gray-900">
+                        {seguro.tipoCalculo}
+                      </span>
                     </div>
 
-                    {seguro.tipoCalculo === 'PORCENTAJE' ? (
+                    {seguro.tipoCalculo === "PORCENTAJE" ? (
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Porcentaje:</span>
                         <div className="flex items-center space-x-1">
                           <Percent className="w-4 h-4 text-green-600" />
-                          <span className="font-medium text-green-600">{seguro.porcentajeDescuento}%</span>
+                          <span className="font-medium text-green-600">
+                            {seguro.porcentajeDescuento}%
+                          </span>
                         </div>
                       </div>
                     ) : (
@@ -176,7 +212,9 @@ const Seguros = () => {
                         <span className="text-gray-600">Monto Fijo:</span>
                         <div className="flex items-center space-x-1">
                           <DollarSign className="w-4 h-4 text-blue-600" />
-                          <span className="font-medium text-blue-600">S/ {seguro.montoFijo}</span>
+                          <span className="font-medium text-blue-600">
+                            S/ {seguro.montoFijo}
+                          </span>
                         </div>
                       </div>
                     )}

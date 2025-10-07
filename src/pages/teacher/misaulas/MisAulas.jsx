@@ -16,11 +16,9 @@ import {
 } from "lucide-react";
 import TablaAulas from "./tablas/TablaAulas";
 import { mockData } from "../../../data/mockData";
-import { useAuthStore } from "../../../store";
 import { toast } from "sonner";
 
 const MisAulas = () => {
-  const { user } = useAuthStore();
   const [aulas, setAulas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -63,12 +61,12 @@ const MisAulas = () => {
       // Simular delay de red
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Usar datos ficticios de mockData
+      // Usar datos demo sin depender de autenticación
       const aulasDemo = mockData.aulas.map((aula) => ({
         ...aula,
         // Agregar algunos campos adicionales que podrían necesitarse
         estudiantesCount: Math.floor(Math.random() * 25) + 15,
-        profesorAsignado: user?.nombre || "Profesor Demo",
+        profesorAsignado: "Profesor Demo",
         estadoAula: "Activa",
       }));
 
