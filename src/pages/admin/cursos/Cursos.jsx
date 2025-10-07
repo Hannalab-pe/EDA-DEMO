@@ -15,9 +15,6 @@ import ModalEliminarCurso from './modales/ModalEliminarCurso';
 import ModalVerCurso from './modales/ModalVerCurso';
 import TablaCursos from './tablas/TablaCursos';
 
-// Importar servicios
-import { cursoService } from '../../../services/cursoService';
-
 const Cursos = () => {
   const [cursos, setCursos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,12 +34,58 @@ const Cursos = () => {
   const cargarCursos = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Cargando cursos...');
+      console.log('🔍 Cargando cursos (demo)...');
 
-      const response = await cursoService.getAll();
-      console.log('📚 Cursos obtenidos:', response);
+      // Simular carga de datos
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      setCursos(response?.info?.data || []);
+      const cursosDemo = [
+        {
+          idCurso: 1,
+          nombre: "Desarrollo Infantil Temprano",
+          descripcion: "Curso especializado en el desarrollo cognitivo y emocional de niños de 0-3 años",
+          codigo: "DIT-001",
+          duracion: "120 horas",
+          capacidadMaxima: 25,
+          matriculados: 18,
+          estado: "activo",
+          fechaInicio: "2024-03-01",
+          fechaFin: "2024-07-15",
+          modalidad: "presencial",
+          precio: 850.00
+        },
+        {
+          idCurso: 2,
+          nombre: "Metodologías Lúdicas",
+          descripcion: "Técnicas de enseñanza a través del juego para niños de 3-6 años",
+          codigo: "ML-002",
+          duracion: "80 horas",
+          capacidadMaxima: 20,
+          matriculados: 15,
+          estado: "activo",
+          fechaInicio: "2024-04-01",
+          fechaFin: "2024-06-30",
+          modalidad: "híbrido",
+          precio: 650.00
+        },
+        {
+          idCurso: 3,
+          nombre: "Estimulación Temprana",
+          descripcion: "Actividades para potenciar el desarrollo neurológico infantil",
+          codigo: "ET-003",
+          duracion: "60 horas",
+          capacidadMaxima: 30,
+          matriculados: 22,
+          estado: "activo",
+          fechaInicio: "2024-05-01",
+          fechaFin: "2024-07-01",
+          modalidad: "virtual",
+          precio: 450.00
+        }
+      ];
+
+      console.log('📚 Cursos obtenidos (demo):', cursosDemo);
+      setCursos(cursosDemo);
     } catch (error) {
       console.error('❌ Error al cargar cursos:', error);
       toast.error('Error al cargar los cursos');
@@ -90,20 +133,31 @@ const Cursos = () => {
   // Funciones para guardar cambios
   const handleSaveCurso = async (cursoData) => {
     try {
-      console.log('💾 Guardando curso:', cursoData);
+      console.log('💾 Guardando curso (demo):', cursoData);
+
+      // Simular guardado
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (cursoSeleccionado) {
         // Actualizar curso existente
-        await cursoService.update(cursoSeleccionado.idCurso, cursoData);
+        setCursos(prev => prev.map(curso => 
+          curso.idCurso === cursoSeleccionado.idCurso 
+            ? { ...curso, ...cursoData }
+            : curso
+        ));
         toast.success('Curso actualizado exitosamente');
       } else {
         // Crear nuevo curso
-        await cursoService.create(cursoData);
+        const nuevoCurso = {
+          ...cursoData,
+          idCurso: Date.now(), // ID temporal
+          matriculados: 0,
+          estado: 'activo'
+        };
+        setCursos(prev => [...prev, nuevoCurso]);
         toast.success('Curso creado exitosamente');
       }
 
-      // Recargar lista de cursos
-      await cargarCursos();
       handleCloseModals();
     } catch (error) {
       console.error('❌ Error al guardar curso:', error);
@@ -113,13 +167,14 @@ const Cursos = () => {
 
   const handleDeleteCurso = async () => {
     try {
-      console.log('🗑️ Eliminando curso:', cursoSeleccionado);
+      console.log('🗑️ Eliminando curso (demo):', cursoSeleccionado);
 
-      await cursoService.delete(cursoSeleccionado.idCurso);
+      // Simular eliminación
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setCursos(prev => prev.filter(curso => curso.idCurso !== cursoSeleccionado.idCurso));
       toast.success('Curso eliminado exitosamente');
 
-      // Recargar lista de cursos
-      await cargarCursos();
       handleCloseModals();
     } catch (error) {
       console.error('❌ Error al eliminar curso:', error);

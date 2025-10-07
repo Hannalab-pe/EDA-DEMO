@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, User, Mail, Phone, Shield, Building, Key } from 'lucide-react';
 import ImageUploader from '../../../../components/common/ImageUploader';
-import { uploadUserImage } from '../../../../services/cloudinaryService';
 
 const ModalAgregarUsuario = ({ isOpen, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
@@ -100,9 +99,11 @@ const ModalAgregarUsuario = ({ isOpen, onClose, onSave }) => {
   const handlePhotoUpload = async (file) => {
     try {
       setUploading(true);
-      const result = await uploadUserImage(file);
-      setPhotoUrl(result.url);
-      return result;
+      // Simular subida de imagen en modo demo
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const mockUrl = URL.createObjectURL(file);
+      setPhotoUrl(mockUrl);
+      return { url: mockUrl, public_id: 'demo_' + Date.now() };
     } catch (error) {
       console.error('Error uploading photo:', error);
       throw error;

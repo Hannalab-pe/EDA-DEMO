@@ -24,7 +24,6 @@ import {
   FileText,
   BarChart3
 } from 'lucide-react';
-import openaiService from '../../../services/openaiService';
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
@@ -43,14 +42,39 @@ const AIChat = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Verificar estado de la API al cargar
+  // Función para generar respuestas demo de AI
+  const getDemoAIResponse = (userMessage) => {
+    const message = userMessage.toLowerCase();
+    
+    if (message.includes('profesor') || message.includes('maestr') || message.includes('docent')) {
+      return `👩‍🏫 **Estrategias para Mejorar el Desempeño Docente**\n\n🎯 **Capacitación Continua:**\n• Talleres mensuales de metodologías lúdicas\n• Certificaciones en desarrollo infantil\n• Intercambio de experiencias entre maestros\n\n📊 **Evaluación y Feedback:**\n• Observaciones de clase estructuradas\n• Reuniones individuales semanales\n• Reconocimiento público de logros\n\n🌟 **Motivación y Bienestar:**\n• Programa de incentivos por desempeño\n• Espacios de relajación y descanso\n• Celebración de fechas especiales\n\n¿Te gustaría profundizar en alguna de estas estrategias?`;
+    }
+    
+    if (message.includes('padre') || message.includes('familia') || message.includes('apoderado')) {
+      return `👨‍👩‍👧‍👦 **Mejorando la Comunicación con Padres**\n\n💬 **Canales de Comunicación:**\n• App móvil para mensajes instantáneos\n• Reuniones virtuales mensuales\n• Boletines informativos semanales\n\n📱 **Herramientas Digitales:**\n• Fotos y videos del progreso diario\n• Reportes de actividades en tiempo real\n• Agenda digital de eventos\n\n🤝 **Participación Activa:**\n• Talleres para padres sobre desarrollo infantil\n• Actividades familiares en el jardín\n• Comités de padres colaboradores\n\n¿Qué aspecto te interesa implementar primero?`;
+    }
+    
+    if (message.includes('actividad') || message.includes('juego') || message.includes('lúdic')) {
+      return `🎨 **Actividades Lúdicas para Desarrollo Integral**\n\n🧠 **Desarrollo Cognitivo:**\n• Juegos de memoria con colores y formas\n• Rompecabezas adaptados por edad\n• Cuentos interactivos con preguntas\n\n🤸‍♀️ **Desarrollo Motor:**\n• Circuitos de psicomotricidad\n• Bailes y canciones con movimientos\n• Actividades de arte manual\n\n💭 **Desarrollo Emocional:**\n• Teatro de emociones\n• Rincón de la calma\n• Juegos cooperativos\n\n🎯 **Para 3-5 años:** Todas adaptables por nivel de dificultad.\n\n¿Necesitas ideas específicas para algún grupo de edad?`;
+    }
+    
+    if (message.includes('conflict') || message.includes('problema') || message.includes('disciplina')) {
+      return `🕊️ **Gestión de Conflictos en el Aula**\n\n🔍 **Prevención:**\n• Reglas claras y visuales\n• Rutinas estructuradas\n• Espacios bien organizados\n\n⚖️ **Resolución:**\n• Técnica del semáforo emocional\n• Tiempo de reflexión guiada\n• Mediación entre niños\n\n👥 **Trabajo en Equipo:**\n• Círculos de conversación\n• Actividades de empatía\n• Reconocimiento de comportamientos positivos\n\n📋 **Seguimiento:**\n• Registro de incidentes\n• Comunicación con padres\n• Planes de mejora individualizados\n\n¿Hay algún tipo de conflicto específico que quieres abordar?`;
+    }
+    
+    if (message.includes('salud') || message.includes('seguridad') || message.includes('higiene')) {
+      return `🏥 **Salud y Seguridad Infantil**\n\n🧼 **Protocolos de Higiene:**\n• Lavado de manos cada 2 horas\n• Desinfección de juguetes diaria\n• Control de temperatura al ingreso\n\n🚨 **Medidas de Seguridad:**\n• Simulacros mensuales de evacuación\n• Botiquín completo y actualizado\n• Personal capacitado en primeros auxilios\n\n🍎 **Alimentación Saludable:**\n• Menús nutritivos balanceados\n• Control de alergias alimentarias\n• Educación sobre hábitos saludables\n\n📋 **Documentación:**\n• Fichas médicas actualizadas\n• Registro de incidentes\n• Comunicación inmediata con padres\n\n¿Necesitas ayuda con algún protocolo específico?`;
+    }
+    
+    // Respuesta genérica
+    return `🤖 **¡Excelente pregunta!**\n\nComo tu asistente educativo especializado en jardines infantiles, estoy aquí para ayudarte con cualquier desafío administrativo o pedagógico.\n\n🎯 **Temas en los que puedo ayudarte:**\n• Gestión de personal docente\n• Comunicación con padres de familia\n• Actividades pedagógicas innovadoras\n• Resolución de conflictos\n• Planificación educativa\n• Salud y seguridad\n• Gestión financiera\n• Eventos y celebraciones\n\n💡 **Consejo:** Sé más específico en tu consulta para darte una respuesta más detallada y práctica.\n\n¿En qué área específica necesitas mi apoyo hoy?`;
+  };
+
+  // Verificar estado de la API al cargar - DEMO VERSION
   useEffect(() => {
     const checkApiStatus = () => {
-      if (openaiService.isConfigured()) {
-        setApiStatus('connected');
-      } else {
-        setApiStatus('error');
-      }
+      // Siempre configurado en modo demo
+      setApiStatus('connected');
     };
 
     checkApiStatus();
@@ -101,11 +125,11 @@ const AIChat = () => {
     setIsTyping(true);
 
     try {
-      // Preparar historial de conversación para OpenAI
+      // Preparar historial de conversación para la respuesta demo
       const history = conversationHistory.slice(-6); // Limitar a últimos 6 mensajes para contexto
 
-      // Llamar a OpenAI ChatGPT
-      const aiResponse = await openaiService.sendMessage(userMessage, history);
+      // Simular respuesta de AI con datos demo
+      const aiResponse = getDemoAIResponse(userMessage);
 
       // Agregar respuesta a los mensajes
       const newAiMessage = {

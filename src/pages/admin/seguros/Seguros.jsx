@@ -16,28 +16,44 @@ const Seguros = () => {
   const fetchSeguros = async () => {
     try {
       setLoading(true);
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-      const token = localStorage.getItem('token') || JSON.parse(localStorage.getItem('auth-storage'))?.state?.token;
-
-      const response = await fetch(`${API_BASE_URL}/tipo-seguro`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      
+      // Simular datos demo de seguros
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const segurosDemo = [
+        {
+          idTipoSeguro: 1,
+          nombre: "Seguro Básico Escolar",
+          descripcion: "Cobertura básica para actividades escolares y accidentes menores",
+          porcentaje: 15.5,
+          monto: 150.00,
+          estado: "ACTIVO",
+          fechaCreacion: "2024-01-15T10:00:00Z",
+          cobertura: "Accidentes escolares, primeros auxilios, medicamentos básicos"
+        },
+        {
+          idTipoSeguro: 2,
+          nombre: "Seguro Integral Premium",
+          descripcion: "Cobertura completa incluyendo hospitalización y cirugías menores",
+          porcentaje: 25.0,
+          monto: 350.00,
+          estado: "ACTIVO",
+          fechaCreacion: "2024-01-20T14:30:00Z",
+          cobertura: "Hospitalización, cirugías menores, medicamentos, terapias"
+        },
+        {
+          idTipoSeguro: 3,
+          nombre: "Seguro Familiar",
+          descripcion: "Extensión de cobertura para padres y hermanos del estudiante",
+          porcentaje: 30.0,
+          monto: 500.00,
+          estado: "INACTIVO",
+          fechaCreacion: "2024-02-01T09:15:00Z",
+          cobertura: "Cobertura familiar completa, emergencias, consultas médicas"
         }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al obtener tipos de seguro');
-      }
-
-      const result = await response.json();
-
-      if (result.success && result.tiposSeguro) {
-        setSeguros(result.tiposSeguro);
-      } else {
-        throw new Error('Formato de respuesta inválido');
-      }
+      ];
+      
+      setSeguros(segurosDemo);
     } catch (error) {
       console.error('Error fetching seguros:', error);
       toast.error('Error al cargar los tipos de seguro');

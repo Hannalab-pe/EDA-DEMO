@@ -1,6 +1,5 @@
 // src/pages/admin/planilla/Planilla.jsx
 import React, { useState, useMemo, useEffect } from 'react';
-import { useTrabajadoresTipoContratoPlanilla } from '../../../hooks/queries/usePlanillaQueries';
 import { useAuthStore } from '../../../store';
 import {
   Users,
@@ -17,7 +16,6 @@ import {
   Send
 } from 'lucide-react';
 import { toast } from 'sonner';
-import planillaService from '../../../services/planillaService';
 
 const Planilla = () => {
   // Obtener fecha actual para valores por defecto
@@ -34,20 +32,77 @@ const Planilla = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTrabajadores, setSelectedTrabajadores] = useState([]);
   const [isCreatingPlanilla, setIsCreatingPlanilla] = useState(false);
+  const [trabajadores, setTrabajadores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Obtener usuario del store
   const { user } = useAuthStore();
 
-  // Hook para obtener trabajadores con contrato planilla
-  const {
-    data: trabajadores = [],
-    isLoading: loading,
-    error,
-    refetch
-  } = useTrabajadoresTipoContratoPlanilla({
-    mes: selectedMes,
-    anio: selectedAnio
-  });
+  // Función para refrescar datos (demo)
+  const refetch = async () => {
+    await loadTrabajadoresDemo();
+  };
+
+  // Cargar datos demo de trabajadores
+  const loadTrabajadoresDemo = async () => {
+    try {
+      setLoading(true);
+      
+      // Simular carga de datos
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const trabajadoresDemo = [
+        {
+          idTrabajador: 1,
+          nombre: "María Elena",
+          apellido: "García López",
+          tipoContrato: "PLANILLA",
+          cargo: "Directora",
+          sueldo: 3500.00,
+          estado: "ACTIVO",
+          planillaGenerada: false,
+          fechaIngreso: "2024-01-15"
+        },
+        {
+          idTrabajador: 2,
+          nombre: "Ana Patricia",
+          apellido: "Mendoza Silva",
+          tipoContrato: "PLANILLA",
+          cargo: "Profesora Principal",
+          sueldo: 2800.00,
+          estado: "ACTIVO",
+          planillaGenerada: false,
+          fechaIngreso: "2024-02-01"
+        },
+        {
+          idTrabajador: 3,
+          nombre: "Carlos Alberto",
+          apellido: "Ruiz Torres",
+          tipoContrato: "PLANILLA",
+          cargo: "Profesor de Educación Física",
+          sueldo: 2500.00,
+          estado: "ACTIVO",
+          planillaGenerada: true,
+          fechaIngreso: "2024-01-20"
+        }
+      ];
+      
+      setTrabajadores(trabajadoresDemo);
+      setError(null);
+    } catch (error) {
+      console.error('Error loading trabajadores demo:', error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos demo al montar el componente
+  useEffect(() => {
+    loadTrabajadoresDemo();
+  }, [selectedMes, selectedAnio]);
+  }, [selectedMes, selectedAnio]);
 
   // Filtrar trabajadores por búsqueda local
   const filteredTrabajadores = useMemo(() => {
@@ -186,10 +241,19 @@ const Planilla = () => {
 
     setIsCreatingPlanilla(true);
     try {
-      const response = await planillaService.generarPlanillasConTrabajadores(payload);
-      console.log('✅ Respuesta del servidor:', response);
+      // Simular creación exitosa de planilla
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('✅ Planilla creada exitosamente (demo)');
 
       toast.success(`Planilla creada exitosamente con ${selectedTrabajadores.length} trabajadores`);
+      
+      // Marcar trabajadores como planilla generada
+      setTrabajadores(prev => prev.map(t => 
+        selectedTrabajadores.some(st => st.idTrabajador === t.idTrabajador) 
+          ? { ...t, planillaGenerada: true }
+          : t
+      ));
       
       // Limpiar selección y salir del modo selección
       setIsSelectionMode(false);
@@ -199,64 +263,7 @@ const Planilla = () => {
       await refetch();
     } catch (error) {
       console.error('❌ Error al crear planilla:', error);
-      
-      // Si el error es 409 (Conflict) o es un error de conflicto personalizado
-      if (error.response?.status === 409 || error.status === 409 || error.isConflict || error.message.includes('Ya existe una planilla')) {
-        console.log('🔄 Detectado error de conflicto - Planilla ya existe para este período');
-        console.log('📊 Detalles del error:', { status: error.status, isConflict: error.isConflict, message: error.message });
-        console.log('🔄 Planilla ya existe para este período, intentando agregar trabajadores...');
-        
-        try {
-          // Obtener la planilla existente por período
-          const planillaExistente = await planillaService.obtenerPlanillaPorPeriodo(selectedMes, selectedAnio);
-          console.log('📋 Planilla existente encontrada:', planillaExistente);
-          
-          if (planillaExistente && planillaExistente.idPlanillaMensual) {
-            console.log('✅ Planilla existente válida con ID:', planillaExistente.idPlanillaMensual);
-            // Agregar trabajadores a la planilla existente
-            // Extraer solo los IDs de los trabajadores seleccionados
-            const trabajadoresIds = selectedTrabajadores.map(trabajador => trabajador.idTrabajador);
-            
-            const agregarPayload = {
-              trabajadores: trabajadoresIds,
-              generadoPor: entidadId
-            };
-            
-            console.log('📤 Agregando trabajadores a planilla existente:', agregarPayload);
-            
-            const responseAgregar = await planillaService.agregarTrabajadoresAPlanilla(
-              planillaExistente.idPlanillaMensual, 
-              trabajadoresIds,
-              entidadId
-            );
-            
-            console.log('✅ Trabajadores agregados exitosamente:', responseAgregar);
-            toast.success(`Trabajadores agregados exitosamente a la planilla existente`);
-            
-            // Limpiar selección y salir del modo selección
-            setIsSelectionMode(false);
-            setSelectedTrabajadores([]);
-            
-            // Refrescar datos
-            await refetch();
-          } else {
-            console.error('❌ Planilla existente no tiene ID válido:', planillaExistente);
-            toast.error('La planilla existente no tiene un ID válido. Contacte al administrador.');
-          }
-        } catch (agregarError) {
-          console.error('❌ Error al agregar trabajadores a planilla existente:', agregarError);
-          
-          // Si el error es 404, significa que no existe planilla para este período
-          if (agregarError.response?.status === 404) {
-            toast.error('No se encontró una planilla existente para este período. Intente crear una nueva planilla.');
-          } else {
-            toast.error(agregarError.response?.data?.message || 'Error al agregar trabajadores a la planilla existente');
-          }
-        }
-      } else {
-        // Error diferente a 409
-        toast.error(error.response?.data?.message || 'Error al crear la planilla');
-      }
+      toast.error('Error al crear la planilla. Intenta nuevamente.');
     } finally {
       setIsCreatingPlanilla(false);
     }

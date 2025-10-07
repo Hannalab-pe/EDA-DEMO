@@ -7,7 +7,6 @@ import {
   Loader2,
   RefreshCw
 } from 'lucide-react'
-import cajaService from '../../../services/cajaService'
 import { toast } from 'sonner'
 
 const GestionFinanciera = () => {
@@ -26,16 +25,25 @@ const GestionFinanciera = () => {
   const cargarSaldoCaja = async () => {
     setLoadingSaldo(true)
     try {
-      console.log('🔄 Cargando saldo de caja...')
-      const response = await cajaService.obtenerSaldo()
+      console.log('🔄 Cargando saldo de caja (demo)...')
       
-      if (response.success) {
+      // Simular carga de datos demo
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const responseDemo = {
+        success: true,
+        saldo: 15750.50,
+        ingresos: 28900.00,
+        egresos: 13149.50
+      }
+      
+      if (responseDemo.success) {
         setSaldoData({
-          saldo: response.saldo,
-          ingresos: response.ingresos,
-          egresos: response.egresos
+          saldo: responseDemo.saldo,
+          ingresos: responseDemo.ingresos,
+          egresos: responseDemo.egresos
         })
-        console.log('✅ Saldo cargado:', response)
+        console.log('✅ Saldo cargado (demo):', responseDemo)
       }
     } catch (error) {
       console.error('❌ Error al cargar saldo:', error)

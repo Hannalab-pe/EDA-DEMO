@@ -75,20 +75,8 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
         tipoCalculo: formData.tipoCalculo
       };
 
-      const response = await fetch(`${API_BASE_URL}/tipo-seguro`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSend)
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al crear el tipo de seguro');
-      }
-
-      const result = await response.json();
+      // Simular creación exitosa del seguro
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast.success('Tipo de seguro creado exitosamente');
       onTipoSeguroCreado();
