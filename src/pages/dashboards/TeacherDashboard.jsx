@@ -240,27 +240,27 @@ const TeacherDashboard = () => {
     setIsChangingPassword(true);
 
     try {
-      // Usar el servicio demo para cambio de contraseña
-      await demoAuthService.changePasswordDemo(user.id, {
-        nuevaContrasena: newPassword,
-        confirmarContrasena: confirmPassword,
-      });
+      // Demo: Solo verificar que las contraseñas coincidan
+      console.log('🎭 [DEMO] Cambiando contraseña sin backend...');
+      
+      // Simular delay mínimo
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Actualizar el estado del usuario para indicar que ya cambió la contraseña
       updateUser({ ...user, cambioContrasena: true });
 
-      toast.success("Contraseña cambiada exitosamente");
+      toast.success("Contraseña cambiada exitosamente (demo)");
       setIsPasswordChangeModalOpen(false);
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      console.error("Error al cambiar contraseña:", error);
-      toast.success("Contraseña cambiada exitosamente (modo demo)");
+      console.error("Error en demo cambio contraseña:", error);
       // En modo demo, siempre permitir el cambio
       updateUser({ ...user, cambioContrasena: true });
       setIsPasswordChangeModalOpen(false);
       setNewPassword("");
       setConfirmPassword("");
+      toast.success("Contraseña cambiada exitosamente (demo)");
     } finally {
       setIsChangingPassword(false);
     }

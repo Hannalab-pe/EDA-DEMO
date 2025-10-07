@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store";
-import { useParentDashboard } from "../../hooks/useParentDashboard";
+import { useParentDashboardDemo } from "../../hooks/useParentDashboardDemo";
 
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import axios from "axios";
+
 import { toast } from "sonner";
 import {
   BarChart3,
@@ -49,9 +49,9 @@ const ParentDashboard = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const { logout, user, updateUser } = useAuthStore();
 
-  // Hook personalizado para datos del dashboard familiar
+  // Hook personalizado para datos del dashboard familiar usando datos demo
   const { dashboardData, loading, error, refreshData, estadisticas } =
-    useParentDashboard();
+    useParentDashboardDemo();
 
   // Verificar si el usuario necesita cambiar contraseña
   useEffect(() => {
@@ -258,15 +258,8 @@ const ParentDashboard = () => {
 
     setIsChangingPassword(true);
 
-    try {
-      const response = await axios.patch(
-        `/api/v1/usuario/${user.id}/forzar-cambio-contrasena`,
-        {
-          nuevaContrasena: newPassword,
-          confirmarContrasena: confirmPassword,
-        }
-      );
-
+    // Simular cambio de contraseña exitoso
+    setTimeout(() => {
       // Actualizar el estado del usuario para indicar que ya cambió la contraseña
       updateUser({ ...user, cambioContrasena: true });
 
@@ -274,12 +267,8 @@ const ParentDashboard = () => {
       setIsPasswordChangeModalOpen(false);
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error) {
-      console.error("Error al cambiar contraseña:", error);
-      toast.error("Error al cambiar la contraseña. Inténtalo de nuevo.");
-    } finally {
       setIsChangingPassword(false);
-    }
+    }, 1000);
   };
 
   const renderOverview = () => (

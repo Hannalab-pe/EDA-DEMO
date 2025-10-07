@@ -608,6 +608,88 @@ export const mockData = {
       decimales: 2,
     },
   },
+
+  // Datos para estudiantes con tareas (para parent dashboard)
+  students: [
+    {
+      id: 1,
+      name: "Sofía Pérez",
+      grade: "1ro",
+      tasks: [
+        {
+          id: 1,
+          title: "Tarea de Matemáticas - Números del 1 al 10",
+          description: "Practicar los números del 1 al 10 y colorear las figuras",
+          subject: "Matemáticas",
+          dueDate: "2024-12-20T23:59:59",
+          status: "pending",
+          priority: "high",
+          teacher: "Prof. Ana García",
+          timeEstimate: "45 min",
+          grade: "1ro",
+          assignedDate: "2024-12-15T09:00:00",
+          notes: "Importante revisar con los padres"
+        },
+        {
+          id: 2,
+          title: "Lectura de Cuentos",
+          description: "Leer el cuento 'El patito feo' y hacer un dibujo",
+          subject: "Lenguaje",
+          dueDate: "2024-12-22T23:59:59",
+          status: "completed",
+          priority: "medium",
+          teacher: "Prof. María López",
+          timeEstimate: "30 min",
+          grade: "1ro",
+          assignedDate: "2024-12-16T10:00:00",
+          completedAt: "2024-12-18T15:30:00",
+          notes: "Excelente trabajo realizado"
+        },
+        {
+          id: 3,
+          title: "Ciencias Naturales - Los Animales",
+          description: "Identificar animales domésticos y salvajes",
+          subject: "Ciencias",
+          dueDate: "2024-12-25T23:59:59",
+          status: "in_progress",
+          priority: "medium",
+          teacher: "Prof. Carlos Ruiz",
+          timeEstimate: "40 min",
+          grade: "1ro",
+          assignedDate: "2024-12-17T08:00:00",
+          notes: "Actividad práctica incluida"
+        },
+        {
+          id: 4,
+          title: "Arte y Creatividad",
+          description: "Crear una tarjeta navideña usando materiales reciclados",
+          subject: "Arte",
+          dueDate: "2024-12-19T23:59:59",
+          status: "overdue",
+          priority: "low",
+          teacher: "Prof. Elena Vega",
+          timeEstimate: "60 min",
+          grade: "1ro",
+          assignedDate: "2024-12-12T14:00:00",
+          notes: "Materiales disponibles en el aula"
+        },
+        {
+          id: 5,
+          title: "Educación Física - Ejercicios",
+          description: "Realizar ejercicios de coordinación y equilibrio",
+          subject: "Educación Física",
+          dueDate: "2024-12-21T23:59:59",
+          status: "pending",
+          priority: "medium",
+          teacher: "Prof. Miguel Torres",
+          timeEstimate: "25 min",
+          grade: "1ro",
+          assignedDate: "2024-12-18T11:00:00",
+          notes: "Ejercicios adaptados para casa"
+        }
+      ]
+    }
+  ],
 };
 
 // Función para simular delay de API

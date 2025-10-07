@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "../../utils/demoToast";
 import { useAuthStore } from "../../store";
-import { User, Lock, Eye, EyeOff, GraduationCap, Sparkles, PenTool, Book, Apple, Star, Heart, Palette, Music, Smile, Baby, Scissors, Puzzle, Trophy, Gift, Gamepad2, Paintbrush, Shapes, Zap, Rocket, Bird, TreePine, Sun, Moon, Cloud, Flower, Cake, Crown, Diamond, ChevronDown } from "lucide-react";
+import { User, Lock, Eye, EyeOff, GraduationCap, Sparkles, PenTool, Book, Apple, Star, Heart, Palette, Music, Smile, Baby, Scissors, Puzzle, Trophy, Gift, Gamepad2, Paintbrush, Shapes, Zap, Rocket, Bird, TreePine, Sun, Moon, Cloud, Flower, Cake, Crown, Diamond } from "lucide-react";
 import demoUsers from "../../data/users.json";
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
@@ -37,7 +36,6 @@ const Login = () => {
 
   const handleRoleSelection = (roleKey) => {
     setSelectedRole(roleKey);
-    setShowRoleSelector(false);
   };
 
   const handleDemoLogin = async () => {
@@ -416,61 +414,51 @@ const Login = () => {
 
                 {/* Demo Form */}
                 <div className="space-y-6">
-                  {/* Role Selector */}
+                  {/* Role Selector - Botones individuales */}
                   <div className={`transition-all duration-700 transform ${
                     isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                   }`} style={{ transitionDelay: '0.5s' }}>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Selecciona tu rol
+                    <label className="block text-sm font-semibold text-gray-700 mb-4 text-center">
+                      Selecciona tu rol para ingresar
                     </label>
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setShowRoleSelector(!showRoleSelector)}
-                        className="w-full pl-4 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 hover:border-gray-300 transition-all duration-300 bg-white/70 backdrop-blur-sm text-left"
-                      >
-                        {selectedRole ? (
+                    
+                    {/* Botones de roles */}
+                    <div className="space-y-3">
+                      {Object.entries(demoUsers.roles).map(([roleKey, roleData]) => (
+                        <button
+                          key={roleKey}
+                          type="button"
+                          onClick={() => handleRoleSelection(roleKey)}
+                          className={`w-full p-4 border-2 rounded-2xl transition-all duration-300 text-left ${
+                            selectedRole === roleKey
+                              ? 'border-blue-500 bg-blue-50 shadow-md'
+                              : 'border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white/90'
+                          }`}
+                        >
                           <div className="flex items-center">
-                            <span className="text-2xl mr-3">{demoUsers.roles[selectedRole].icon}</span>
-                            <div>
-                              <div className="font-medium text-gray-800">
-                                {demoUsers.roles[selectedRole].displayName}
+                            <span className="text-3xl mr-4">{roleData.icon}</span>
+                            <div className="flex-1">
+                              <div className={`font-semibold ${
+                                selectedRole === roleKey ? 'text-blue-800' : 'text-gray-800'
+                              }`}>
+                                {roleData.displayName}
                               </div>
-                              <div className="text-sm text-gray-500">
-                                {demoUsers.roles[selectedRole].description}
+                              <div className={`text-sm ${
+                                selectedRole === roleKey ? 'text-blue-600' : 'text-gray-500'
+                              }`}>
+                                {roleData.description}
                               </div>
                             </div>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500">Elige un rol para continuar...</span>
-                        )}
-                        <ChevronDown className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 transition-transform ${showRoleSelector ? 'rotate-180' : ''}`} />
-                      </button>
-                      
-                      {showRoleSelector && (
-                        <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-2xl shadow-xl overflow-hidden">
-                          {Object.entries(demoUsers.roles).map(([roleKey, roleData]) => (
-                            <button
-                              key={roleKey}
-                              type="button"
-                              onClick={() => handleRoleSelection(roleKey)}
-                              className="w-full px-4 py-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
-                            >
-                              <div className="flex items-center">
-                                <span className="text-2xl mr-3">{roleData.icon}</span>
-                                <div>
-                                  <div className="font-medium text-gray-800">
-                                    {roleData.displayName}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {roleData.description}
-                                  </div>
-                                </div>
+                            {selectedRole === roleKey && (
+                              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
                               </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                            )}
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
 
