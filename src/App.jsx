@@ -26,12 +26,39 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { initializeAuth, isAuthenticated, loading, user } = useAuthStore();
+  const { initializeAuth, isAuthenticated, loading, user, clearAll } = useAuthStore();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // Inicializar autenticación al cargar la app
   useEffect(() => {
     initializeAuth();
+    
+    // Agregar función de debug global para limpiar estado
+    if (typeof window !== 'undefined') {
+      window.clearAuthState = () => {
+        console.log('🔧 Ejecutando limpieza de estado desde consola...');
+        clearAll();
+        window.location.reload();
+      };
+      
+      window.debugAuth = () => {
+        const currentState = useAuthStore.getState();
+        console.log('🔍 Estado actual de autenticación:', {
+          isAuthenticated: currentState.isAuthenticated,
+          user: currentState.user,
+          role: currentState.role,
+          token: currentState.token?.substring(0, 20) + '...',
+          localStorage: {
+            token: localStorage.getItem('token')?.substring(0, 20) + '...',
+            authStorage: localStorage.getItem('auth-storage') ? 'Presente' : 'Ausente'
+          }
+        });
+      };
+      
+      console.log('🔧 Funciones de debug disponibles:');
+      console.log('  - window.clearAuthState() - Limpia completamente el estado');
+      console.log('  - window.debugAuth() - Muestra el estado actual');
+    }
   }, []);
 
   // Verificar si necesita cambiar contraseña después de autenticarse

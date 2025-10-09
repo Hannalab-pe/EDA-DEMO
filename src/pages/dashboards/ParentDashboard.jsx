@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "../../store";
 import { useParentDashboardDemo } from "../../hooks/useParentDashboardDemo";
 
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-import { toast } from "sonner";
 import {
   BarChart3,
   FileText,
@@ -16,7 +15,6 @@ import {
   LogOut,
   Star,
   CheckCircle,
-  User,
   X,
   TrendingUp,
   ChevronRight,
@@ -42,23 +40,11 @@ const ParentDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] =
-    useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const { logout, user, updateUser } = useAuthStore();
+  const { logout, user } = useAuthStore();
 
   // Hook personalizado para datos del dashboard familiar usando datos demo
   const { dashboardData, loading, error, refreshData, estadisticas } =
     useParentDashboardDemo();
-
-  // Verificar si el usuario necesita cambiar contraseña
-  useEffect(() => {
-    if (user?.cambioContrasena === false) {
-      setIsPasswordChangeModalOpen(true);
-    }
-  }, [user]);
 
   const menuItems = [
     // 📊 DASHBOARD
@@ -238,37 +224,6 @@ const ParentDashboard = () => {
 
   const handleCancelLogout = () => {
     setIsLogoutModalOpen(false);
-  };
-
-  const handlePasswordChange = async () => {
-    if (!newPassword || !confirmPassword) {
-      toast.error("Por favor completa todos los campos");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast.error("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-
-    setIsChangingPassword(true);
-
-    // Simular cambio de contraseña exitoso
-    setTimeout(() => {
-      // Actualizar el estado del usuario para indicar que ya cambió la contraseña
-      updateUser({ ...user, cambioContrasena: true });
-
-      toast.success("Contraseña cambiada exitosamente");
-      setIsPasswordChangeModalOpen(false);
-      setNewPassword("");
-      setConfirmPassword("");
-      setIsChangingPassword(false);
-    }, 1000);
   };
 
   const renderOverview = () => (
@@ -753,122 +708,6 @@ const ParentDashboard = () => {
                       Cerrar sesión
                     </button>
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-
-      {/* Modal de cambio de contraseña obligatorio */}
-      <Transition appear show={isPasswordChangeModalOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-50" onClose={() => {}}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <User className="w-6 h-6 text-yellow-600" />
-                    </div>
-                  </div>
-
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-semibold text-center text-gray-900 mb-2"
-                  >
-                    Cambio de Contraseña Requerido
-                  </Dialog.Title>
-
-                  <p className="text-sm text-gray-600 text-center mb-6">
-                    Por seguridad, debes cambiar tu contraseña antes de
-                    continuar usando el sistema.
-                  </p>
-
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handlePasswordChange();
-                    }}
-                    className="space-y-4"
-                  >
-                    <div>
-                      <label
-                        htmlFor="newPassword"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Nueva Contraseña
-                      </label>
-                      <input
-                        type="password"
-                        id="newPassword"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                        placeholder="Ingresa tu nueva contraseña"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="confirmPassword"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Confirmar Contraseña
-                      </label>
-                      <input
-                        type="password"
-                        id="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                        placeholder="Repite tu nueva contraseña"
-                        required
-                      />
-                    </div>
-
-                    <div className="mt-6">
-                      <button
-                        type="submit"
-                        className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isChangingPassword}
-                      >
-                        {isChangingPassword ? (
-                          <>
-                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                            Cambiando...
-                          </>
-                        ) : (
-                          "Cambiar Contraseña"
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="mt-3 text-xs text-gray-500 text-center">
-                      La contraseña debe tener al menos 6 caracteres
-                    </div>
-                  </form>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

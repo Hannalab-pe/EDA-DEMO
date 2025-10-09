@@ -16,7 +16,13 @@ export const demoAuthService = {
       // Mapear rol al formato esperado por el sistema
       const getRoleMappingForDemo = (roleKey) => {
         const roleMap = {
+          admin: { id: "1", nombre: "admin", permissions: ["all"] },
           administracion: { id: "1", nombre: "admin", permissions: ["all"] },
+          trabajador: {
+            id: "2",
+            nombre: "trabajador",
+            permissions: ["read_students", "write_students", "academic_access"],
+          },
           docente: {
             id: "2",
             nombre: "trabajador",
@@ -56,7 +62,7 @@ export const demoAuthService = {
           tipo: "DEMO",
           rol: user.role,
           entidadId: "1",
-          cambioContrasena: true, // Cambiar a true para que no requiera cambio obligatorio
+          cambioContrasena: true, // En modo demo no requerir cambio de contraseña
           role: {
             id: roleMapping.id,
             nombre: roleMapping.nombre,
@@ -116,7 +122,13 @@ export const demoAuthService = {
       // Mapear rol para validación
       const getRoleMappingForDemo = (roleKey) => {
         const roleMap = {
+          admin: { id: "1", nombre: "admin", permissions: ["all"] },
           administracion: { id: "1", nombre: "admin", permissions: ["all"] },
+          trabajador: {
+            id: "2",
+            nombre: "trabajador",
+            permissions: ["read_students", "write_students", "academic_access"],
+          },
           docente: {
             id: "2",
             nombre: "trabajador",
@@ -155,7 +167,7 @@ export const demoAuthService = {
           fullName: user.fullName,
           tipo: "DEMO",
           rol: user.role,
-          cambioContrasena: true, // Asegurar que no requiera cambio
+          cambioContrasena: true, // En modo demo no requerir cambio de contraseña
           role: {
             id: roleMapping.id,
             nombre: roleMapping.nombre,

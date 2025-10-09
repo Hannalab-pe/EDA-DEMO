@@ -98,7 +98,7 @@ const Login = () => {
           tipo: "DEMO",
           rol: selectedUser.role,
           entidadId: "1",
-          cambioContrasena: false,
+          cambioContrasena: true,
           role: {
             id: selectedUser.id.toString(),
             nombre: selectedUser.role,
@@ -117,11 +117,8 @@ const Login = () => {
         permissions: selectedUser.permissions || [],
       };
 
-      // Actualizar store de Zustand
+      // Actualizar store de Zustand (ya guarda el token internamente)
       login(userData);
-
-      // Guardar token en localStorage
-      localStorage.setItem("token", userData.token);
 
       toast.success(`¡Bienvenido ${selectedUser.name}! 🎉`, {
         description: `Accediendo como ${
@@ -499,7 +496,7 @@ const Login = () => {
               <div className="w-full max-w-md">
                 {/* Form Container */}
                 <div
-                  className={`bg-transparent rounded-3xl border border-white/30 p-6 lg:p-8 relative transition-all duration-1200 transform shadow-xl ${
+                  className={`bg-transparent rounded-3xl border-white/90 p-6 lg:p-8 relative transition-all duration-1200 transform ${
                     isVisible
                       ? "translate-y-0 opacity-100 scale-100"
                       : "translate-y-8 opacity-0 scale-95"

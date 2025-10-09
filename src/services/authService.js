@@ -174,39 +174,6 @@ export const authService = {
     }
 
     try {
-      // Fallback para modo desarrollo primero
-      if (token.startsWith('dev-token-')) {
-        const userId = token.replace('dev-token-', '');
-        const testUsers = {
-          '1': {
-            id: '1',
-            email: 'admin@nidopro.com',
-            nombre: 'Administrador',
-            apellido: 'Sistema',
-            role: { id: '1', nombre: 'admin' },
-            permissions: ['all']
-          },
-          '2': {
-            id: '2', 
-            email: 'trabajador@nidopro.com',
-            nombre: 'Juan',
-            apellido: 'Pérez',
-            role: { id: '2', nombre: 'trabajador' },
-            permissions: ['read_students', 'write_students']
-          }
-        };
-        
-        const user = testUsers[userId];
-        if (user) {
-          return {
-            valid: true,
-            user,
-            role: user.role,
-            permissions: user.permissions
-          };
-        }
-      }
-
       // Para tokens reales del backend
       const response = await authApi.get('/auth/validate', {
         headers: {

@@ -16,6 +16,12 @@ const useAuthStore = create(
 
       // Acciones de autenticación
       login: (userData) => {
+        console.log('🔐 Iniciando sesión como:', userData.user.rol, userData.user.fullName);
+        
+        // Guardar token en localStorage
+        localStorage.setItem('token', userData.token);
+        
+        // Actualizar estado de Zustand
         set({
           user: userData.user,
           token: userData.token,
@@ -24,6 +30,8 @@ const useAuthStore = create(
           isAuthenticated: true,
           error: null,
         });
+        
+        console.log('✅ Sesión guardada correctamente');
       },
 
       logout: async () => {
@@ -117,6 +125,29 @@ const useAuthStore = create(
         return role?.nombre === 'especialista' || role?.nombre === 'specialist';
       },
 
+      // Limpiar completamente el estado y localStorage (para debug)
+      clearAll: () => {
+        console.log('🧹 Limpiando completamente el estado de autenticación');
+        
+        // Limpiar localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth-storage');
+        
+        // Resetear estado
+        set({
+          user: null,
+          token: null,
+          role: null,
+          permissions: [],
+          isAuthenticated: false,
+          loading: false,
+          error: null,
+          initialized: false,
+        });
+        
+        console.log('✅ Estado limpiado completamente');
+      },
+
       // Obtener el ID del rol para APIs
       getRoleId: () => {
         const { role } = get();
@@ -132,13 +163,14 @@ const useAuthStore = create(
         
         const token = localStorage.getItem('token');
         if (token) {
-          // Para tokens demo
+          // Solo para tokens demo válidos
           if (token.startsWith('demo-token-')) {
             try {
               const { authService } = await import('../services/authService');
               const validation = await authService.validateToken(token);
               
               if (validation.valid) {
+                console.log('🔄 Restaurando sesión demo válida:', validation.user.rol);
                 set({ 
                   user: validation.user,
                   token, 
@@ -150,81 +182,29 @@ const useAuthStore = create(
                 return;
               }
             } catch (error) {
-              console.log('Error validando token demo:', error);
+              console.log('❌ Error validando token demo:', error);
+              // Si falla la validación, limpiar todo
+              localStorage.removeItem('token');
+              localStorage.removeItem('auth-storage');
             }
-          }
-          
-          // Para modo desarrollo
-          if (token.startsWith('dev-token-')) {
-            const userId = token.replace('dev-token-', '');
-            const testUsers = {
-              '1': {
-                id: '1',
-                email: 'admin@nidopro.com',
-                nombre: 'Administrador',
-                apellido: 'Sistema',
-                role: { id: '1', nombre: 'admin' },
-                permissions: ['all']
-              },
-              '2': {
-                id: '2', 
-                email: 'trabajador@nidopro.com',
-                nombre: 'Juan',
-                apellido: 'Pérez',
-                role: { id: '2', nombre: 'trabajador' },
-                permissions: ['read_students', 'write_students']
-              }
-            };
-            
-            const user = testUsers[userId];
-            if (user) {
-              set({ 
-                user,
-                token, 
-                isAuthenticated: true, 
-                role: user.role,
-                permissions: user.permissions,
-                loading: false 
-              });
-              return;
-            }
-          }
-          
-          // Si hay un token guardado, mantener el estado persistido
-          console.log('🔄 Restaurando sesión persistida desde localStorage');
-          
-          // Obtener el estado persistido del localStorage
-          const persistedState = JSON.parse(localStorage.getItem('auth-storage') || '{}');
-          
-          if (persistedState.state && persistedState.state.user && persistedState.state.role) {
-            // Restaurar el estado persistido completo
-            set({ 
-              user: persistedState.state.user,
-              token, 
-              isAuthenticated: true, 
-              role: persistedState.state.role,
-              permissions: persistedState.state.permissions || [],
-              loading: false,
-              error: null
-            });
           } else {
-            // Si no hay estado persistido, limpiar todo
+            // Si no es un token demo válido, limpiar todo
+            console.log('🧹 Token no válido, limpiando localStorage');
             localStorage.removeItem('token');
             localStorage.removeItem('auth-storage');
-            set({ 
-              user: null,
-              token: null,
-              role: null,
-              permissions: [],
-              isAuthenticated: false,
-              loading: false,
-              error: null
-            });
           }
-        } else {
-          // Si no hay token, establecer loading como false
-          set({ loading: false });
         }
+        
+        // Si llegamos aquí, no hay sesión válida
+        set({ 
+          user: null,
+          token: null,
+          role: null,
+          permissions: [],
+          isAuthenticated: false,
+          loading: false,
+          error: null
+        });
       },
     }),
     {
