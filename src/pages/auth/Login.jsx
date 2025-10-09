@@ -143,7 +143,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-white to-purple-100 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-white to-purple-100 relative overflow-x-hidden">
       {/* Background Elements with animations */}
       <div
         className={`absolute inset-0 transition-all duration-1500 ${
@@ -486,11 +486,11 @@ const Login = () => {
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-6xl flex items-center justify-center">
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-6xl flex items-stretch justify-center">
             {/* Left Side - Login Form */}
             <div
-              className={`w-full lg:w-1/2 flex items-center justify-start pl-6 pr-3 transition-all duration-1000 transform ${
+              className={`w-full lg:w-1/2 flex items-center justify-center transition-all duration-1000 transform ${
                 isVisible
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-10 opacity-0"
@@ -499,38 +499,38 @@ const Login = () => {
               <div className="w-full max-w-md">
                 {/* Form Container */}
                 <div
-                  className={`bg-transparent rounded-3xl border border-white/30 p-8 relative transition-all duration-1200 transform ${
+                  className={`bg-transparent rounded-3xl border border-white/30 p-6 lg:p-8 relative transition-all duration-1200 transform shadow-xl ${
                     isVisible
                       ? "translate-y-0 opacity-100 scale-100"
                       : "translate-y-8 opacity-0 scale-95"
                   }`}
                 >
                   {/* Mobile logo */}
-                  <div className="lg:hidden flex items-center justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
-                      <GraduationCap className="w-8 h-8 text-white" />
+                  <div className="lg:hidden flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+                      <GraduationCap className="w-6 h-6 text-white" />
                     </div>
                   </div>
 
                   {/* Form Header */}
                   <div
-                    className={`text-center mb-8 transition-all duration-700 transform ${
+                    className={`text-center mb-6 transition-all duration-700 transform ${
                       isVisible
                         ? "translate-y-0 opacity-100"
                         : "translate-y-4 opacity-0"
                     }`}
                     style={{ transitionDelay: "0.3s" }}
                   >
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    <h3 className="text-xl lg:text-2xl font-bold text-gray-800 mb-2">
                       Demo EDA
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm lg:text-base text-gray-600">
                       Selecciona un rol para explorar el sistema
                     </p>
                   </div>
 
                   {/* Demo Form */}
-                  <div className="space-y-6">
+                  <div className="space-y-4 lg:space-y-6">
                     {/* Role Selector - Botones individuales */}
                     <div
                       className={`transition-all duration-700 transform ${
@@ -540,31 +540,31 @@ const Login = () => {
                       }`}
                       style={{ transitionDelay: "0.5s" }}
                     >
-                      <label className="block text-sm font-semibold text-gray-700 mb-4 text-center">
+                      <label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
                         Selecciona tu rol para ingresar
                       </label>
 
-                      {/* Botones de roles */}
-                      <div className="space-y-3">
+                      {/* Botones de roles - más compactos en mobile */}
+                      <div className="space-y-2 lg:space-y-3">
                         {Object.entries(demoUsers.roles).map(
                           ([roleKey, roleData]) => (
                             <button
                               key={roleKey}
                               type="button"
                               onClick={() => handleRoleSelection(roleKey)}
-                              className={`w-full p-4 border-2 rounded-2xl transition-all duration-300 text-left ${
+                              className={`w-full p-3 lg:p-4 border-2 rounded-xl lg:rounded-2xl transition-all duration-300 text-left ${
                                 selectedRole === roleKey
                                   ? "border-blue-500 bg-blue-50 shadow-md"
                                   : "border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white/90"
                               }`}
                             >
                               <div className="flex items-center">
-                                <span className="text-3xl mr-4">
+                                <span className="text-2xl lg:text-3xl mr-3">
                                   {roleData.icon}
                                 </span>
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0">
                                   <div
-                                    className={`font-semibold ${
+                                    className={`font-semibold text-sm lg:text-base truncate ${
                                       selectedRole === roleKey
                                         ? "text-blue-800"
                                         : "text-gray-800"
@@ -573,7 +573,7 @@ const Login = () => {
                                     {roleData.displayName}
                                   </div>
                                   <div
-                                    className={`text-sm ${
+                                    className={`text-xs lg:text-sm line-clamp-1 ${
                                       selectedRole === roleKey
                                         ? "text-blue-600"
                                         : "text-gray-500"
@@ -583,9 +583,9 @@ const Login = () => {
                                   </div>
                                 </div>
                                 {selectedRole === roleKey && (
-                                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                                     <svg
-                                      className="w-4 h-4 text-white"
+                                      className="w-3 h-3 lg:w-4 lg:h-4 text-white"
                                       fill="currentColor"
                                       viewBox="0 0 20 20"
                                     >
@@ -604,52 +604,6 @@ const Login = () => {
                       </div>
                     </div>
 
-                    {/* Usuario Preview */}
-                    {selectedUser && (
-                      <div
-                        className={`transition-all duration-700 transform ${
-                          isVisible
-                            ? "translate-y-0 opacity-100"
-                            : "translate-y-4 opacity-0"
-                        }`}
-                        style={{ transitionDelay: "0.7s" }}
-                      >
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 border border-blue-200">
-                          <div className="flex items-center">
-                            <div className="text-3xl mr-4">
-                              {selectedUser.avatar}
-                            </div>
-                            <div>
-                              <div className="font-semibold text-gray-800">
-                                {selectedUser.fullName}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {selectedUser.username}
-                              </div>
-                              {selectedUser.aula && (
-                                <div className="text-sm text-blue-600">
-                                  {selectedUser.aula} - {selectedUser.grado}
-                                </div>
-                              )}
-                              {selectedUser.specialty && (
-                                <div className="text-sm text-purple-600">
-                                  {selectedUser.specialty}
-                                </div>
-                              )}
-                              {selectedUser.children && (
-                                <div className="text-sm text-orange-600">
-                                  Padre/Madre de{" "}
-                                  {selectedUser.children
-                                    .map((child) => child.name)
-                                    .join(", ")}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
                     {/* Demo Login Button */}
                     <div
                       className={`transition-all duration-700 transform ${
@@ -657,13 +611,13 @@ const Login = () => {
                           ? "translate-y-0 opacity-100"
                           : "translate-y-4 opacity-0"
                       }`}
-                      style={{ transitionDelay: "0.9s" }}
+                      style={{ transitionDelay: "0.7s" }}
                     >
                       <button
                         type="button"
                         onClick={handleDemoLogin}
                         disabled={isLoading || !selectedUser}
-                        className={`w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl ${
+                        className={`w-full py-3 lg:py-4 px-6 rounded-xl lg:rounded-2xl font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl ${
                           isLoading || !selectedUser
                             ? "bg-gray-400 cursor-not-allowed scale-100"
                             : "bg-gradient-to-r from-blue-600 to-purple-600 focus:outline-none focus:ring-4 focus:ring-blue-200 hover:from-blue-700 hover:to-purple-700"
@@ -671,33 +625,37 @@ const Login = () => {
                       >
                         {isLoading ? (
                           <div className="flex items-center justify-center">
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                            Accediendo al Demo...
+                            <div className="w-4 h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 lg:mr-3"></div>
+                            <span className="text-sm lg:text-base">
+                              Accediendo al Demo...
+                            </span>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 mr-2" />
-                            {selectedUser
-                              ? `Entrar como ${selectedUser.name}`
-                              : "Selecciona un rol primero"}
+                            <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                            <span className="text-sm lg:text-base">
+                              {selectedUser
+                                ? `Entrar como ${selectedUser.name}`
+                                : "Selecciona un rol primero"}
+                            </span>
                           </div>
                         )}
                       </button>
                     </div>
 
                     {/* Demo Notice */}
-                    <div className="text-center">
-                      <div className="inline-flex items-center px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <span className="text-yellow-600 text-sm">
-                          🎭 Modo Demo - Todos los datos son ficticios
+                    <div className="text-center mt-4">
+                      <div className="inline-flex items-center px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <span className="text-yellow-600 text-xs lg:text-sm">
+                          🎭 Modo Demo - Datos ficticios
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Decorative elements for form */}
-                  <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg rotate-45 opacity-20"></div>
-                  <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-gradient-to-br from-pink-400 to-red-500 rounded-full opacity-30"></div>
+                  <div className="absolute -top-2 -right-2 lg:-top-4 lg:-right-4 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg rotate-45 opacity-20"></div>
+                  <div className="absolute -bottom-2 -left-2 lg:-bottom-4 lg:-left-4 w-4 h-4 lg:w-6 lg:h-6 bg-gradient-to-br from-pink-400 to-red-500 rounded-full opacity-30"></div>
                 </div>
               </div>
             </div>
@@ -787,15 +745,15 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Powered by HannahLab - Marca en inferior izquierda */}
-        <div className="absolute bottom-4 left-6 z-20 hover:-translate-y-1 transition-all duration-400">
+        {/* Powered by HannahLab - Marca en inferior */}
+        <div className="absolute bottom-2 lg:bottom-4 left-4 lg:left-6 z-20 hover:-translate-y-1 transition-all duration-400">
           <div
-            className={`flex justify-center items-center space-x-2  transition-all duration-1000 transform ${
+            className={`flex justify-center items-center space-x-2 transition-all duration-1000 transform ${
               isVisible ? "translate-y-0" : "translate-y-4 opacity-0"
             }`}
             style={{ transitionDelay: "1.5s" }}
           >
-            <div className="text-black text-sm font-medium">
+            <div className="text-black text-xs lg:text-sm font-medium">
               <a
                 href="https://hannahlab.com/"
                 target="_blank"
@@ -803,7 +761,7 @@ const Login = () => {
                 className="hover:text-black transition-colors cursor-pointer"
               >
                 Powered by{" "}
-                <span className="font-extrabold text-xl bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">
+                <span className="font-extrabold text-base lg:text-xl bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">
                   HannahLab
                 </span>
               </a>
