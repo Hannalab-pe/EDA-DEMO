@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/auth';
 import ChangePasswordModal from './components/auth/ChangePasswordModal';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/auth/Dashboard';
+import WhatsAppButton from './components/common/WhatsAppButton';
 
 // Configuración del QueryClient con cache de 5-10 minutos
 const queryClient = new QueryClient({
@@ -171,6 +172,9 @@ function App() {
             userName={user.nombre || user.fullName}
           />
         )}
+
+        {/* Botón flotante de WhatsApp - visible en toda la aplicación */}
+        <WhatsAppButton />
       </div>
       
       {/* React Query DevTools - solo en desarrollo */}
