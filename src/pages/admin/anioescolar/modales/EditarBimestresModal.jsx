@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Save, Edit } from 'lucide-react';
+import { X, Calendar, Info, Edit } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useActualizarFechasBimestres } from '../../../../hooks/queries/useBimestreQueries';
+import { toast } from 'sonner';
 
 const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
   const [bimestresData, setBimestresData] = useState([]);
-
-  const actualizarFechasMutation = useActualizarFechasBimestres();
 
   // Inicializar datos cuando se abre el modal
   useEffect(() => {
@@ -34,21 +32,11 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      // Preparar datos para el endpoint
-      const dataToSend = bimestresData.map(bimestre => ({
-        id: bimestre.id,
-        fechaInicio: bimestre.fechaInicio,
-        fechaFin: bimestre.fechaFin,
-        fechaLimiteProgramacion: bimestre.fechaLimiteProgramacion
-      }));
-
-      await actualizarFechasMutation.mutateAsync(dataToSend);
-      onClose();
-    } catch (error) {
-      console.error('Error:', error);
-      // El error ya se maneja en el hook
-    }
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y editar fechas de bimestres reales.',
+      duration: 5000,
+    });
   };
 
   if (!isOpen || !bimestres || bimestres.length === 0) return null;
@@ -164,26 +152,15 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                       type="button"
                       onClick={onClose}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                      disabled={actualizarFechasMutation.isPending}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      disabled={actualizarFechasMutation.isPending}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors"
                     >
-                      {actualizarFechasMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Actualizando...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4" />
-                          Actualizar Fechas
-                        </>
-                      )}
+                      <Info className="w-4 h-4" />
+                      Actualizar Fechas
                     </button>
                   </div>
                 </form>

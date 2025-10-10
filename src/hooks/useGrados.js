@@ -1,14 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { gradoService } from '../services/gradoService';
-import gradosService from '../services/gradosService';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { demoGradosService } from "../services/demoGradosService";
 
 // Query keys para los grados
 export const GRADOS_QUERY_KEYS = {
-  all: ['grados'],
-  lists: () => [...GRADOS_QUERY_KEYS.all, 'list'],
+  all: ["grados"],
+  lists: () => [...GRADOS_QUERY_KEYS.all, "list"],
   list: (filters) => [...GRADOS_QUERY_KEYS.lists(), { filters }],
-  details: () => [...GRADOS_QUERY_KEYS.all, 'detail'],
+  details: () => [...GRADOS_QUERY_KEYS.all, "detail"],
   detail: (id) => [...GRADOS_QUERY_KEYS.details(), id],
 };
 
@@ -21,54 +20,60 @@ export const useGrados = () => {
   // Query para obtener todos los grados
   const gradosQuery = useQuery({
     queryKey: GRADOS_QUERY_KEYS.lists(),
-    queryFn: () => gradoService.getAllGrados(),
+    queryFn: demoGradosService.getAllGrados,
     staleTime: 5 * 60 * 1000, // 5 minutos
     cacheTime: 10 * 60 * 1000, // 10 minutos
     refetchOnWindowFocus: false,
     retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     onError: (error) => {
-      console.error('❌ Error al cargar grados:', error);
-      toast.error('Error al cargar los grados disponibles');
-    }
+      console.error("❌ Error al cargar grados:", error);
+      toast.error("Error al cargar los grados disponibles");
+    },
   });
 
   // Mutation para crear grado
   const createGradoMutation = useMutation({
-    mutationFn: (gradoData) => gradoService.createGrado(gradoData),
+    mutationFn: (gradoData) => demoGradosService.createGrado(gradoData),
     onSuccess: (data) => {
+      toast.success("Grado creado exitosamente");
       // Invalidar caché para refrescar la lista
       queryClient.invalidateQueries(GRADOS_QUERY_KEYS.lists());
     },
     onError: (error) => {
-      console.error('❌ Error al crear grado:', error);
-    }
+      console.error("❌ Error al crear grado:", error);
+      toast.error(error.message || "Error al crear grado");
+    },
   });
 
   // Mutation para actualizar grado
   const updateGradoMutation = useMutation({
-    mutationFn: ({ id, data }) => gradoService.updateGrado(id, data),
+    mutationFn: ({ id, data }) => demoGradosService.updateGrado(id, data),
     onSuccess: (data, variables) => {
+      toast.success("Grado actualizado exitosamente");
       // Invalidar caché específico del grado y lista general
       queryClient.invalidateQueries(GRADOS_QUERY_KEYS.detail(variables.id));
       queryClient.invalidateQueries(GRADOS_QUERY_KEYS.lists());
     },
     onError: (error) => {
-      console.error('❌ Error al actualizar grado:', error);
-    }
+      console.error("❌ Error al actualizar grado:", error);
+      toast.error(error.message || "Error al actualizar grado");
+    },
   });
 
   // Mutation para eliminar grado
   const deleteGradoMutation = useMutation({
-    mutationFn: (id) => gradoService.deleteGrado(id),
+    mutationFn: (id) => demoGradosService.deleteGrado(id),
     onSuccess: (data, id) => {
+      toast.success("Grado eliminado exitosamente");
       // Remover del caché y refrescar lista
       queryClient.removeQueries(GRADOS_QUERY_KEYS.detail(id));
       queryClient.invalidateQueries(GRADOS_QUERY_KEYS.lists());
     },
     onError: (error) => {
-      console.error('❌ Error al eliminar grado:', error);
-    }
+      console.error("❌ Error al eliminar grado:", error);
+      toast.error(error.message || "Error al eliminar grado");
+    },
   });
 
   // Funciones de utilidad
@@ -79,7 +84,7 @@ export const useGrados = () => {
   const prefetchGrado = (id) => {
     return queryClient.prefetchQuery({
       queryKey: GRADOS_QUERY_KEYS.detail(id),
-      queryFn: () => gradoService.getGradoById(id),
+      queryFn: () => demoGradosService.getGradoById(id),
       staleTime: 5 * 60 * 1000,
     });
   };
@@ -87,22 +92,22 @@ export const useGrados = () => {
   // Helpers para buscar grados
   const findGradoById = (id) => {
     const grados = gradosQuery.data || [];
-    return grados.find(grado => grado.idGrado === id || grado.id === id);
+    return grados.find((grado) => grado.idGrado === id || grado.id === id);
   };
 
   const findGradoByNombre = (nombre) => {
     const grados = gradosQuery.data || [];
-    return grados.find(grado => 
-      grado.nombre?.toLowerCase() === nombre?.toLowerCase()
+    return grados.find(
+      (grado) => grado.nombre?.toLowerCase() === nombre?.toLowerCase()
     );
   };
 
   const getGradosOptions = () => {
     const grados = gradosQuery.data || [];
-    return grados.map(grado => ({
+    return grados.map((grado) => ({
       value: grado.idGrado || grado.id,
       label: grado.nombre,
-      data: grado
+      data: grado,
     }));
   };
 
@@ -113,32 +118,32 @@ export const useGrados = () => {
     isError: gradosQuery.isError,
     error: gradosQuery.error,
     isSuccess: gradosQuery.isSuccess,
-    
+
     // Mutations
     createGrado: createGradoMutation.mutate,
     updateGrado: updateGradoMutation.mutate,
     deleteGrado: deleteGradoMutation.mutate,
-    
+
     // Estados de las mutations
     isCreating: createGradoMutation.isLoading,
     isUpdating: updateGradoMutation.isLoading,
     isDeleting: deleteGradoMutation.isLoading,
-    
+
     // Errores de las mutations
     createError: createGradoMutation.error,
     updateError: updateGradoMutation.error,
     deleteError: deleteGradoMutation.error,
-    
+
     // Funciones de utilidad
     refetchGrados,
     prefetchGrado,
     findGradoById,
     findGradoByNombre,
     getGradosOptions,
-    
+
     // Query object para casos avanzados
     gradosQuery,
-    
+
     // Para mantener compatibilidad con la versión anterior
     loadingGrados: gradosQuery.isLoading,
     errorGrados: gradosQuery.error,
@@ -153,7 +158,7 @@ export const useGrados = () => {
 export const useGrado = (id, options = {}) => {
   return useQuery({
     queryKey: GRADOS_QUERY_KEYS.detail(id),
-    queryFn: () => gradoService.getGradoById(id),
+    queryFn: () => demoGradosService.getGradoById(id),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
@@ -166,38 +171,41 @@ export const useGrado = (id, options = {}) => {
  */
 export const useGradosOptions = () => {
   const { grados, isLoading, isError } = useGrados();
-  
-  const options = grados.map(grado => ({
+
+  const options = grados.map((grado) => ({
     value: grado.idGrado || grado.id,
     label: grado.grado || grado.nombre,
-    grado: grado
+    grado: grado,
   }));
 
   return {
     options,
     isLoading,
     isError,
-    hasGrados: grados.length > 0
+    hasGrados: grados.length > 0,
   };
 };
 
 // Hook simple para crear grado (para modales rápidos)
 const useGradosSimple = () => {
   const queryClient = useQueryClient();
-  
+
   const crearGrado = async (data) => {
     try {
-      const result = await gradoService.createGrado(data);
-      
+      const result = await demoGradosService.createGrado(data);
+
+      toast.success("Grado creado exitosamente");
+
       // Invalidar el caché de la tabla de grados para que se actualice inmediatamente
       queryClient.invalidateQueries(GRADOS_QUERY_KEYS.lists());
-      
+
       return result;
     } catch (error) {
+      toast.error(error.message || "Error al crear grado");
       throw error;
     }
   };
-  
+
   return { crearGrado };
 };
 
@@ -209,39 +217,39 @@ export default useGradosSimple;
 export const useGradosTabla = () => {
   return useQuery({
     queryKey: GRADOS_QUERY_KEYS.lists(),
-    queryFn: gradoService.getAllGrados,
+    queryFn: demoGradosService.getAllGrados,
     staleTime: 5 * 60 * 1000, // 5 minutos
     cacheTime: 10 * 60 * 1000, // 10 minutos
     refetchOnWindowFocus: false,
     retry: 3,
     onError: (error) => {
-      console.error('❌ Error al cargar grados en tabla:', error);
-      toast.error('Error al cargar los grados');
+      console.error("❌ Error al cargar grados en tabla:", error);
+      toast.error("Error al cargar los grados");
     },
-    // Asegurar que siempre retorne un array y extraer correctamente los datos
+    // Asegurar que siempre retorne un array
     select: (data) => {
       // Si ya es un array, devolverlo
       if (Array.isArray(data)) {
         return data;
       }
-      
+
       // Si tiene la estructura response.info.data
       if (data?.info?.data && Array.isArray(data.info.data)) {
         return data.info.data;
       }
-      
+
       // Si tiene la estructura response.grados
       if (data?.grados && Array.isArray(data.grados)) {
         return data.grados;
       }
-      
+
       // Si tiene la estructura response.data
       if (data?.data && Array.isArray(data.data)) {
         return data.data;
       }
-      
+
       // Fallback: array vacío
       return [];
-    }
+    },
   });
 };

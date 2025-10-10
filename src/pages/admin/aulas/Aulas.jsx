@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Edit,
@@ -9,7 +9,8 @@ import {
   BookOpen,
   Eye
 } from 'lucide-react';
-import { useAulasAdmin, useUpdateAula } from '../../../hooks/queries/useAulasQueries';
+import { toast } from 'sonner';
+import demoAulaService from '../../../services/demoAulaService';
 import ModalEditarAula from './modales/ModalEditarAula';
 import ModalAgregarAula from './modales/ModalAgregarAula';
 
@@ -18,12 +19,39 @@ const Aulas = () => {
   const [modalEditarAula, setModalEditarAula] = useState(false);
   const [modalAgregarAula, setModalAgregarAula] = useState(false);
   const [aulaSeleccionada, setAulaSeleccionada] = useState(null);
+  
+  // Estados para datos DEMO
+  const [aulas, setAulas] = useState([]);
+  const [loadingAulas, setLoadingAulas] = useState(true);
 
-  // Hook para obtener aulas
-  const { data: aulas = [], isLoading: loadingAulas, error: errorAulas } = useAulasAdmin();
+  // Cargar aulas (DEMO)
+  useEffect(() => {
+    const fetchAulas = async () => {
+      try {
+        setLoadingAulas(true);
+        const data = await demoAulaService.getAllAulas();
+        setAulas(data);
+        console.log("[DEMO] Aulas cargadas:", data.length);
+      } catch (error) {
+        console.error("[DEMO] Error al cargar aulas:", error);
+        toast.error("Error al cargar las aulas");
+      } finally {
+        setLoadingAulas(false);
+      }
+    };
 
-  // Hook para actualizar aulas
-  const updateAulaMutation = useUpdateAula();
+    fetchAulas();
+  }, []);
+
+  // Función para recargar aulas
+  const recargarAulas = async () => {
+    try {
+      const data = await demoAulaService.getAllAulas();
+      setAulas(data);
+    } catch (error) {
+      console.error("[DEMO] Error al recargar aulas:", error);
+    }
+  };
 
   // Filtrar aulas por búsqueda
   const aulasFiltradas = aulas.filter(aula =>
@@ -87,11 +115,6 @@ const Aulas = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="text-gray-500 mt-4">Cargando aulas...</p>
           </div>
-        ) : errorAulas ? (
-          <div className="text-center py-12">
-            <p className="text-red-500 text-lg">Error al cargar las aulas</p>
-            <p className="text-gray-500 text-sm mt-2">{errorAulas.message}</p>
-          </div>
         ) : aulasFiltradas.length === 0 ? (
           <div className="text-center py-12">
             <div className="p-8 bg-gray-50 rounded-lg">
@@ -147,7 +170,7 @@ const Aulas = () => {
                       <div className="flex items-center">
                         <Users className="h-4 w-4 text-gray-400 mr-2" />
                         <span className="text-sm text-gray-900">
-                          {aula.cantidadEstudiantes || 0}
+                          {aula.capacidad || 0}
                         </span>
                       </div>
                     </td>
@@ -176,6 +199,7 @@ const Aulas = () => {
           isOpen={modalEditarAula}
           onClose={handleCloseEditarAula}
           aula={aulaSeleccionada}
+          onSuccess={recargarAulas}
         />
       )}
 
@@ -183,6 +207,7 @@ const Aulas = () => {
         <ModalAgregarAula
           isOpen={modalAgregarAula}
           onClose={() => setModalAgregarAula(false)}
+          onSuccess={recargarAulas}
         />
       )}
     </div>

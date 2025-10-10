@@ -1,47 +1,27 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { X, Users, Save } from 'lucide-react';
+import { X, Users, Info } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useUpdateAula } from '../../../../hooks/queries/useAulasQueries';
 import { toast } from 'sonner';
 
-const ModalEditarAula = ({ isOpen, onClose, aula }) => {
+const ModalEditarAula = ({ isOpen, onClose, aula, onSuccess }) => {
   const [cantidadEstudiantes, setCantidadEstudiantes] = useState('');
-
-  const updateAulaMutation = useUpdateAula();
 
   // Cargar datos del aula cuando se abre el modal
   useEffect(() => {
     if (isOpen && aula) {
-      setCantidadEstudiantes(aula.cantidadEstudiantes || 0);
+      setCantidadEstudiantes(aula.capacidad || aula.cantidadEstudiantes || 0);
     }
   }, [isOpen, aula]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!aula?.idAula) {
-      toast.error('Error: No se pudo identificar el aula');
-      return;
-    }
-
-    try {
-      await updateAulaMutation.mutateAsync({
-        id: aula.idAula,
-        cantidadEstudiantes: parseInt(cantidadEstudiantes) || 0
-      });
-
-      toast.success('Aula actualizada exitosamente', {
-        description: `Capacidad máxima actualizada a ${cantidadEstudiantes}`
-      });
-
-      onClose();
-    } catch (error) {
-      console.error('Error al actualizar aula:', error);
-      toast.error('Error al actualizar aula', {
-        description: error.message || 'Ocurrió un error inesperado'
-      });
-    }
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y editar aulas reales.',
+      duration: 5000,
+    });
   };
 
   const handleClose = () => {
@@ -126,26 +106,15 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
                       type="button"
                       onClick={handleClose}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                      disabled={updateAulaMutation.isPending}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      disabled={updateAulaMutation.isPending}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                     >
-                      {updateAulaMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Actualizando...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4" />
-                          Actualizar
-                        </>
-                      )}
+                      <Info className="w-4 h-4" />
+                      Ver Sistema Completo
                     </button>
                   </div>
                 </form>

@@ -1,13 +1,11 @@
 // src/pages/admin/planilla/Planilla.jsx
 import React, { useState, useMemo, useEffect } from "react";
-import { useAuthStore } from "../../../store";
 import {
   Users,
   Search,
   RefreshCw,
   AlertCircle,
   CheckCircle,
-  DollarSign,
   Calendar,
   FileText,
   Plus,
@@ -16,91 +14,40 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "sonner";
+import demoPlanillaService from "../../../services/demoPlanillaService";
 
 const Planilla = () => {
-  // Obtener fecha actual para valores por defecto
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1; // getMonth() devuelve 0-11, sumamos 1
-  const currentYear = currentDate.getFullYear();
-
-  // Estados para filtros
-  const [selectedMes, setSelectedMes] = useState(currentMonth.toString());
-  const [selectedAnio, setSelectedAnio] = useState(currentYear.toString());
+  // Estados para filtros (Octubre 2025 por defecto)
+  const [selectedMes, setSelectedMes] = useState("10");
+  const [selectedAnio, setSelectedAnio] = useState("2025");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Estados para selección de trabajadores
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTrabajadores, setSelectedTrabajadores] = useState([]);
-  const [isCreatingPlanilla, setIsCreatingPlanilla] = useState(false);
   const [trabajadores, setTrabajadores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Obtener usuario del store
-  const { user } = useAuthStore();
-
-  // Función para refrescar datos (demo)
-  const refetch = async () => {
-    await loadTrabajadoresDemo();
-  };
-
-  // Cargar datos demo de trabajadores
-  const loadTrabajadoresDemo = async () => {
+  // Cargar trabajadores disponibles para el periodo seleccionado
+  const cargarTrabajadores = async () => {
     try {
       setLoading(true);
-
-      // Simular carga de datos
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const trabajadoresDemo = [
-        {
-          idTrabajador: 1,
-          nombre: "María Elena",
-          apellido: "García López",
-          tipoContrato: "PLANILLA",
-          cargo: "Directora",
-          sueldo: 3500.0,
-          estado: "ACTIVO",
-          planillaGenerada: false,
-          fechaIngreso: "2024-01-15",
-        },
-        {
-          idTrabajador: 2,
-          nombre: "Ana Patricia",
-          apellido: "Mendoza Silva",
-          tipoContrato: "PLANILLA",
-          cargo: "Profesora Principal",
-          sueldo: 2800.0,
-          estado: "ACTIVO",
-          planillaGenerada: false,
-          fechaIngreso: "2024-02-01",
-        },
-        {
-          idTrabajador: 3,
-          nombre: "Carlos Alberto",
-          apellido: "Ruiz Torres",
-          tipoContrato: "PLANILLA",
-          cargo: "Profesor de Educación Física",
-          sueldo: 2500.0,
-          estado: "ACTIVO",
-          planillaGenerada: true,
-          fechaIngreso: "2024-01-20",
-        },
-      ];
-
-      setTrabajadores(trabajadoresDemo);
-      setError(null);
+      const data = await demoPlanillaService.getTrabajadoresDisponibles(
+        selectedMes,
+        selectedAnio
+      );
+      setTrabajadores(data);
     } catch (error) {
-      console.error("Error loading trabajadores demo:", error);
-      setError(error);
+      console.error("Error al cargar trabajadores:", error);
+      toast.error("Error al cargar trabajadores");
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar datos demo al montar el componente
+  // Cargar trabajadores al montar y cuando cambie el periodo
   useEffect(() => {
-    loadTrabajadoresDemo();
+    cargarTrabajadores();
   }, [selectedMes, selectedAnio]);
 
   // Filtrar trabajadores por búsqueda local
@@ -119,12 +66,8 @@ const Planilla = () => {
 
   // Función para refrescar datos
   const handleRefresh = async () => {
-    try {
-      await refetch();
-      toast.success("Datos actualizados correctamente");
-    } catch (error) {
-      toast.error("Error al actualizar los datos");
-    }
+    await cargarTrabajadores();
+    toast.success("Datos actualizados correctamente");
   };
 
   // Función para cambiar período
@@ -133,7 +76,7 @@ const Planilla = () => {
       toast.error("Debe seleccionar mes y año");
       return;
     }
-    await refetch();
+    await cargarTrabajadores();
   };
 
   // Función para activar modo selección
@@ -171,168 +114,22 @@ const Planilla = () => {
     }
   };
 
-  // Función para crear planilla con trabajadores seleccionados
-  const handleCreatePlanilla = async () => {
+  // Función para crear planilla con trabajadores seleccionados (DEMO)
+  const handleCreatePlanilla = () => {
     if (selectedTrabajadores.length === 0) {
       toast.error("Debe seleccionar al menos un trabajador");
       return;
     }
 
-    // Obtener entidadId - primero del store, luego del localStorage
-    console.log("🔍 Verificando información del usuario...");
-    console.log("📋 user del store:", user);
-
-    let entidadId = user?.entidadId;
-
-    if (!entidadId) {
-      console.log(
-        "⚠️ No se encontró entidadId en el store, intentando localStorage..."
-      );
-      const userData = JSON.parse(localStorage.getItem("user") || "{}");
-      console.log("📋 userData del localStorage:", userData);
-      entidadId = userData?.entidadId;
-    }
-
-    console.log("🆔 entidadId final:", entidadId);
-
-    if (!entidadId) {
-      console.error(
-        "❌ No se pudo encontrar entidadId ni en store ni en localStorage"
-      );
-      console.log(
-        "🔍 Store user keys:",
-        user ? Object.keys(user) : "user is null"
-      );
-      const userData = JSON.parse(localStorage.getItem("user") || "{}");
-      console.log("🔍 localStorage user keys:", Object.keys(userData));
-      toast.error("No se pudo obtener la información del usuario");
-      return;
-    }
-
-    // Calcular fecha de pago programada (último día del mes)
-    // JavaScript usa meses 0-11, así que restamos 1 al mes seleccionado
-    const fechaPagoProgramada = new Date(
-      parseInt(selectedAnio),
-      parseInt(selectedMes) - 1,
-      0
+    toast.info(
+      `Para generar planillas con ${selectedTrabajadores.length} trabajador(es), por favor contáctanos en soporte@colegio.edu.pe o al WhatsApp +51 987 654 321. ¡Estamos aquí para ayudarte! 📋`,
+      { duration: 6000 }
     );
-    const fechaPagoString = fechaPagoProgramada.toISOString().split("T")[0];
 
-    console.log("📅 Fecha de pago calculada:", {
-      selectedMes,
-      selectedAnio,
-      mesJS: parseInt(selectedMes) - 1,
-      fechaPagoProgramada,
-      fechaPagoString,
-    });
-
-    const payload = {
-      mes: parseInt(selectedMes),
-      anio: parseInt(selectedAnio),
-      fechaPagoProgramada: fechaPagoString,
-      trabajadores: selectedTrabajadores.map((t) => t.idTrabajador),
-      generadoPor: entidadId,
-    };
-
-    // Validar que tenemos todos los datos necesarios
-    if (!entidadId) {
-      console.error("❌ No se pudo obtener entidadId para crear la planilla");
-      toast.error(
-        "No se pudo obtener la información del usuario. Por favor, recarga la página e intenta nuevamente."
-      );
-      return;
-    }
-
-    if (selectedTrabajadores.length === 0) {
-      console.error("❌ No hay trabajadores seleccionados");
-      toast.error(
-        "Debe seleccionar al menos un trabajador para crear la planilla"
-      );
-      return;
-    }
-
-    console.log("📤 Enviando payload a crear planilla:", payload);
-    console.log("👥 Detalles de trabajadores seleccionados:", {
-      cantidad: selectedTrabajadores.length,
-      trabajadores: selectedTrabajadores.map((t) => ({
-        idTrabajador: t.idTrabajador,
-        nombre: t.nombre,
-        apellido: t.apellido,
-      })),
-    });
-    console.log("🆔 entidadId usado:", entidadId);
-
-    setIsCreatingPlanilla(true);
-    try {
-      // Simular creación exitosa de planilla
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      console.log("✅ Planilla creada exitosamente (demo)");
-
-      toast.success(
-        `Planilla creada exitosamente con ${selectedTrabajadores.length} trabajadores`
-      );
-
-      // Marcar trabajadores como planilla generada
-      setTrabajadores((prev) =>
-        prev.map((t) =>
-          selectedTrabajadores.some((st) => st.idTrabajador === t.idTrabajador)
-            ? { ...t, planillaGenerada: true }
-            : t
-        )
-      );
-
-      // Limpiar selección y salir del modo selección
-      setIsSelectionMode(false);
-      setSelectedTrabajadores([]);
-
-      // Refrescar datos
-      await refetch();
-    } catch (error) {
-      console.error("❌ Error al crear planilla:", error);
-      toast.error("Error al crear la planilla. Intenta nuevamente.");
-    } finally {
-      setIsCreatingPlanilla(false);
-    }
+    // Limpiar selección
+    setIsSelectionMode(false);
+    setSelectedTrabajadores([]);
   };
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Usuario no autenticado
-          </h3>
-          <p className="text-gray-600">
-            Debe iniciar sesión para acceder a esta funcionalidad
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Error al cargar los datos
-          </h3>
-          <p className="text-gray-600 mb-4">
-            {error.message || "Ha ocurrido un error inesperado"}
-          </p>
-          <button
-            onClick={handleRefresh}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -395,22 +192,11 @@ const Planilla = () => {
               </button>
               <button
                 onClick={handleCreatePlanilla}
-                disabled={
-                  selectedTrabajadores.length === 0 || isCreatingPlanilla
-                }
+                disabled={selectedTrabajadores.length === 0}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {isCreatingPlanilla ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Creando...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Crear Planilla ({selectedTrabajadores.length})
-                  </>
-                )}
+                <Send className="w-4 h-4" />
+                Crear Planilla ({selectedTrabajadores.length})
               </button>
             </>
           )}

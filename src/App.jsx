@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'sonner';
-import { useAuthStore } from './store';
-import { ProtectedRoute } from './components/auth';
-import ChangePasswordModal from './components/auth/ChangePasswordModal';
-import Login from './pages/auth/Login';
-import Dashboard from './pages/auth/Dashboard';
-import WhatsAppButton from './components/common/WhatsAppButton';
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "sonner";
+import { useAuthStore } from "./store";
+import { ProtectedRoute } from "./components/auth";
+import ChangePasswordModal from "./components/auth/ChangePasswordModal";
+import Login from "./pages/auth/Login";
+import Dashboard from "./pages/auth/Dashboard";
+import WhatsAppButton from "./components/common/WhatsAppButton";
+import { SidebarProvider } from "./contexts/SidebarContext";
 
 // Configuración del QueryClient con cache de 5-10 minutos
 const queryClient = new QueryClient({
@@ -27,38 +33,43 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { initializeAuth, isAuthenticated, loading, user, clearAll } = useAuthStore();
+  const { initializeAuth, isAuthenticated, loading, user, clearAll } =
+    useAuthStore();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // Inicializar autenticación al cargar la app
   useEffect(() => {
     initializeAuth();
-    
+
     // Agregar función de debug global para limpiar estado
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.clearAuthState = () => {
-        console.log('🔧 Ejecutando limpieza de estado desde consola...');
+        console.log("🔧 Ejecutando limpieza de estado desde consola...");
         clearAll();
         window.location.reload();
       };
-      
+
       window.debugAuth = () => {
         const currentState = useAuthStore.getState();
-        console.log('🔍 Estado actual de autenticación:', {
+        console.log("🔍 Estado actual de autenticación:", {
           isAuthenticated: currentState.isAuthenticated,
           user: currentState.user,
           role: currentState.role,
-          token: currentState.token?.substring(0, 20) + '...',
+          token: currentState.token?.substring(0, 20) + "...",
           localStorage: {
-            token: localStorage.getItem('token')?.substring(0, 20) + '...',
-            authStorage: localStorage.getItem('auth-storage') ? 'Presente' : 'Ausente'
-          }
+            token: localStorage.getItem("token")?.substring(0, 20) + "...",
+            authStorage: localStorage.getItem("auth-storage")
+              ? "Presente"
+              : "Ausente",
+          },
         });
       };
-      
-      console.log('🔧 Funciones de debug disponibles:');
-      console.log('  - window.clearAuthState() - Limpia completamente el estado');
-      console.log('  - window.debugAuth() - Muestra el estado actual');
+
+      console.log("🔧 Funciones de debug disponibles:");
+      console.log(
+        "  - window.clearAuthState() - Limpia completamente el estado"
+      );
+      console.log("  - window.debugAuth() - Muestra el estado actual");
     }
   }, []);
 
@@ -79,12 +90,12 @@ function App() {
       setShowPasswordModal(false);
       // Actualizar el estado del usuario para indicar que ya cambió la contraseña
       // Esto evitará que el modal se muestre nuevamente
-      useAuthStore.setState(state => ({
+      useAuthStore.setState((state) => ({
         ...state,
         user: {
           ...state.user,
-          cambioContrasena: true
-        }
+          cambioContrasena: true,
+        },
       }));
     }
   };
@@ -103,65 +114,72 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="app-container min-h-screen bg-gray-50">
-        <Router future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true
-        }}>
+      <SidebarProvider>
+        <div className="app-container min-h-screen bg-gray-50">
+          <Router
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
           <Routes>
             {/* Ruta raíz - redirige según autenticación */}
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
-                isAuthenticated ? 
-                  <Navigate to="/dashboard" replace /> : 
+                isAuthenticated ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
                   <Navigate to="/login" replace />
-              } 
+                )
+              }
             />
-            
+
             {/* Login - solo accesible si no está autenticado */}
-            <Route 
-              path="/login" 
+            <Route
+              path="/login"
               element={
-                isAuthenticated ? 
-                  <Navigate to="/dashboard" replace /> : 
+                isAuthenticated ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
                   <Login />
-              } 
+                )
+              }
             />
-            
+
             {/* Dashboard protegido */}
-            <Route 
-              path="/dashboard/*" 
+            <Route
+              path="/dashboard/*"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
+
             {/* Ruta 404 */}
-            <Route 
-              path="*" 
+            <Route
+              path="*"
               element={
                 <div className="min-h-screen flex items-center justify-center bg-gray-50">
                   <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                      404
+                    </h1>
                     <p className="text-gray-600 mb-4">Página no encontrada</p>
-                    <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+                    <Navigate
+                      to={isAuthenticated ? "/dashboard" : "/login"}
+                      replace
+                    />
                   </div>
                 </div>
-              } 
+              }
             />
           </Routes>
         </Router>
-        
+
         {/* Toaster para notificaciones globales */}
-        <Toaster 
-          position="top-right" 
-          richColors 
-          closeButton
-          duration={4000}
-        />
+        <Toaster position="top-right" richColors closeButton duration={4000} />
 
         {/* Modal de cambio de contraseña obligatorio */}
         {showPasswordModal && user && (
@@ -176,9 +194,10 @@ function App() {
         {/* Botón flotante de WhatsApp - visible en toda la aplicación */}
         <WhatsAppButton />
       </div>
-      
+
       {/* React Query DevTools - solo en desarrollo */}
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </SidebarProvider>
     </QueryClientProvider>
   );
 }

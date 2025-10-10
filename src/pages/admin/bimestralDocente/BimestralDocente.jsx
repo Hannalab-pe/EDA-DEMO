@@ -3,7 +3,8 @@ import { UserCheck, RefreshCw } from 'lucide-react';
 import EvaluacionDocenteModal from './modales/EvaluacionDocenteModal';
 import ModalVerEvaluacion from './modales/ModalVerEvaluacion';
 import TablaEvaluacionesDocente from './tablas/TablaEvaluacionesDocente';
-import { evaluacionService } from '../../../services/evaluacionService';
+// 🎭 DEMO MODE: Usar servicio demo en lugar de API
+import demoEvaluacionBimestralService from '../../../services/demoEvaluacionBimestralService';
 import { toast } from 'sonner';
 
 const BimestralDocente = () => {
@@ -16,10 +17,9 @@ const BimestralDocente = () => {
   const fetchEvaluaciones = async () => {
     try {
       setLoading(true);
-      const data = await evaluacionService.getEvaluacionesDocente();
-      console.log('Evaluaciones data:', data);
-      console.log('Is array:', Array.isArray(data));
-      setEvaluaciones(data);
+      const response = await demoEvaluacionBimestralService.getAll();
+      console.log('[DEMO] Evaluaciones cargadas:', response.evaluaciones);
+      setEvaluaciones(response.evaluaciones || []);
     } catch (error) {
       console.error('Error fetching evaluaciones:', error);
       toast.error('Error al cargar las evaluaciones');

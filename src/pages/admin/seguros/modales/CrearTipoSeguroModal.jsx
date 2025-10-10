@@ -3,6 +3,7 @@ import { X, Shield, Save, Loader2 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toast } from "sonner";
+import demoSeguroService from "../../../../services/demoSeguroService";
 
 const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
   const [formData, setFormData] = useState({
@@ -67,33 +68,13 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
     setLoading(true);
 
     try {
-      const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "https://nidopro.up.railway.app/api/v1";
-      const token =
-        localStorage.getItem("token") ||
-        JSON.parse(localStorage.getItem("auth-storage"))?.state?.token;
+      // Crear tipo de seguro usando el servicio demo
+      const nuevoSeguro = await demoSeguroService.createTipoSeguro(formData);
 
-      // Preparar los datos para enviar
-      const dataToSend = {
-        nombreSeguro: formData.nombreSeguro.trim(),
-        descripcion: formData.descripcion.trim(),
-        porcentajeDescuento:
-          formData.tipoCalculo === "PORCENTAJE"
-            ? parseFloat(formData.porcentajeDescuento).toFixed(2)
-            : null,
-        montoFijo:
-          formData.tipoCalculo === "MONTO_FIJO"
-            ? parseFloat(formData.montoFijo).toFixed(2)
-            : null,
-        esObligatorio: formData.esObligatorio,
-        estaActivo: formData.estaActivo,
-        tipoCalculo: formData.tipoCalculo,
-      };
-
-      // Simular creación exitosa del seguro
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      console.log("✅ Tipo de seguro creado:", nuevoSeguro);
       toast.success("Tipo de seguro creado exitosamente");
+      
+      // Llamar al callback para recargar la lista
       onTipoSeguroCreado();
       onClose();
 

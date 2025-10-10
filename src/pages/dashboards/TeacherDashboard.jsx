@@ -224,7 +224,7 @@ const TeacherDashboard = () => {
         <div className="flex items-center bg-green-600 justify-between p-7 border-b border-gray-200 lg:justify-start">
           <div className="flex items-center space-x-3 ">
             <Baby className="w-8 h-8 text-white" />
-            <span className="text-xl font-bold text-white">Nido Pro</span>
+            <span className="text-xl font-bold text-white">EDA</span>
           </div>
           <button
             className="lg:hidden p-2 text-white hover:text-gray-200"

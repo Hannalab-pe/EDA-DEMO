@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 const useAuthStore = create(
   persist(
@@ -16,11 +16,15 @@ const useAuthStore = create(
 
       // Acciones de autenticación
       login: (userData) => {
-        console.log('🔐 Iniciando sesión como:', userData.user.rol, userData.user.fullName);
-        
+        console.log(
+          "🔐 Iniciando sesión como:",
+          userData.user.rol,
+          userData.user.fullName
+        );
+
         // Guardar token en localStorage
-        localStorage.setItem('token', userData.token);
-        
+        localStorage.setItem("token", userData.token);
+
         // Actualizar estado de Zustand
         set({
           user: userData.user,
@@ -30,19 +34,19 @@ const useAuthStore = create(
           isAuthenticated: true,
           error: null,
         });
-        
-        console.log('✅ Sesión guardada correctamente');
+
+        console.log("✅ Sesión guardada correctamente");
       },
 
       logout: async () => {
         try {
           // Llamar al servicio de logout para limpiar en el backend
-          const { authService } = await import('../services/authService');
+          const { authService } = await import("../services/authService");
           await authService.logout();
         } catch (error) {
-          console.log('Error al cerrar sesión en backend:', error);
+          console.log("Error al cerrar sesión en backend:", error);
         }
-        
+
         // Limpiar estado de Zustand
         set({
           user: null,
@@ -54,13 +58,13 @@ const useAuthStore = create(
           error: null,
           initialized: false,
         });
-        
+
         // Limpiar localStorage completamente
-        localStorage.removeItem('token');
-        localStorage.removeItem('auth-storage');
-        
+        localStorage.removeItem("token");
+        localStorage.removeItem("auth-storage");
+
         // Redirigir al login
-        window.location.href = '/login';
+        window.location.href = "/login";
       },
 
       setLoading: (loading) => {
@@ -104,35 +108,35 @@ const useAuthStore = create(
       // Verificar si es admin
       isAdmin: () => {
         const { role } = get();
-        return role?.nombre === 'admin' || role?.nombre === 'administrador';
+        return role?.nombre === "admin" || role?.nombre === "administrador";
       },
 
       // Verificar si es profesor/trabajador
       isTrabajador: () => {
         const { role } = get();
-        return role?.nombre === 'profesor' || role?.nombre === 'trabajador';
+        return role?.nombre === "profesor" || role?.nombre === "trabajador";
       },
 
       // Verificar si es padre
       isPadre: () => {
         const { role } = get();
-        return role?.nombre === 'padre' || role?.nombre === 'parent';
+        return role?.nombre === "padre" || role?.nombre === "parent";
       },
 
       // Verificar si es especialista
       isEspecialista: () => {
         const { role } = get();
-        return role?.nombre === 'especialista' || role?.nombre === 'specialist';
+        return role?.nombre === "especialista" || role?.nombre === "specialist";
       },
 
       // Limpiar completamente el estado y localStorage (para debug)
       clearAll: () => {
-        console.log('🧹 Limpiando completamente el estado de autenticación');
-        
+        console.log("🧹 Limpiando completamente el estado de autenticación");
+
         // Limpiar localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('auth-storage');
-        
+        localStorage.removeItem("token");
+        localStorage.removeItem("auth-storage");
+
         // Resetear estado
         set({
           user: null,
@@ -144,8 +148,8 @@ const useAuthStore = create(
           error: null,
           initialized: false,
         });
-        
-        console.log('✅ Estado limpiado completamente');
+
+        console.log("✅ Estado limpiado completamente");
       },
 
       // Obtener el ID del rol para APIs
@@ -158,57 +162,60 @@ const useAuthStore = create(
       initializeAuth: async () => {
         const { initialized } = get();
         if (initialized) return; // Evitar múltiples inicializaciones
-        
+
         set({ loading: true, initialized: true });
-        
-        const token = localStorage.getItem('token');
+
+        const token = localStorage.getItem("token");
         if (token) {
           // Solo para tokens demo válidos
-          if (token.startsWith('demo-token-')) {
+          if (token.startsWith("demo-token-")) {
             try {
-              const { authService } = await import('../services/authService');
+              const { authService } = await import("../services/authService");
               const validation = await authService.validateToken(token);
-              
+
               if (validation.valid) {
-                console.log('🔄 Restaurando sesión demo válida:', validation.user.rol);
-                set({ 
+                console.log(
+                  "🔄 Restaurando sesión demo válida:",
+                  validation.user.rol
+                );
+                set({
                   user: validation.user,
-                  token, 
-                  isAuthenticated: true, 
+                  token,
+                  isAuthenticated: true,
                   role: validation.role,
                   permissions: validation.permissions || [],
-                  loading: false 
+                  loading: false,
                 });
                 return;
               }
             } catch (error) {
-              console.log('❌ Error validando token demo:', error);
+              console.log("❌ Error validando token demo:", error);
               // Si falla la validación, limpiar todo
-              localStorage.removeItem('token');
-              localStorage.removeItem('auth-storage');
+              localStorage.removeItem("token");
+              localStorage.removeItem("auth-storage");
             }
           } else {
             // Si no es un token demo válido, limpiar todo
-            console.log('🧹 Token no válido, limpiando localStorage');
-            localStorage.removeItem('token');
-            localStorage.removeItem('auth-storage');
+            console.log("🧹 Token no válido, limpiando localStorage");
+            localStorage.removeItem("token");
+            localStorage.removeItem("auth-storage");
           }
         }
-        
+
         // Si llegamos aquí, no hay sesión válida
-        set({ 
+        set({
           user: null,
           token: null,
           role: null,
           permissions: [],
           isAuthenticated: false,
           loading: false,
-          error: null
+          error: null,
         });
       },
     }),
     {
-      name: 'auth-storage', // Nombre para localStorage
+      name: "auth-storage", // Nombre para localStorage
       partialize: (state) => ({
         user: state.user,
         token: state.token,

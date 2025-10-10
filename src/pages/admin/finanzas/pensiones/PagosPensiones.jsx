@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { 
+import {
   ArrowLeft,
   Search,
   Check,
@@ -17,7 +17,7 @@ import {
 import { toast } from 'sonner'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import pensionService from '../../../../services/pensionService'
+import { pagosPensionesDemo } from '../../../../data/finanzasDemo'
 
 const PagosPensiones = () => {
   const [loading, setLoading] = useState(false)
@@ -27,7 +27,7 @@ const PagosPensiones = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterEstado, setFilterEstado] = useState('TODOS')
   const [filterMes, setFilterMes] = useState('')
-  const [filterAnio, setFilterAnio] = useState(new Date().getFullYear())
+  const [filterAnio, setFilterAnio] = useState(2024) // Año de los datos demo
   
   // Estado para verificación masiva
   const [loadingVerificacion, setLoadingVerificacion] = useState(false)
@@ -78,14 +78,86 @@ const PagosPensiones = () => {
   const cargarPensiones = async () => {
     setLoading(true)
     try {
-      console.log('🔄 Cargando pensiones...')
-      const response = await pensionService.obtenerPensionesEstudiantes()
-      
-      if (response.success) {
-        setPensiones(response.pensiones)
-        console.log('✅ Pensiones cargadas:', response.pensiones.length)
-        toast.success(`${response.pensiones.length} pensiones cargadas`)
-      }
+      console.log('🎭 DEMO: Cargando pensiones...')
+
+      // Simular delay de carga
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      // Usar datos demo con más registros
+      const pensionesExtendidas = [
+        ...pagosPensionesDemo,
+        // Agregar más datos demo para tener variedad
+        {
+          id: 6,
+          estudianteId: 6,
+          estudiante: {
+            nombre: 'Isabella',
+            apellido: 'Sánchez Rojas',
+            nombreCompleto: 'Isabella Sánchez Rojas',
+            grado: '3 años',
+            aula: 'Aula Roja',
+            codigo: 'EST-2024-006'
+          },
+          mes: 'Marzo',
+          anio: 2024,
+          monto: 350.00,
+          montoPagado: 350.00,
+          fechaVencimiento: '2024-03-10',
+          fechaPago: '2024-03-11',
+          metodoPago: 'EFECTIVO',
+          estadoPension: 'PAGADO',
+          numeroComprobante: 'PENSION-2024-03-006',
+          mora: 0
+        },
+        {
+          id: 7,
+          estudianteId: 7,
+          estudiante: {
+            nombre: 'Sebastián',
+            apellido: 'Ramírez Castro',
+            nombreCompleto: 'Sebastián Ramírez Castro',
+            grado: '4 años',
+            aula: 'Aula Azul',
+            codigo: 'EST-2024-007'
+          },
+          mes: 'Marzo',
+          anio: 2024,
+          monto: 350.00,
+          montoPagado: 0,
+          fechaVencimiento: '2024-03-10',
+          fechaPago: null,
+          metodoPago: null,
+          estadoPension: 'PENDIENTE',
+          numeroComprobante: null,
+          mora: 35.00
+        },
+        {
+          id: 8,
+          estudianteId: 8,
+          estudiante: {
+            nombre: 'Camila',
+            apellido: 'Vega Moreno',
+            nombreCompleto: 'Camila Vega Moreno',
+            grado: '5 años',
+            aula: 'Aula Verde',
+            codigo: 'EST-2024-008'
+          },
+          mes: 'Marzo',
+          anio: 2024,
+          monto: 350.00,
+          montoPagado: 350.00,
+          fechaVencimiento: '2024-03-10',
+          fechaPago: '2024-03-07',
+          metodoPago: 'YAPE',
+          estadoPension: 'PAGADO',
+          numeroComprobante: 'PENSION-2024-03-008',
+          mora: 0
+        }
+      ]
+
+      setPensiones(pensionesExtendidas)
+      console.log('✅ Pensiones demo cargadas:', pensionesExtendidas.length)
+      toast.success(`${pensionesExtendidas.length} pensiones cargadas`)
     } catch (error) {
       console.error('❌ Error al cargar pensiones:', error)
       toast.error('Error al cargar las pensiones')
@@ -141,44 +213,33 @@ const PagosPensiones = () => {
 
     setLoadingVerificacion(true)
     try {
-      // Obtener entidadId del localStorage
-      let entidadId = null;
-      try {
-        const authState = localStorage.getItem('auth-storage');
-        if (authState) {
-          const parsedAuthState = JSON.parse(authState);
-          entidadId = parsedAuthState?.state?.user?.entidadId;
+      console.log('🎭 DEMO: Confirmando pagos de pensiones...')
+
+      // Simular delay de confirmación
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Actualizar estado de las pensiones seleccionadas
+      const updatedPensiones = pensiones.map(pension => {
+        if (selectedPensiones.includes(pension.id)) {
+          return {
+            ...pension,
+            estadoPension: 'PAGADO',
+            fechaPago: new Date().toISOString().split('T')[0],
+            numeroComprobante: `PENSION-${Date.now()}-${pension.id}`,
+            montoPagado: pension.monto,
+            observaciones: observaciones || 'Pago confirmado en demo'
+          }
         }
-      } catch (error) {
-        console.error('Error al obtener entidadId:', error);
-      }
+        return pension
+      })
 
-      if (!entidadId) {
-        toast.error('No se encontró información del usuario. Inicie sesión nuevamente.');
-        return;
-      }
+      setPensiones(updatedPensiones)
+      toast.success(`${selectedPensiones.length} pago(s) confirmado(s) exitosamente (demo)`)
 
-      const datosVerificacion = {
-        idsPensiones: selectedPensiones,
-        estadoPension: 'PAGADO',
-        observaciones: observaciones || 'Pagos verificados masivamente después de revisión de vouchers',
-        registradoPor: entidadId
-      }
+      // Limpiar selección
+      setSelectedPensiones([])
+      setObservaciones('')
 
-      console.log('📤 Confirmando pagos:', datosVerificacion)
-
-      const response = await pensionService.verificarPagosMasivo(datosVerificacion)
-      
-      if (response.success) {
-        toast.success(`${selectedPensiones.length} pagos confirmados exitosamente`)
-        
-        // Limpiar selección y observaciones
-        setSelectedPensiones([])
-        setObservaciones('')
-        
-        // Recargar pensiones
-        cargarPensiones()
-      }
     } catch (error) {
       console.error('❌ Error al confirmar pagos:', error)
       toast.error(error.message || 'Error al confirmar los pagos')

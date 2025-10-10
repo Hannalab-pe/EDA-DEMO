@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, 
   Users,
@@ -10,32 +10,34 @@ import {
   Plus
 } from 'lucide-react';
 import TablaAulas from './tablas/TablaAula';
-import { useAulasAsignacion } from '../../../hooks/useAulasAsignacion';
-import { useClasesHook } from '../../../hooks/useClases';
+import { demoAsignacionAulaService } from '../../../services/demoAsignacionAulaService';
 import ModalAgregarAula from './modales/ModalAgregarAula';
 import ModalVerAula from './modales/ModalVerAula';
 import ModalEditarAula from './modales/ModalEditarAula';
 import ModalEliminarAula from './modales/ModalEliminarAula';
 
 const AsignacionAula = () => {
-  // Hook para gestión de aulas y asignaciones
-  const { 
-    aulas,
-    asignaciones,
-    loadingAulas,
-    loadingAsignaciones,
-    refetchAsignaciones
-  } = useAulasAsignacion();
+  // Estados para gestión de datos DEMO
+  const [asignaciones, setAsignaciones] = useState([]);
+  const [loadingAsignaciones, setLoadingAsignaciones] = useState(true);
 
-  // Hook para gestión de clases
-  const {
-    clases,
-    loading: clasesLoading,
-    getTotalClases,
-    getTotalEstudiantes,
-    getPromedioAsistencia,
-    getClasesActivas
-  } = useClasesHook();
+  // Cargar asignaciones al montar el componente
+  useEffect(() => {
+    cargarAsignaciones();
+  }, []);
+
+  const cargarAsignaciones = async () => {
+    setLoadingAsignaciones(true);
+    try {
+      const data = await demoAsignacionAulaService.getAllAsignaciones();
+      setAsignaciones(data);
+      console.log('[DEMO] Asignaciones de aulas cargadas:', data.length);
+    } catch (error) {
+      console.error('[DEMO] Error al cargar asignaciones:', error);
+    } finally {
+      setLoadingAsignaciones(false);
+    }
+  };
 
   // Estados locales solo para UI
   const [showModal, setShowModal] = useState(false);
@@ -62,8 +64,12 @@ const AsignacionAula = () => {
     return asignaciones
       ?.filter(asignacion => asignacion.estadoActivo)
       ?.reduce((total, asignacion) => {
-        return total + (asignacion.idAula?.cantidadEstudiantes || 0);
+        return total + (asignacion.idAula?.capacidad || asignacion.idAula?.cantidadEstudiantes || 0);
       }, 0) || 0;
+  };
+
+  const getTotalClases = () => {
+    return asignaciones?.filter(a => a.estadoActivo)?.length || 0;
   };
 
   return (
@@ -124,49 +130,46 @@ const AsignacionAula = () => {
       <TablaAulas
         asignaciones={asignaciones}
         loading={loadingAsignaciones}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-        onImport={handleImport}
-        onExport={handleExport}
-        onRefresh={refetchAsignaciones}
+        onRefresh={cargarAsignaciones}
       />
 
-      {/* Modal para agregar clase */}
+      {/* Modal para agregar asignación */}
       <ModalAgregarAula
         isOpen={showModal}
         onClose={() => setShowModal(false)}
+        onSuccess={cargarAsignaciones}
       />
 
-      {/* Modal para ver clase */}
+      {/* Modal para ver asignación */}
       <ModalVerAula
         isOpen={showViewModal}
         onClose={() => {
           setShowViewModal(false);
           setSelectedClase(null);
         }}
-        clase={selectedClase}
+        asignacion={selectedClase}
       />
 
-      {/* Modal para editar clase */}
+      {/* Modal para editar asignación */}
       <ModalEditarAula
         isOpen={showEditModal}
         onClose={() => {
           setShowEditModal(false);
           setSelectedClase(null);
         }}
-        clase={selectedClase}
+        asignacion={selectedClase}
+        onSuccess={cargarAsignaciones}
       />
 
-      {/* Modal para eliminar clase */}
+      {/* Modal para eliminar asignación */}
       <ModalEliminarAula
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
           setSelectedClase(null);
         }}
-        clase={selectedClase}
+        asignacion={selectedClase}
+        onSuccess={cargarAsignaciones}
       />
     </div>
   );
@@ -176,27 +179,19 @@ const AsignacionAula = () => {
     setShowModal(true);
   }
 
-  function handleEdit(clase) {
-    setSelectedClase(clase);
+  function handleEdit(asignacion) {
+    setSelectedClase(asignacion);
     setShowEditModal(true);
   }
 
-  function handleDelete(clase) {
-    setSelectedClase(clase);
+  function handleDelete(asignacion) {
+    setSelectedClase(asignacion);
     setShowDeleteModal(true);
   }
 
-  function handleView(clase) {
-    setSelectedClase(clase);
+  function handleView(asignacion) {
+    setSelectedClase(asignacion);
     setShowViewModal(true);
-  }
-
-  function handleImport() {
-    console.log('Importar clases');
-  }
-
-  function handleExport() {
-    console.log('Exportar clases');
   }
 };
 

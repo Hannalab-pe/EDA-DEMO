@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { 
+import {
   Save,
   Loader2,
   Edit,
@@ -11,7 +11,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import { toast } from 'sonner'
-import cajaService from '../../../../services/cajaService'
+import { movimientosCajaDemo, saldoCajaDemo } from '../../../../data/finanzasDemo'
 
 // Categorías por tipo de movimiento
 const categoriasIngreso = [
@@ -131,14 +131,15 @@ const MovimientosCaja = () => {
   const cargarMovimientos = async () => {
     setLoadingHistorial(true)
     try {
-      console.log('🔄 Cargando historial de movimientos...')
-      const response = await cajaService.obtenerMovimientos()
-      
-      if (response.success) {
-        setMovimientos(response.movimientos)
-        console.log('✅ Movimientos cargados:', response.movimientos.length)
-        toast.success(`${response.movimientos.length} movimientos cargados`)
-      }
+      console.log('🎭 DEMO: Cargando historial de movimientos...')
+
+      // Simular delay de carga
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      // Usar datos demo
+      setMovimientos(movimientosCajaDemo)
+      console.log('✅ Movimientos demo cargados:', movimientosCajaDemo.length)
+      toast.success(`${movimientosCajaDemo.length} movimientos cargados`)
     } catch (error) {
       console.error('❌ Error al cargar movimientos:', error)
       toast.error('Error al cargar el historial de movimientos')
@@ -153,17 +154,18 @@ const MovimientosCaja = () => {
   const cargarSaldoCaja = async () => {
     setLoadingSaldo(true)
     try {
-      console.log('🔄 Cargando saldo de caja...')
-      const response = await cajaService.obtenerSaldo()
-      
-      if (response.success) {
-        setSaldoData({
-          saldo: response.saldo,
-          ingresos: response.ingresos,
-          egresos: response.egresos
-        })
-        console.log('✅ Saldo cargado:', response)
-      }
+      console.log('🎭 DEMO: Cargando saldo de caja...')
+
+      // Simular delay de carga
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Usar datos demo
+      setSaldoData({
+        saldo: saldoCajaDemo.saldo,
+        ingresos: saldoCajaDemo.ingresos,
+        egresos: saldoCajaDemo.egresos
+      })
+      console.log('✅ Saldo demo cargado:', saldoCajaDemo)
     } catch (error) {
       console.error('❌ Error al cargar saldo:', error)
       toast.error('Error al cargar el saldo de caja')
@@ -194,42 +196,23 @@ const MovimientosCaja = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       // Validaciones básicas
       if (!formData.concepto || !formData.monto) {
         toast.error('Complete los campos requeridos')
+        setLoading(false)
         return
       }
-      
-      // Obtener el ID de la entidad del localStorage
-      let entidadId = null;
-      
-      try {
-        // Primero intentar obtener directamente del localStorage
-        entidadId = localStorage.getItem('entidadId');
-        
-        // Si no está disponible directamente, extraer del store de autenticación
-        if (!entidadId) {
-          const authState = localStorage.getItem('auth-storage');
-          if (authState) {
-            const parsedAuthState = JSON.parse(authState);
-            entidadId = parsedAuthState?.state?.user?.entidadId;
-          }
-        }
-      } catch (error) {
-        console.error('Error al obtener entidadId:', error);
-      }
-      
-      if (!entidadId) {
-        toast.error('No se encontró información del usuario. Inicie sesión nuevamente.');
-        return;
-      }
-      
-      console.log('🔍 EntidadId obtenido:', entidadId);
-      
-      // Preparar datos para envío con el nuevo formato
-      const dataToSend = {
+
+      console.log('🎭 DEMO: Guardando movimiento...')
+
+      // Simular delay de guardado
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Preparar nuevo movimiento demo
+      const nuevoMovimiento = {
+        id: movimientos.length + 1,
         tipo: formData.tipo,
         concepto: formData.concepto,
         descripcion: formData.descripcion,
@@ -237,45 +220,55 @@ const MovimientosCaja = () => {
         categoria: formData.categoria,
         subcategoria: formData.subcategoria,
         metodoPago: formData.metodoPago,
-        comprobante: formData.comprobante,
-        registradoPor: entidadId,
+        comprobante: formData.comprobante || `COMP-${Date.now()}`,
         estado: formData.estado,
         fecha: formData.fecha,
-        numeroTransaccion: formData.numeroTransaccion,
-        referenciaExterna: formData.referenciaExterna
+        numeroTransaccion: formData.numeroTransaccion || `TRX-${Date.now()}`,
+        referenciaExterna: formData.referenciaExterna,
+        creadoPor: 'admin@nidopro.com'
       }
-      
-      console.log('📤 Enviando movimiento:', dataToSend)
-      
-      // Llamar al servicio real
-      const response = await cajaService.crearMovimiento(dataToSend)
-      
-      if (response.success) {
-        toast.success('Movimiento registrado exitosamente')
-        
-        // Limpiar formulario
-        setFormData({
-          tipo: 'INGRESO',
-          concepto: '',
-          descripcion: '',
-          monto: '',
-          categoria: '',
-          subcategoria: '',
-          metodoPago: 'EFECTIVO',
-          comprobante: '',
-          estado: 'CONFIRMADO',
-          fecha: new Date().toLocaleDateString('en-CA'),
-          numeroTransaccion: '',
-          referenciaExterna: ''
-        })
-        
-        // Recargar historial y saldo si está activo
-        if (activeTab === 'historial') {
-          cargarMovimientos()
-          cargarSaldoCaja()
-        }
+
+      console.log('✅ Movimiento demo creado:', nuevoMovimiento)
+
+      // Agregar al listado de movimientos
+      setMovimientos(prev => [nuevoMovimiento, ...prev])
+
+      // Actualizar saldo
+      if (formData.tipo === 'INGRESO') {
+        setSaldoData(prev => ({
+          ...prev,
+          saldo: prev.saldo + parseFloat(formData.monto),
+          ingresos: prev.ingresos + parseFloat(formData.monto)
+        }))
+      } else {
+        setSaldoData(prev => ({
+          ...prev,
+          saldo: prev.saldo - parseFloat(formData.monto),
+          egresos: prev.egresos + parseFloat(formData.monto)
+        }))
       }
-      
+
+      toast.success('Movimiento registrado exitosamente (demo)')
+
+      // Limpiar formulario
+      setFormData({
+        tipo: 'INGRESO',
+        concepto: '',
+        descripcion: '',
+        monto: '',
+        categoria: '',
+        subcategoria: '',
+        metodoPago: 'EFECTIVO',
+        comprobante: '',
+        estado: 'CONFIRMADO',
+        fecha: new Date().toLocaleDateString('en-CA'),
+        numeroTransaccion: '',
+        referenciaExterna: ''
+      })
+
+      // Cambiar a pestaña historial para ver el nuevo movimiento
+      setActiveTab('historial')
+
     } catch (error) {
       console.error('❌ Error:', error)
       toast.error(error.message || 'Error al registrar el movimiento')

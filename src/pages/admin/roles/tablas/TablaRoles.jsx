@@ -1,6 +1,10 @@
-import React from 'react';
-import { Shield } from 'lucide-react';
-import { DataTable, rolesColumns, rolesFilters } from '../../../../components/common/DataTable';
+import React from "react";
+import { Shield } from "lucide-react";
+import {
+  DataTable,
+  rolesColumns,
+  rolesFilters,
+} from "../../../../components/common/DataTable";
 
 /**
  * Tabla de roles refactorizada usando el componente DataTable unificado
@@ -12,8 +16,6 @@ const TablaRoles = ({
   onEdit,
   onDelete,
   onView,
-  onImport,
-  onExport
 }) => {
   return (
     <div>
@@ -25,15 +27,13 @@ const TablaRoles = ({
         searchPlaceholder="Buscar roles..."
         icon={Shield}
         onAdd={onAdd}
-        onImport={onImport}
-        onExport={onExport}
         actions={{
           add: true, // Habilitado para crear nuevos roles
           edit: false, // Deshabilitado para edición
           delete: false, // Deshabilitado para eliminación
           view: false, // Deshabilitado para vista
-          import: false,
-          export: true
+          import: false, // Deshabilitado
+          export: false, // Deshabilitado
         }}
         filters={rolesFilters}
         loadingMessage="Cargando roles..."

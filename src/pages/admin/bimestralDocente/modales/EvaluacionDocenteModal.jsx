@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'sonner';
-import trabajadorService from '../../../../services/trabajadorService.js';
-import { bimestreService } from '../../../../services/bimestreService.js';
-import { evaluacionService } from '../../../../services/evaluacionService.js';
+// 🎭 DEMO MODE: Usar datos de mockData y servicio demo
+import { mockData } from '../../../../data/mockData';
+import demoEvaluacionBimestralService from '../../../../services/demoEvaluacionBimestralService';
 
 const schema = yup.object({
   puntajePlanificacion: yup.number().min(0).max(20).required('Puntaje de planificación es requerido'),
@@ -41,24 +41,26 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [trabajadoresRes, bimestreActualRes] = await Promise.all([
-        trabajadorService.getAllTrabajadores(),
-        bimestreService.getBimestreActual(),
-      ]);
-      
-      // Filtrar solo los trabajadores con rol DOCENTE
-      const docentes = (trabajadoresRes || []).filter(trabajador => 
-        trabajador.idRol?.nombre === 'DOCENTE' || trabajador.rol?.nombre === 'DOCENTE'
+      // 🎭 DEMO: Obtener datos directamente de mockData
+      const docentes = mockData.trabajadores.filter(
+        (trabajador) =>
+          trabajador.idRol?.nombre === 'DOCENTE' || trabajador.rol?.nombre === 'DOCENTE'
       );
-      
+
+      // Obtener el bimestre activo
+      const bimestreActivo = mockData.bimestres.find((b) => b.estaActivo === true);
+
       setTrabajadores(docentes);
-      setBimestres(bimestreActualRes ? [bimestreActualRes] : []);
-      
+      setBimestres(bimestreActivo ? [bimestreActivo] : mockData.bimestres);
+
+      console.log('[DEMO] Docentes cargados:', docentes.length);
+      console.log('[DEMO] Bimestre activo:', bimestreActivo);
+
       // Preseleccionar el bimestre activo si existe
-      if (bimestreActualRes) {
+      if (bimestreActivo) {
         reset((prevValues) => ({
           ...prevValues,
-          idBimestre: bimestreActualRes.idBimestre
+          idBimestre: bimestreActivo.idBimestre,
         }));
       }
     } catch (error) {
@@ -72,37 +74,39 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
   const onSubmit = async (data) => {
     setSubmitting(true);
     try {
-      // Get idCoordinador from localStorage
-      const authData = JSON.parse(localStorage.getItem('auth-storage') || localStorage.getItem('auth') || '{}');
-      console.log('Auth data from localStorage:', authData);
-      
-      const idCoordinador = authData.state?.user?.entidadId;
-      console.log('ID Coordinador:', idCoordinador);
-
-      if (!idCoordinador) {
-        toast.error('No se pudo obtener el ID del coordinador');
-        return;
-      }
+      // 🎭 DEMO: Obtener idCoordinador del auth store (simulado)
+      const authData = JSON.parse(
+        localStorage.getItem('auth-storage') || localStorage.getItem('auth') || '{}'
+      );
+      const idCoordinador = authData.state?.user?.entidadId || 1;
 
       const evaluationData = {
         ...data,
         idCoordinador,
-        fechaEvaluacion: data.fechaEvaluacion ? new Date(data.fechaEvaluacion).toISOString().split('T')[0] : null,
+        idTrabajador: parseInt(data.idTrabajador),
+        idBimestre: parseInt(data.idBimestre),
+        puntajePlanificacion: parseFloat(data.puntajePlanificacion),
+        puntajeMetodologia: parseFloat(data.puntajeMetodologia),
+        puntajePuntualidad: parseFloat(data.puntajePuntualidad),
+        puntajeCreatividad: parseFloat(data.puntajeCreatividad),
+        puntajeComunicacion: parseFloat(data.puntajeComunicacion),
+        fechaEvaluacion: data.fechaEvaluacion
+          ? new Date(data.fechaEvaluacion).toISOString().split('T')[0]
+          : null,
       };
 
-      console.log('Datos a enviar al backend:', evaluationData);
+      console.log('[DEMO] Creando evaluación:', evaluationData);
 
-      await evaluacionService.createEvaluacionDocente(evaluationData);
+      // 🎭 DEMO: Usar servicio demo en lugar de API
+      await demoEvaluacionBimestralService.create(evaluationData);
+
       toast.success('Evaluación creada exitosamente');
       reset();
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Error submitting evaluation:', error);
-      
-      // Show specific error message from backend if available
-      const errorMessage = error.response?.data?.message || 'Error al crear la evaluación';
-      toast.error(errorMessage);
+      toast.error('Error al crear la evaluación');
     } finally {
       setSubmitting(false);
     }

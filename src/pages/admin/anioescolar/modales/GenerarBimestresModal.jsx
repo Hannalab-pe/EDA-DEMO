@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { X, Settings, Loader2 } from 'lucide-react';
+import { X, Settings, Info } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useGenerarBimestresAutomaticos } from '../../../../hooks/queries/useBimestreQueries';
-import { usePeriodosEscolares } from '../../../../hooks/queries/usePeriodoEscolarQueries';
+import { toast } from 'sonner';
+import demoPeriodoEscolarService from '../../../../services/demoPeriodoEscolarService';
 
 const GenerarBimestresModal = ({ isOpen, onClose }) => {
   const [selectedPeriodo, setSelectedPeriodo] = useState('');
+  const [periodos, setPeriodos] = useState([]);
+  const [loadingPeriodos, setLoadingPeriodos] = useState(true);
 
-  // Hooks
-  const { data: periodosData = [], isLoading: loadingPeriodos } = usePeriodosEscolares();
-  const generarBimestresMutation = useGenerarBimestresAutomaticos();
+  // Cargar períodos (DEMO)
+  useEffect(() => {
+    const fetchPeriodos = async () => {
+      try {
+        setLoadingPeriodos(true);
+        const data = await demoPeriodoEscolarService.getAll();
+        setPeriodos(data);
+      } catch (error) {
+        console.error("[DEMO] Error al cargar períodos:", error);
+      } finally {
+        setLoadingPeriodos(false);
+      }
+    };
 
-  // Extraer periodos del response
-  const periodos = periodosData || [];
+    if (isOpen) {
+      fetchPeriodos();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,14 +36,11 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    try {
-      await generarBimestresMutation.mutateAsync(selectedPeriodo);
-      onClose();
-      setSelectedPeriodo('');
-    } catch (error) {
-      console.error('Error generating bimestres:', error);
-      // El error ya se maneja en el hook
-    }
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y generar bimestres automáticamente.',
+      duration: 5000,
+    });
   };
 
   return (
@@ -112,7 +123,7 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
                   {selectedPeriodo && (
                     <div className="p-3 bg-purple-50 rounded-lg">
                       {(() => {
-                        const periodo = periodos.find(p => p.idPeriodoEscolar === selectedPeriodo);
+                        const periodo = periodos.find(p => p.idPeriodoEscolar === parseInt(selectedPeriodo));
                         return periodo ? (
                           <div className="text-sm text-purple-800">
                             <p><strong>Año:</strong> {periodo.anioEscolar}</p>
@@ -131,17 +142,16 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
                       type="button"
                       onClick={onClose}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                      disabled={generarBimestresMutation.isPending}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      disabled={generarBimestresMutation.isPending || !selectedPeriodo || loadingPeriodos}
+                      disabled={!selectedPeriodo || loadingPeriodos}
                       className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center space-x-2"
                     >
-                      {generarBimestresMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                      <span>{generarBimestresMutation.isPending ? 'Generando...' : 'Generar Bimestres'}</span>
+                      <Info className="w-4 h-4" />
+                      <span>Generar Bimestres</span>
                     </button>
                   </div>
                 </form>

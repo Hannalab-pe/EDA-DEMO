@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Save, Edit } from 'lucide-react';
+import { X, Calendar, Info, Edit } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useActualizarPeriodoEscolar } from '../../../../hooks/queries/usePeriodoEscolarQueries';
 import { toast } from 'sonner';
 
 const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
@@ -13,8 +12,6 @@ const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
     estaActivo: true,
     descripcion: ''
   });
-
-  const actualizarPeriodoMutation = useActualizarPeriodoEscolar();
 
   // Cargar datos del período cuando se abre el modal
   useEffect(() => {
@@ -40,17 +37,11 @@ const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await actualizarPeriodoMutation.mutateAsync({
-        id: periodo.idPeriodoEscolar,
-        periodoData: formData
-      });
-
-      onClose();
-    } catch (error) {
-      console.error('Error:', error);
-      // El error ya se maneja en el hook
-    }
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y editar períodos escolares reales.',
+      duration: 5000,
+    });
   };
 
   if (!isOpen || !periodo) return null;
@@ -184,26 +175,15 @@ const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
                       type="button"
                       onClick={onClose}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                      disabled={actualizarPeriodoMutation.isPending}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      disabled={actualizarPeriodoMutation.isPending}
-                      className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
                     >
-                      {actualizarPeriodoMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Actualizando...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4" />
-                          Actualizar
-                        </>
-                      )}
+                      <Info className="w-4 h-4" />
+                      Actualizar
                     </button>
                   </div>
                 </form>

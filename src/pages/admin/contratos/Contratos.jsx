@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Eye, AlertTriangle } from 'lucide-react';
-import { useContratos } from '../../../hooks/useContratos';
+import { demoContratoService } from '../../../services/demoContratoService';
 import ModalVerContrato from './modales/ModalVerContrato';
 
 const Contratos = () => {
@@ -8,13 +8,37 @@ const Contratos = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState(null);
 
-  // Hook personalizado para obtener contratos
-  const {
-    contratos,
-    loading,
-    statistics,
-    refreshContratos
-  } = useContratos();
+  // Estados para datos DEMO
+  const [contratos, setContratos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statistics, setStatistics] = useState({
+    total: 0,
+    active: 0,
+    expiringSoon: 0,
+    expired: 0,
+  });
+
+  // Cargar contratos y estadísticas al montar
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  const cargarDatos = async () => {
+    setLoading(true);
+    try {
+      const [contratosData, stats] = await Promise.all([
+        demoContratoService.getAllContratos(),
+        demoContratoService.getEstadisticas(),
+      ]);
+      setContratos(contratosData);
+      setStatistics(stats);
+      console.log('[DEMO] Contratos cargados:', contratosData.length);
+    } catch (error) {
+      console.error('[DEMO] Error al cargar contratos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setShowModal(true);
@@ -124,16 +148,16 @@ const Contratos = () => {
                 {contratos.map((contrato) => (
                   <tr key={contrato.idContrato} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {contrato.numeroContrato}
+                      #{contrato.idContrato}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {contrato.idTipoContrato?.nombreTipo || 'Sin tipo'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.idTrabajador2?.nombre} {contrato.idTrabajador2?.apellido}
+                      {contrato.idTrabajador?.nombre} {contrato.idTrabajador?.apellido}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.cargoContrato}
+                      {contrato.idTrabajador?.idRol?.nombreRol || 'Sin cargo'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(contrato.fechaInicio).toLocaleDateString('es-ES')}
@@ -143,13 +167,13 @@ const Contratos = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        contrato.estadoContrato === 'ACTIVO'
+                        contrato.estadoContrato === 'activo'
                           ? 'bg-green-100 text-green-800'
-                          : contrato.estadoContrato === 'INACTIVO'
+                          : contrato.estadoContrato === 'vencido'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {contrato.estadoContrato}
+                        {contrato.estadoContrato.toUpperCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

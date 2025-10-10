@@ -8,9 +8,9 @@ const TablaEvaluacionesDocente = ({ evaluaciones, loading, onViewEvaluacion }) =
   // Get unique docentes for filter
   const docentesOptions = useMemo(() => {
     if (!Array.isArray(evaluaciones)) return [];
-    const unique = [...new Set(evaluaciones.map(ev => ev.idTrabajador2?.idTrabajador))];
+    const unique = [...new Set(evaluaciones.map(ev => ev.trabajador?.idTrabajador))];
     return unique.map(id => {
-      const docente = evaluaciones.find(ev => ev.idTrabajador2?.idTrabajador === id)?.idTrabajador2;
+      const docente = evaluaciones.find(ev => ev.trabajador?.idTrabajador === id)?.trabajador;
       return docente ? { id: docente.idTrabajador, nombre: `${docente.nombre} ${docente.apellido}` } : null;
     }).filter(Boolean);
   }, [evaluaciones]);
@@ -20,11 +20,11 @@ const TablaEvaluacionesDocente = ({ evaluaciones, loading, onViewEvaluacion }) =
     if (!Array.isArray(evaluaciones)) return [];
     return evaluaciones.filter(ev => {
       const matchesSearch = !searchTerm ||
-        ev.idTrabajador2?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.idTrabajador2?.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.idBimestre2?.nombreBimestre?.toLowerCase().includes(searchTerm.toLowerCase());
+        ev.trabajador?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ev.trabajador?.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ev.bimestre?.nombreBimestre?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesDocente = !selectedDocente || ev.idTrabajador2?.idTrabajador === selectedDocente;
+      const matchesDocente = !selectedDocente || ev.trabajador?.idTrabajador === parseInt(selectedDocente);
 
       return matchesSearch && matchesDocente;
     });
@@ -116,40 +116,44 @@ const TablaEvaluacionesDocente = ({ evaluaciones, loading, onViewEvaluacion }) =
               </tr>
             ) : (
               filteredEvaluaciones.map((evaluacion) => (
-                <tr key={evaluacion.idEvaluacionDocente} className="hover:bg-gray-50">
+                <tr key={evaluacion.idEvaluacion} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {evaluacion.idTrabajador2?.nombre} {evaluacion.idTrabajador2?.apellido}
+                      {evaluacion.trabajador?.nombre} {evaluacion.trabajador?.apellido}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {evaluacion.idTrabajador2?.correo}
+                      {evaluacion.trabajador?.idRol?.nombre || 'DOCENTE'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {evaluacion.idBimestre2?.nombreBimestre}
+                      {evaluacion.bimestre?.nombreBimestre}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      Bimestre {evaluacion.idBimestre2?.numeroBimestre}
-                    </div>
+                    <span className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full ${
+                      evaluacion.bimestre?.estaActivo
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {evaluacion.bimestre?.estaActivo ? 'Activo' : 'Finalizado'}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 space-y-1">
-                      <div>Planificación: {evaluacion.puntajePlanificacion}</div>
-                      <div>Metodología: {evaluacion.puntajeMetodologia}</div>
-                      <div>Puntualidad: {evaluacion.puntajePuntualidad}</div>
-                      <div>Creatividad: {evaluacion.puntajeCreatividad}</div>
-                      <div>Comunicación: {evaluacion.puntajeComunicacion}</div>
+                    <div className="text-xs text-gray-900 space-y-0.5">
+                      <div>📋 Planificación: <span className="font-medium">{evaluacion.puntajePlanificacion}</span></div>
+                      <div>🎯 Metodología: <span className="font-medium">{evaluacion.puntajeMetodologia}</span></div>
+                      <div>⏰ Puntualidad: <span className="font-medium">{evaluacion.puntajePuntualidad}</span></div>
+                      <div>💡 Creatividad: <span className="font-medium">{evaluacion.puntajeCreatividad}</span></div>
+                      <div>💬 Comunicación: <span className="font-medium">{evaluacion.puntajeComunicacion}</span></div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      evaluacion.calificacionFinal === 'A' ? 'bg-green-100 text-green-800' :
-                      evaluacion.calificacionFinal === 'B' ? 'bg-blue-100 text-blue-800' :
-                      evaluacion.calificacionFinal === 'C' ? 'bg-yellow-100 text-yellow-800' :
+                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
+                      evaluacion.promedioFinal >= 18 ? 'bg-green-100 text-green-800' :
+                      evaluacion.promedioFinal >= 15 ? 'bg-blue-100 text-blue-800' :
+                      evaluacion.promedioFinal >= 11 ? 'bg-yellow-100 text-yellow-800' :
                       'bg-red-100 text-red-800'
                     }`}>
-                      {evaluacion.calificacionFinal} ({evaluacion.puntajeTotal})
+                      {evaluacion.promedioFinal}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -157,7 +161,7 @@ const TablaEvaluacionesDocente = ({ evaluaciones, loading, onViewEvaluacion }) =
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {evaluacion.idCoordinador?.nombre} {evaluacion.idCoordinador?.apellido}
+                      {evaluacion.coordinador?.nombre} {evaluacion.coordinador?.apellido}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

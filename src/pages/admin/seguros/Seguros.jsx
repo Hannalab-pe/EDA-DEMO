@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import CrearTipoSeguroModal from "./modales/CrearTipoSeguroModal";
 import { toast } from "sonner";
+import demoSeguroService from "../../../services/demoSeguroService";
 
 const Seguros = () => {
   const [modalCrearTipoSeguro, setModalCrearTipoSeguro] = useState(false);
@@ -23,50 +24,8 @@ const Seguros = () => {
   const fetchSeguros = async () => {
     try {
       setLoading(true);
-
-      // Simular datos demo de seguros
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const segurosDemo = [
-        {
-          idTipoSeguro: 1,
-          nombre: "Seguro Básico Escolar",
-          descripcion:
-            "Cobertura básica para actividades escolares y accidentes menores",
-          porcentaje: 15.5,
-          monto: 150.0,
-          estado: "ACTIVO",
-          fechaCreacion: "2024-01-15T10:00:00Z",
-          cobertura:
-            "Accidentes escolares, primeros auxilios, medicamentos básicos",
-        },
-        {
-          idTipoSeguro: 2,
-          nombre: "Seguro Integral Premium",
-          descripcion:
-            "Cobertura completa incluyendo hospitalización y cirugías menores",
-          porcentaje: 25.0,
-          monto: 350.0,
-          estado: "ACTIVO",
-          fechaCreacion: "2024-01-20T14:30:00Z",
-          cobertura:
-            "Hospitalización, cirugías menores, medicamentos, terapias",
-        },
-        {
-          idTipoSeguro: 3,
-          nombre: "Seguro Familiar",
-          descripcion:
-            "Extensión de cobertura para padres y hermanos del estudiante",
-          porcentaje: 30.0,
-          monto: 500.0,
-          estado: "INACTIVO",
-          fechaCreacion: "2024-02-01T09:15:00Z",
-          cobertura:
-            "Cobertura familiar completa, emergencias, consultas médicas",
-        },
-      ];
-
-      setSeguros(segurosDemo);
+      const data = await demoSeguroService.getAllTiposSeguros();
+      setSeguros(data);
     } catch (error) {
       console.error("Error fetching seguros:", error);
       toast.error("Error al cargar los tipos de seguro");

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Settings, Save } from 'lucide-react';
+import { X, DollarSign, Info } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
@@ -12,50 +12,14 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
     regenerarExistentes: false,
     aplicarDescuentosPagoAdelantado: false
   });
-  const [loading, setLoading] = useState(false);
-  const [entidadId, setEntidadId] = useState('');
 
   useEffect(() => {
-    // Obtener entidadId del localStorage (auth-storage)
-    const persistedState = JSON.parse(localStorage.getItem('auth-storage') || '{}');
-    const userEntidadId = persistedState?.state?.user?.entidadId;
-
-    console.log('🔍 Estado persistido:', persistedState);
-    console.log('👤 Usuario:', persistedState?.state?.user);
-    console.log('🆔 EntidadId encontrado:', userEntidadId);
-
-    // Si no está en user.entidadId, intentar obtenerlo del token JWT
-    let finalEntidadId = userEntidadId;
-
-    if (!finalEntidadId) {
-      const token = persistedState?.state?.token || localStorage.getItem('token');
-      if (token && token !== 'null') {
-        try {
-          // Decodificar JWT para obtener entidadId
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          finalEntidadId = payload.entidadId || payload.entidad_id || payload.entityId;
-          console.log('🔑 EntidadId del JWT:', finalEntidadId);
-        } catch (error) {
-          console.error('❌ Error decodificando JWT:', error);
-        }
-      }
-    }
-
-    if (finalEntidadId) {
-      setEntidadId(finalEntidadId);
-    } else {
-      console.error('❌ No se pudo encontrar entidadId ni en localStorage ni en JWT');
-      toast.error('No se pudo obtener la información del usuario. Verifica que estés logueado correctamente.');
-      onClose();
-      return;
-    }
-
     // Actualizar descripción por defecto
     setFormData(prev => ({
       ...prev,
       descripcion: `Generación automática de pensiones para el año escolar ${new Date().getFullYear()}`
     }));
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -67,47 +31,12 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      const payload = {
-        ...formData,
-        registradoPorId: entidadId
-      };
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/pension-estudiante/configurar-anio-escolar-optimizada?registradoPorId=${entidadId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al generar las pensiones');
-      }
-
-      const result = await response.json();
-
-      toast.success('Pensiones generadas exitosamente');
-      onClose();
-
-      // Reset form
-      setFormData({
-        anioEscolar: new Date().getFullYear(),
-        diaVencimientoPersonalizado: 15,
-        descripcion: `Generación automática de pensiones para el año escolar ${new Date().getFullYear()}`,
-        regenerarExistentes: false,
-        aplicarDescuentosPagoAdelantado: false
-      });
-
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Error al generar las pensiones');
-    } finally {
-      setLoading(false);
-    }
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y generar pensiones automáticamente.',
+      duration: 5000,
+    });
   };
 
   if (!isOpen) return null;
@@ -249,15 +178,10 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
                     </button>
                     <button
                       type="submit"
-                      disabled={loading}
-                      className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
                     >
-                      {loading ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      <span>{loading ? 'Generando...' : 'Generar'}</span>
+                      <Info className="w-4 h-4" />
+                      <span>Generar Pensiones</span>
                     </button>
                   </div>
                 </form>

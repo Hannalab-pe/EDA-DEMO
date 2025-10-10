@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { Loader2, CheckCircle, School, X, ChevronDown } from 'lucide-react';
+import { Info, School, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAulasHook } from '../../../../hooks/useAulas';
-import { useGradosOptions } from '../../../../hooks/useGrados';
 
-const ModalEditarAula = ({ isOpen, onClose, aula }) => {
+const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
   const [form, setForm] = useState({
     seccion: '',
     cantidadEstudiantes: '',
@@ -15,23 +13,21 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
     equipamiento: '',
     idGrado: ''
   });
-  const [loading, setLoading] = useState(false);
-  const { updateAula, updating } = useAulasHook();
-  const { options: gradosOptions, isLoading: loadingGrados } = useGradosOptions();
 
-  // Cargar datos del aula cuando se abre el modal
+  // Cargar datos de la asignación cuando se abre el modal
   useEffect(() => {
-    if (aula && isOpen) {
+    if (asignacion && isOpen) {
+      const aula = asignacion.idAula || {};
       setForm({
         seccion: aula.seccion || '',
-        cantidadEstudiantes: aula.cantidadEstudiantes?.toString() || '',
+        cantidadEstudiantes: aula.capacidad?.toString() || aula.cantidadEstudiantes?.toString() || '',
         descripcion: aula.descripcion || '',
         ubicacion: aula.ubicacion || '',
         equipamiento: aula.equipamiento || '',
-        idGrado: aula.idGrado || ''
+        idGrado: aula.idGrado?.idGrado || ''
       });
     }
-  }, [aula, isOpen]);
+  }, [asignacion, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,60 +40,22 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!aula?.idAula) {
-      toast.error('No se pudo identificar el aula a actualizar');
-      return;
-    }
-
-    // Validaciones
-    if (!form.seccion.trim()) {
-      toast.error('La sección es requerida');
-      return;
-    }
-
-    if (!form.cantidadEstudiantes || isNaN(form.cantidadEstudiantes) || Number(form.cantidadEstudiantes) < 0) {
-      toast.error('La cantidad de estudiantes debe ser un número válido mayor o igual a 0');
-      return;
-    }
-
-    if (!form.idGrado) {
-      toast.error('Debe seleccionar un grado');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Preparar datos para enviar
-      const aulaData = {
-        seccion: form.seccion.trim(),
-        cantidadEstudiantes: Number(form.cantidadEstudiantes),
-        descripcion: form.descripcion.trim(),
-        ubicacion: form.ubicacion.trim(),
-        equipamiento: form.equipamiento.trim(),
-        idGrado: form.idGrado
-      };
-
-      await updateAula(aula.idAula, aulaData);
-      onClose();
-    } catch (error) {
-      // El error ya se maneja en el hook
-    } finally {
-      setLoading(false);
-    }
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo con todas las funcionalidades de gestión de asignaciones de aulas.',
+      duration: 5000,
+    });
   };
 
   const handleClose = () => {
-    if (!loading) {
-      setForm({
-        seccion: '',
-        cantidadEstudiantes: '',
-        descripcion: '',
-        ubicacion: '',
-        equipamiento: '',
-        idGrado: ''
-      });
-      onClose();
-    }
+    setForm({
+      seccion: '',
+      cantidadEstudiantes: '',
+      descripcion: '',
+      ubicacion: '',
+      equipamiento: '',
+      idGrado: ''
+    });
+    onClose();
   };
 
   return (
@@ -130,12 +88,11 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
                 <div className="flex items-center justify-between mb-4">
                   <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 flex items-center">
                     <School className="w-5 h-5 mr-2 text-blue-600" />
-                    Editar Aula
+                    Editar Asignación de Aula
                   </Dialog.Title>
                   <button
                     onClick={handleClose}
-                    disabled={loading}
-                    className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -146,7 +103,7 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="seccion" className="block text-sm font-medium text-gray-700 mb-1">
-                        Sección *
+                        Sección
                       </label>
                       <input
                         type="text"
@@ -155,15 +112,14 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
                         value={form.seccion}
                         onChange={handleChange}
                         placeholder="Ej: A, B, C"
-                        required
-                        disabled={loading}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed opacity-60"
                       />
                     </div>
 
                     <div>
                       <label htmlFor="cantidadEstudiantes" className="block text-sm font-medium text-gray-700 mb-1">
-                        Cantidad de Estudiantes *
+                        Capacidad de Estudiantes
                       </label>
                       <input
                         type="number"
@@ -171,123 +127,26 @@ const ModalEditarAula = ({ isOpen, onClose, aula }) => {
                         name="cantidadEstudiantes"
                         value={form.cantidadEstudiantes}
                         onChange={handleChange}
-                        min="0"
-                        placeholder="0"
-                        required
-                        disabled={loading}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed opacity-60"
                       />
                     </div>
-                  </div>
-
-                  {/* Selector de Grado */}
-                  <div>
-                    <label htmlFor="idGrado" className="block text-sm font-medium text-gray-700 mb-1">
-                      Grado Académico *
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="idGrado"
-                        name="idGrado"
-                        value={form.idGrado}
-                        onChange={handleChange}
-                        required
-                        disabled={loading || loadingGrados}
-                        className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-white"
-                      >
-                        <option value="">
-                          {loadingGrados ? 'Cargando grados...' : 'Seleccione un grado'}
-                        </option>
-                        {gradosOptions.map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Información adicional */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
-                        Ubicación
-                      </label>
-                      <input
-                        type="text"
-                        id="ubicacion"
-                        name="ubicacion"
-                        value={form.ubicacion}
-                        onChange={handleChange}
-                        placeholder="Ej: Primer piso, Edificio A"
-                        disabled={loading}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Descripción */}
-                  <div>
-                    <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
-                      Descripción
-                    </label>
-                    <textarea
-                      id="descripcion"
-                      name="descripcion"
-                      value={form.descripcion}
-                      onChange={handleChange}
-                      rows={3}
-                      placeholder="Descripción del aula..."
-                      disabled={loading}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* Equipamiento */}
-                  <div>
-                    <label htmlFor="equipamiento" className="block text-sm font-medium text-gray-700 mb-1">
-                      Equipamiento
-                    </label>
-                    <textarea
-                      id="equipamiento"
-                      name="equipamiento"
-                      value={form.equipamiento}
-                      onChange={handleChange}
-                      rows={3}
-                      placeholder="Proyector, pizarra digital, computadoras..."
-                      disabled={loading}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
                   </div>
 
                   <div className="flex justify-end space-x-3 pt-4">
                     <button
                       type="button"
                       onClick={handleClose}
-                      disabled={loading}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      disabled={loading || !form.seccion || !form.cantidadEstudiantes || !form.idGrado}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex items-center"
                     >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Actualizando...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Actualizar Aula
-                        </>
-                      )}
+                      <Info className="w-4 h-4 mr-2" />
+                      Ver Sistema Completo
                     </button>
                   </div>
                 </form>

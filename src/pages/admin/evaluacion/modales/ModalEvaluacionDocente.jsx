@@ -11,8 +11,7 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { storage } from '../../../../firebase-config';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+// 🎭 DEMO MODE: Firebase imports removidos - no se usan
 import { toast } from 'sonner';
 
 const ModalEvaluacionDocente = ({
@@ -113,27 +112,31 @@ const ModalEvaluacionDocente = ({
     }
   };
 
-  // Subir archivo a Firebase
+  // 🎭 DEMO: Subir archivo (SIN Firebase - Solo simulación)
   const uploadFileToFirebase = async (file) => {
     try {
       setUploading(true);
       toast.loading('Subiendo archivo...', { id: 'upload-file' });
 
-      // Crear nombre único para el archivo
+      // Simular tiempo de carga realista
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      // Generar URL falsa pero realista
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = ref(storage, `evaluaciones-docentes/${fileName}`);
+      const fakeDownloadURL = `https://demo-storage.local/evaluaciones-docentes/${fileName}`;
 
-      // Subir archivo
-      const snapshot = await uploadBytes(storageRef, file);
-
-      // Obtener URL de descarga
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      console.log('📁 [DEMO MODE] Archivo simulado:', {
+        nombre: file.name,
+        tamaño: `${(file.size / 1024).toFixed(2)} KB`,
+        tipo: file.type,
+        urlFalsa: fakeDownloadURL
+      });
 
       toast.dismiss('upload-file');
       toast.success('Archivo subido exitosamente');
 
-      return downloadURL;
+      return fakeDownloadURL;
     } catch (error) {
       console.error('Error al subir archivo:', error);
       toast.dismiss('upload-file');

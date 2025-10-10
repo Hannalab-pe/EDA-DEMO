@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { Loader2, CheckCircle, School, X, ChevronDown } from 'lucide-react';
+import { CheckCircle, School, X, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAulasSimple } from '../../../../hooks/useAulas';
-import { useGradosOptions } from '../../../../hooks/useGrados';
+import { mockData } from '../../../../data/mockData';
+import demoAulaService from '../../../../services/demoAulaService';
 
-const ModalAgregarAula = ({ isOpen, onClose }) => {
+const ModalAgregarAula = ({ isOpen, onClose, onSuccess }) => {
   const [form, setForm] = useState({
     seccion: '',
     cantidadEstudiantes: '',
     idGrado: ''
   });
   const [loading, setLoading] = useState(false);
-  const { crearAula } = useAulasSimple();
-  const { options: gradosOptions, isLoading: loadingGrados, hasGrados } = useGradosOptions();
+  const [gradosOptions, setGradosOptions] = useState([]);
+
+  // Cargar grados desde mockData (DEMO)
+  useEffect(() => {
+    if (isOpen) {
+      const grados = (mockData.grados || []).map(grado => ({
+        value: grado.idGrado,
+        label: grado.grado
+      }));
+      setGradosOptions(grados);
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,14 +55,16 @@ const ModalAgregarAula = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      // Preparar datos para enviar
+      // Preparar datos para enviar (DEMO)
       const aulaData = {
         seccion: form.seccion.trim(),
-        cantidadEstudiantes: Number(form.cantidadEstudiantes),
-        idGrado: form.idGrado
+        capacidad: Number(form.cantidadEstudiantes),
+        idGrado: Number(form.idGrado)
       };
 
-      await crearAula(aulaData);
+      await demoAulaService.createAula(aulaData);
+      
+      toast.success('✅ Aula creada exitosamente');
       
       // Resetear formulario y cerrar modal
       setForm({
@@ -60,9 +72,16 @@ const ModalAgregarAula = ({ isOpen, onClose }) => {
         cantidadEstudiantes: '',
         idGrado: ''
       });
+      
+      // Recargar lista de aulas
+      if (onSuccess) {
+        onSuccess();
+      }
+      
       onClose();
     } catch (error) {
-      // El error ya se maneja en el hook
+      console.error("[DEMO] Error al crear aula:", error);
+      toast.error(error.message || "Error al crear el aula");
     } finally {
       setLoading(false);
     }
@@ -169,11 +188,11 @@ const ModalAgregarAula = ({ isOpen, onClose }) => {
                         value={form.idGrado}
                         onChange={handleChange}
                         required
-                        disabled={loading || loadingGrados}
+                        disabled={loading}
                         className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-white"
                       >
                         <option value="">
-                          {loadingGrados ? 'Cargando grados...' : 'Seleccione un grado'}
+                          Seleccione un grado
                         </option>
                         {gradosOptions.map(option => (
                           <option key={option.value} value={option.value}>
@@ -185,11 +204,6 @@ const ModalAgregarAula = ({ isOpen, onClose }) => {
                         <ChevronDown className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
-                    {!hasGrados && !loadingGrados && (
-                      <p className="text-xs text-amber-600 mt-1">
-                        No hay grados disponibles. Primero debe crear grados académicos.
-                      </p>
-                    )}
                   </div>
 
                   <div className="flex justify-end space-x-3 pt-4">
@@ -206,17 +220,8 @@ const ModalAgregarAula = ({ isOpen, onClose }) => {
                       disabled={loading || !form.seccion || !form.cantidadEstudiantes || !form.idGrado}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
                     >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creando...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Crear Aula
-                        </>
-                      )}
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      {loading ? 'Creando...' : 'Crear Aula'}
                     </button>
                   </div>
                 </form>

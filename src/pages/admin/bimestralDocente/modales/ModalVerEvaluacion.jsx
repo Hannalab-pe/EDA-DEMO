@@ -62,11 +62,11 @@ const ModalVerEvaluacion = ({ isOpen, onClose, evaluacion }) => {
                         <User className="w-4 h-4 text-gray-500 mr-2" />
                         <span className="text-sm font-medium text-gray-700">Docente</span>
                       </div>
-                      <p className="text-sm text-gray-900">
-                        {evaluacion.idTrabajador2?.nombre} {evaluacion.idTrabajador2?.apellido}
+                      <p className="text-sm text-gray-900 font-medium">
+                        {evaluacion.trabajador?.nombre} {evaluacion.trabajador?.apellido}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {evaluacion.idTrabajador2?.correo}
+                        {evaluacion.trabajador?.idRol?.nombre || 'DOCENTE'}
                       </p>
                     </div>
 
@@ -75,12 +75,16 @@ const ModalVerEvaluacion = ({ isOpen, onClose, evaluacion }) => {
                         <Calendar className="w-4 h-4 text-gray-500 mr-2" />
                         <span className="text-sm font-medium text-gray-700">Bimestre</span>
                       </div>
-                      <p className="text-sm text-gray-900">
-                        {evaluacion.idBimestre2?.nombreBimestre}
+                      <p className="text-sm text-gray-900 font-medium">
+                        {evaluacion.bimestre?.nombreBimestre}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Bimestre {evaluacion.idBimestre2?.numeroBimestre}
-                      </p>
+                      <span className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full ${
+                        evaluacion.bimestre?.estaActivo
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {evaluacion.bimestre?.estaActivo ? 'Activo' : 'Finalizado'}
+                      </span>
                     </div>
                   </div>
 
@@ -93,46 +97,61 @@ const ModalVerEvaluacion = ({ isOpen, onClose, evaluacion }) => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">{evaluacion.puntajePlanificacion}</div>
-                        <div className="text-xs text-gray-600">Planificación</div>
+                        <div className="text-xs text-gray-600">📋 Planificación</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">{evaluacion.puntajeMetodologia}</div>
-                        <div className="text-xs text-gray-600">Metodología</div>
+                        <div className="text-xs text-gray-600">🎯 Metodología</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">{evaluacion.puntajePuntualidad}</div>
-                        <div className="text-xs text-gray-600">Puntualidad</div>
+                        <div className="text-xs text-gray-600">⏰ Puntualidad</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">{evaluacion.puntajeCreatividad}</div>
-                        <div className="text-xs text-gray-600">Creatividad</div>
+                        <div className="text-xs text-gray-600">💡 Creatividad</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">{evaluacion.puntajeComunicacion}</div>
-                        <div className="text-xs text-gray-600">Comunicación</div>
+                        <div className="text-xs text-gray-600">💬 Comunicación</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-green-600">{evaluacion.puntajeTotal}</div>
-                        <div className="text-xs text-gray-600">Total</div>
+                        <div className="text-3xl font-bold text-green-600">{evaluacion.promedioFinal}</div>
+                        <div className="text-xs text-gray-600">✨ Promedio</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Calificación final */}
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Calificación Final</h4>
-                    <div className="flex items-center">
-                      <span className={`inline-flex px-3 py-1 text-lg font-bold rounded-full ${
-                        evaluacion.calificacionFinal === 'A' ? 'bg-green-100 text-green-800' :
-                        evaluacion.calificacionFinal === 'B' ? 'bg-blue-100 text-blue-800' :
-                        evaluacion.calificacionFinal === 'C' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {evaluacion.calificacionFinal}
-                      </span>
-                      <span className="ml-3 text-sm text-gray-600">
-                        Puntaje total: {evaluacion.puntajeTotal}
-                      </span>
+                  <div className={`p-4 rounded-lg ${
+                    evaluacion.promedioFinal >= 18 ? 'bg-green-50' :
+                    evaluacion.promedioFinal >= 15 ? 'bg-blue-50' :
+                    evaluacion.promedioFinal >= 11 ? 'bg-yellow-50' :
+                    'bg-red-50'
+                  }`}>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Evaluación Final</h4>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className={`inline-flex px-4 py-2 text-xl font-bold rounded-full ${
+                          evaluacion.promedioFinal >= 18 ? 'bg-green-100 text-green-800' :
+                          evaluacion.promedioFinal >= 15 ? 'bg-blue-100 text-blue-800' :
+                          evaluacion.promedioFinal >= 11 ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {evaluacion.promedioFinal}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-700">
+                          {evaluacion.promedioFinal >= 18 ? '🏆 Excelente' :
+                           evaluacion.promedioFinal >= 15 ? '👍 Bueno' :
+                           evaluacion.promedioFinal >= 11 ? '⚠️ Regular' :
+                           '❌ Deficiente'}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Promedio calculado automáticamente
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -156,7 +175,7 @@ const ModalVerEvaluacion = ({ isOpen, onClose, evaluacion }) => {
                     <div>
                       <span className="font-medium text-gray-700">Coordinador:</span>
                       <span className="ml-2 text-gray-900">
-                        {evaluacion.idCoordinador?.nombre} {evaluacion.idCoordinador?.apellido}
+                        {evaluacion.coordinador?.nombre} {evaluacion.coordinador?.apellido}
                       </span>
                     </div>
                   </div>

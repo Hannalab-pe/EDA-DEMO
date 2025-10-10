@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, DollarSign, Plus, Settings, Edit, Eye, Table, FileText, BarChart3 } from 'lucide-react';
+import { toast } from 'sonner';
 import CrearPeriodoModal from './modales/CrearPeriodoModal';
 import EditarPeriodoModal from './modales/EditarPeriodoModal';
 import GenerarPensionesModal from './modales/GenerarPensionesModal';
 import GenerarBimestresModal from './modales/GenerarBimestresModal';
 import EditarBimestresModal from './modales/EditarBimestresModal';
-import { usePeriodosEscolares } from '../../../hooks/queries/usePeriodoEscolarQueries';
-import { useBimestres } from '../../../hooks/queries/useBimestreQueries';
+import demoPeriodoEscolarService from '../../../services/demoPeriodoEscolarService';
+import demoBimestreService from '../../../services/demoBimestreService';
 
 const AnioEscolar = () => {
   const [activeSection, setActiveSection] = useState('periodos');
@@ -19,11 +20,69 @@ const AnioEscolar = () => {
   const [bimestresSeleccionados, setBimestresSeleccionados] = useState([]);
   const [periodoBimestresSeleccionado, setPeriodoBimestresSeleccionado] = useState(null);
 
-  // Obtener períodos escolares
-  const { data: periodos = [], isLoading: loadingPeriodos, error: errorPeriodos } = usePeriodosEscolares();
+  // Estados para datos DEMO
+  const [periodos, setPeriodos] = useState([]);
+  const [bimestresData, setBimestresData] = useState({ bimestres: [] });
+  const [loadingPeriodos, setLoadingPeriodos] = useState(true);
+  const [loadingBimestres, setLoadingBimestres] = useState(true);
 
-  // Obtener bimestres
-  const { data: bimestresData = [], isLoading: loadingBimestres, error: errorBimestres } = useBimestres();
+  // Cargar períodos escolares (DEMO)
+  useEffect(() => {
+    const fetchPeriodos = async () => {
+      try {
+        setLoadingPeriodos(true);
+        const data = await demoPeriodoEscolarService.getAll();
+        setPeriodos(data);
+        console.log("[DEMO] Períodos escolares cargados:", data.length);
+      } catch (error) {
+        console.error("[DEMO] Error al cargar períodos:", error);
+        toast.error("Error al cargar períodos escolares");
+      } finally {
+        setLoadingPeriodos(false);
+      }
+    };
+
+    fetchPeriodos();
+  }, []);
+
+  // Cargar bimestres (DEMO)
+  useEffect(() => {
+    const fetchBimestres = async () => {
+      try {
+        setLoadingBimestres(true);
+        const data = await demoBimestreService.getAll();
+        setBimestresData(data);
+        console.log("[DEMO] Bimestres cargados:", data.bimestres.length);
+      } catch (error) {
+        console.error("[DEMO] Error al cargar bimestres:", error);
+        toast.error("Error al cargar bimestres");
+      } finally {
+        setLoadingBimestres(false);
+      }
+    };
+
+    fetchBimestres();
+  }, []);
+
+  // Función para recargar períodos
+  const recargarPeriodos = async () => {
+    try {
+      const data = await demoPeriodoEscolarService.getAll();
+      setPeriodos(data);
+    } catch (error) {
+      console.error("[DEMO] Error al recargar períodos:", error);
+    }
+  };
+
+  // Función para recargar bimestres
+  const recargarBimestres = async () => {
+    try {
+      const data = await demoBimestreService.getAll();
+      setBimestresData(data);
+    } catch (error) {
+      console.error("[DEMO] Error al recargar bimestres:", error);
+    }
+  };
 
   // Handlers para modales
   const handleEditarPeriodo = (periodo) => {
@@ -127,10 +186,6 @@ const AnioEscolar = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="text-gray-500 mt-4">Cargando períodos escolares...</p>
             </div>
-          ) : errorPeriodos ? (
-            <div className="text-center py-12">
-              <p className="text-red-500 text-lg">Error al cargar los períodos escolares</p>
-            </div>
           ) : periodos.length === 0 ? (
             <div className="text-center py-12">
               <div className="p-8 bg-gray-50 rounded-lg">
@@ -226,10 +281,6 @@ const AnioEscolar = () => {
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
               <p className="text-gray-500 mt-4">Cargando bimestres...</p>
-            </div>
-          ) : errorBimestres ? (
-            <div className="text-center py-12">
-              <p className="text-red-500 text-lg">Error al cargar los bimestres</p>
             </div>
           ) : !bimestresData?.bimestres || bimestresData.bimestres.length === 0 ? (
             <div className="text-center py-12">

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useAuthStore } from "../../store";
-import { useAdminDashboard } from "../../hooks/useAdminDashboard";
+import { useAdminDashboardDemo } from "../../hooks/useAdminDashboardDemo";
+import { useSidebar } from "../../contexts/SidebarContext";
 
 import {
   DashboardBarChart,
@@ -71,12 +72,12 @@ import AsignacionCursos from "../admin/asignacion-cursos/AsignacionCursos";
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isMobileSidebarOpen, setIsMobileSidebarOpen } = useSidebar();
   const [financeComponent, setFinanceComponent] = useState("GestionFinanciera");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const { logout, user } = useAuthStore();
 
-  // Usar el hook personalizado para obtener datos reales del dashboard
+  // Usar el hook DEMO para obtener datos estáticos del dashboard
   const {
     stats,
     loading: dashboardLoading,
@@ -84,8 +85,9 @@ const AdminDashboard = () => {
     error: dashboardError,
     dashboardData,
     financialStats,
+    chartData,
     students, // Agregar estudiantes para debug
-  } = useAdminDashboard();
+  } = useAdminDashboardDemo();
 
   // Effect para escuchar eventos de cambio de vista en finanzas
   React.useEffect(() => {
@@ -277,7 +279,7 @@ const AdminDashboard = () => {
   // Función para cerrar el menú móvil al seleccionar una opción
   const handleMenuItemClick = (sectionId) => {
     setActiveSection(sectionId);
-    setIsMobileMenuOpen(false);
+    setIsMobileSidebarOpen(false);
     // Resetear el componente de finanzas al cambiar de sección
     if (sectionId === "finances") {
       setFinanceComponent("GestionFinanciera");
@@ -331,28 +333,28 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen bg-gray-50 border-r">
       {/* Mobile menu overlay */}
-      {isMobileMenuOpen && (
+      {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/30 bg-opacity-50 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Mobile close button */}
         <div className="flex items-center bg-blue-800 justify-between p-7 border-b border-gray-200 lg:justify-start">
           <div className="flex items-center space-x-3 ">
             <Baby className="w-8 h-8 text-white" />
-            <span className="text-xl font-bold text-white">Nido Pro</span>
+            <span className="text-xl font-bold text-white">EDA</span>
           </div>
           <button
             className="lg:hidden p-2 text-white hover:text-gray-300"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => setIsMobileSidebarOpen(false)}
           >
             <X className="w-6 h-6" />
           </button>
@@ -453,7 +455,7 @@ const AdminDashboard = () => {
             {/* Mobile menu button */}
             <button
               className="lg:hidden p-2 text-white hover:text-gray-300"
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={() => setIsMobileSidebarOpen(true)}
             >
               <Menu className="w-6 h-6" />
             </button>

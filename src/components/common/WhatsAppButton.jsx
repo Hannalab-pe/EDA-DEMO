@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useSidebar } from '../../contexts/SidebarContext';
 
 const WhatsAppButton = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const { isMobileSidebarOpen } = useSidebar();
   const phoneNumber = '925223153'; // Número de WhatsApp
 
   // Mensaje predeterminado
@@ -29,10 +31,18 @@ const WhatsAppButton = () => {
 
   return (
     <>
-      {/* Contenedor centrado del botón */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-        {/* Anillo de pulso suave (efecto de onda sutil) */}
-        <div className="absolute inset-0 flex items-center justify-center">
+      {/* Contenedor del botón - cambia posición y tamaño en móvil cuando sidebar está abierto */}
+      <div 
+        className={`
+          fixed z-50 transition-all duration-300
+          ${isMobileSidebarOpen 
+            ? 'bottom-6 right-6 lg:bottom-6 lg:left-1/2 lg:transform lg:-translate-x-1/2' 
+            : 'bottom-6 left-1/2 transform -translate-x-1/2'
+          }
+        `}
+      >
+        {/* Anillo de pulso suave (efecto de onda sutil) - oculto cuando sidebar está abierto en móvil */}
+        <div className={`absolute inset-0 flex items-center justify-center ${isMobileSidebarOpen ? 'lg:block hidden' : ''}`}>
           <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping-slow"></span>
         </div>
 
@@ -41,7 +51,15 @@ const WhatsAppButton = () => {
           onClick={handleClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative flex items-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-white px-6 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 animate-float group"
+          className={`
+            relative flex items-center bg-[#25D366] hover:bg-[#128C7E] text-white 
+            shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 
+            animate-float group rounded-full
+            ${isMobileSidebarOpen 
+              ? 'gap-0 px-3 py-3 lg:gap-3 lg:px-6 lg:py-3.5' 
+              : 'gap-3 px-6 py-3.5'
+            }
+          `}
           aria-label="Contactar por WhatsApp"
         >
           {/* Logo de WhatsApp */}
@@ -51,14 +69,20 @@ const WhatsAppButton = () => {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-lg"></span>
           </div>
 
-          {/* Texto "Contáctanos" */}
-          <span className="font-semibold text-sm whitespace-nowrap">
+          {/* Texto "Contáctanos" - oculto en móvil cuando sidebar está abierto */}
+          <span className={`
+            font-semibold text-sm whitespace-nowrap transition-all duration-300
+            ${isMobileSidebarOpen ? 'hidden lg:inline' : ''}
+          `}>
             Contáctanos
           </span>
 
-          {/* Icono de flecha sutil */}
+          {/* Icono de flecha sutil - oculto en móvil cuando sidebar está abierto */}
           <svg
-            className="w-4 h-4 transition-transform group-hover:translate-x-1"
+            className={`
+              w-4 h-4 transition-transform group-hover:translate-x-1
+              ${isMobileSidebarOpen ? 'hidden lg:block' : ''}
+            `}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -73,8 +97,8 @@ const WhatsAppButton = () => {
         </button>
       </div>
 
-      {/* Tooltip opcional cuando está hover */}
-      {isHovered && (
+      {/* Tooltip opcional cuando está hover - oculto en móvil cuando sidebar está abierto */}
+      {isHovered && !isMobileSidebarOpen && (
         <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm animate-fade-in-up">
           <p className="font-bold text-center">¿Necesitas ayuda? 💬</p>
           <p className="text-xs text-gray-300 text-center">Escríbenos por WhatsApp</p>

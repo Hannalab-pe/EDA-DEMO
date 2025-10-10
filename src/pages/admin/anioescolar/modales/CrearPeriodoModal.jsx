@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, Calendar, Save } from 'lucide-react';
+import { X, Calendar, Info } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useCrearPeriodoEscolar } from '../../../../hooks/queries/usePeriodoEscolarQueries';
+import { toast } from 'sonner';
 
 const CrearPeriodoModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -12,8 +12,6 @@ const CrearPeriodoModal = ({ isOpen, onClose }) => {
     estaActivo: true,
     descripcion: ''
   });
-
-  const crearPeriodoMutation = useCrearPeriodoEscolar();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,23 +23,12 @@ const CrearPeriodoModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      await crearPeriodoMutation.mutateAsync(formData);
-      onClose();
-
-      // Reset form
-      setFormData({
-        anioEscolar: new Date().getFullYear(),
-        fechaInicio: '',
-        fechaFin: '',
-        estaActivo: true,
-        descripcion: ''
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      // El error ya se maneja en el hook
-    }
+    
+    // MODO DEMO: Mostrar toast informativo
+    toast.info('📢 Funcionalidad no disponible en modo demo', {
+      description: 'Contáctanos para obtener el sistema completo y gestionar períodos escolares reales.',
+      duration: 5000,
+    });
   };
 
   if (!isOpen) return null;
@@ -180,15 +167,10 @@ const CrearPeriodoModal = ({ isOpen, onClose }) => {
                     </button>
                     <button
                       type="submit"
-                      disabled={crearPeriodoMutation.isPending}
-                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
                     >
-                      {crearPeriodoMutation.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      <span>{crearPeriodoMutation.isPending ? 'Creando...' : 'Crear'}</span>
+                      <Info className="w-4 h-4" />
+                      <span>Crear Período</span>
                     </button>
                   </div>
                 </form>

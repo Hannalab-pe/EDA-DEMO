@@ -1,118 +1,55 @@
 // src/hooks/queries/useEstudiantesQueries.js
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import axios from 'axios';
-import { uploadStudentImage } from '../../services/cloudinaryService';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { demoEstudiantesService } from "../../services/demoEstudiantesService";
 
 // Query keys para estudiantes
 export const estudiantesKeys = {
-  all: ['estudiantes'],
-  lists: () => [...estudiantesKeys.all, 'list'],
+  all: ["estudiantes"],
+  lists: () => [...estudiantesKeys.all, "list"],
   list: (filters) => [...estudiantesKeys.lists(), { filters }],
-  details: () => [...estudiantesKeys.all, 'detail'],
+  details: () => [...estudiantesKeys.all, "detail"],
   detail: (id) => [...estudiantesKeys.details(), id],
 };
 
-// Servicio API para estudiantes
+// Servicio API para estudiantes (ahora usando servicio demo)
 const estudiantesService = {
   getEstudiantes: async (filters = {}) => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
-    const response = await axios.get(`${API_BASE_URL}/estudiante`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      },
-      params: filters
-    });
-    
-    const responseData = response.data || {};
-    return responseData.estudiantes || [];
+    return await demoEstudiantesService.getEstudiantes(filters);
   },
 
-  // Obtener estudiante por ID
   getEstudianteById: async (id) => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
-    const response = await axios.get(`${API_BASE_URL}/estudiante/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    });
-    
-    return response.data.estudiante;
+    return await demoEstudiantesService.getEstudianteById(id);
   },
 
-  // Crear estudiante
   createEstudiante: async (estudianteData) => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
-    const response = await axios.post(`${API_BASE_URL}/estudiante`, estudianteData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    });
-    
-    return response.data.estudiante;
+    return await demoEstudiantesService.createEstudiante(estudianteData);
   },
 
-  // Actualizar estudiante
   updateEstudiante: async ({ id, ...estudianteData }) => {
-    console.log('🔧 Service updateEstudiante - ID recibido:', id);
-    console.log('🔧 Service updateEstudiante - Datos:', estudianteData);
-    
+    console.log("🔧 Service updateEstudiante - ID recibido:", id);
+    console.log("🔧 Service updateEstudiante - Datos:", estudianteData);
+
     if (!id) {
-      throw new Error('ID del estudiante es requerido para actualizar');
+      throw new Error("ID del estudiante es requerido para actualizar");
     }
-    
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
-    const response = await axios.patch(`${API_BASE_URL}/estudiante/${id}`, estudianteData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
+
+    return await demoEstudiantesService.updateEstudiante({
+      id,
+      ...estudianteData,
     });
-    
-    return response.data.estudiante;
   },
 
-  // Eliminar estudiante
   deleteEstudiante: async (id) => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
-    await axios.delete(`${API_BASE_URL}/estudiante/${id}`, {
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    });
-    
-    return id;
+    return await demoEstudiantesService.deleteEstudiante(id);
   },
 
-  // Cambiar estado del estudiante (desactivar)
   toggleEstudianteStatus: async (id) => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nidopro.up.railway.app/api/v1';
-    const token = localStorage.getItem('token');
-    
     console.log(`🔄 Cambiando estado del estudiante ID: ${id}`);
-    
-    const response = await axios.delete(`${API_BASE_URL}/estudiante/${id}`, {
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    });
-    
-    console.log('✅ Estado del estudiante actualizado:', response.data);
-    return response.data;
-  }
+    const result = await demoEstudiantesService.toggleEstudianteStatus(id);
+    console.log("✅ Estado del estudiante actualizado:", result);
+    return result;
+  },
 };
 
 // Hook para obtener lista de estudiantes
@@ -145,47 +82,33 @@ export const useCreateEstudiante = () => {
 
   return useMutation({
     mutationFn: async (estudianteData) => {
-      let photoData = null;
-
-      // Si hay una imagen, subirla primero a Cloudinary
-      if (estudianteData.photoFile) {
-        try {
-          const uploadResult = await uploadStudentImage(estudianteData.photoFile);
-          photoData = {
-            url: uploadResult.url,
-            publicId: uploadResult.publicId,
-            thumbnailUrl: uploadResult.thumbnailUrl,
-            detailUrl: uploadResult.detailUrl
-          };
-        } catch (uploadError) {
-          console.error('❌ Error al subir imagen:', uploadError);
-          // Continuar sin imagen si falla la subida
-          photoData = null;
-        }
-      }
+      // En modo demo, no subimos imágenes a Cloudinary
+      // Solo usamos el emoji o foto que viene en los datos
+      const photoData = estudianteData.foto || estudianteData.photo || "👤";
 
       // Preparar datos finales
       const finalData = {
         ...estudianteData,
-        photo: photoData || estudianteData.photo || null
+        foto: photoData,
       };
       delete finalData.photoFile;
+      delete finalData.photo;
 
       return estudiantesService.createEstudiante(finalData);
     },
     onSuccess: (newEstudiante) => {
       // Invalidar y refetch de la lista de estudiantes
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.lists() });
-      
-      toast.success('¡Estudiante creado exitosamente!', {
-        description: `${newEstudiante.nombre} ${newEstudiante.apellido} ha sido agregado al sistema`
+
+      toast.success("¡Estudiante creado exitosamente! (Demo)", {
+        description: `${newEstudiante.nombre} ${newEstudiante.apellidos} ha sido agregado al sistema`,
       });
     },
     onError: (error) => {
-      toast.error('Error al crear estudiante', {
-        description: error.message || 'Ocurrió un error inesperado'
+      toast.error("Error al crear estudiante", {
+        description: error.message || "Ocurrió un error inesperado",
       });
-    }
+    },
   });
 };
 
@@ -195,56 +118,45 @@ export const useUpdateEstudiante = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...estudianteData }) => {
-      console.log('🔧 useUpdateEstudiante mutation - ID recibido:', id);
-      console.log('🔧 useUpdateEstudiante mutation - Datos recibidos:', estudianteData);
-      
-      if (!id) {
-        console.error('❌ ID del estudiante es undefined o null');
-        throw new Error('ID del estudiante es requerido');
-      }
-      
-      let photoData = estudianteData.photo;
+      console.log("🔧 useUpdateEstudiante mutation - ID recibido:", id);
+      console.log(
+        "🔧 useUpdateEstudiante mutation - Datos recibidos:",
+        estudianteData
+      );
 
-      // Si hay una nueva imagen, subirla primero
-      if (estudianteData.photoFile) {
-        try {
-          const uploadResult = await uploadStudentImage(estudianteData.photoFile);
-          photoData = {
-            url: uploadResult.url,
-            publicId: uploadResult.publicId,
-            thumbnailUrl: uploadResult.thumbnailUrl,
-            detailUrl: uploadResult.detailUrl
-          };
-        } catch (uploadError) {
-          console.error('❌ Error al subir nueva imagen:', uploadError);
-          throw new Error('Error al subir la nueva imagen');
-        }
+      if (!id) {
+        console.error("❌ ID del estudiante es undefined o null");
+        throw new Error("ID del estudiante es requerido");
       }
+
+      // En modo demo, solo usamos emoji o foto simple
+      const photoData = estudianteData.foto || estudianteData.photo || "👤";
 
       // Preparar datos actualizados
       const finalData = {
         ...estudianteData,
-        photo: photoData
+        foto: photoData,
       };
       delete finalData.photoFile;
+      delete finalData.photo;
 
-      console.log('🔧 Datos finales a enviar:', finalData);
+      console.log("🔧 Datos finales a enviar:", finalData);
       return estudiantesService.updateEstudiante({ id, ...finalData });
     },
     onSuccess: (updatedEstudiante, { id }) => {
       // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.lists() });
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.detail(id) });
-      
-      toast.success('Estudiante actualizado exitosamente', {
-        description: `Los datos de ${updatedEstudiante.nombre} ${updatedEstudiante.apellido} han sido actualizados`
+
+      toast.success("Estudiante actualizado exitosamente (Demo)", {
+        description: `Los datos de ${updatedEstudiante.nombre} ${updatedEstudiante.apellidos} han sido actualizados`,
       });
     },
     onError: (error) => {
-      toast.error('Error al actualizar estudiante', {
-        description: error.message || 'Ocurrió un error inesperado'
+      toast.error("Error al actualizar estudiante", {
+        description: error.message || "Ocurrió un error inesperado",
       });
-    }
+    },
   });
 };
 
@@ -254,19 +166,19 @@ export const useDeleteEstudiante = () => {
 
   return useMutation({
     mutationFn: (id) => {
-      console.log('🔄 Desactivando estudiante ID:', id);
-      
+      console.log("🔄 Desactivando estudiante ID:", id);
+
       if (!id) {
-        console.error('❌ No se encontró ID del estudiante:', id);
-        throw new Error('ID del estudiante no encontrado');
+        console.error("❌ No se encontró ID del estudiante:", id);
+        throw new Error("ID del estudiante no encontrado");
       }
-      
+
       // Usar la función correcta del servicio que llama al DELETE endpoint
       return estudiantesService.toggleEstudianteStatus(id);
     },
     onMutate: () => {
-      const loadingToast = toast.loading('Desactivando estudiante...', {
-        description: 'Procesando desactivación...'
+      const loadingToast = toast.loading("Desactivando estudiante...", {
+        description: "Procesando desactivación...",
       });
       return { loadingToast };
     },
@@ -274,21 +186,21 @@ export const useDeleteEstudiante = () => {
       // Invalidar lista de estudiantes
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.lists() });
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.detail(id) });
-      
-      toast.success('Estudiante desactivado exitosamente', {
+
+      toast.success("Estudiante desactivado exitosamente", {
         id: context.loadingToast,
-        description: 'El estudiante ha sido desactivado del sistema'
+        description: "El estudiante ha sido desactivado del sistema",
       });
-      
-      console.log('✅ Estudiante desactivado y cache invalidado');
+
+      console.log("✅ Estudiante desactivado y cache invalidado");
     },
     onError: (error, variables, context) => {
-      toast.error('Error al desactivar estudiante', {
+      toast.error("Error al desactivar estudiante", {
         id: context?.loadingToast,
-        description: error.message || 'Ocurrió un error inesperado'
+        description: error.message || "Ocurrió un error inesperado",
       });
-      console.error('❌ Error al desactivar estudiante:', error);
-    }
+      console.error("❌ Error al desactivar estudiante:", error);
+    },
   });
 };
 
@@ -298,18 +210,18 @@ export const useToggleEstudianteStatus = () => {
 
   return useMutation({
     mutationFn: (id) => {
-      console.log('🔄 Cambiando estado del estudiante ID:', id);
-      
+      console.log("🔄 Cambiando estado del estudiante ID:", id);
+
       if (!id) {
-        console.error('❌ No se encontró ID del estudiante:', id);
-        throw new Error('ID del estudiante no encontrado');
+        console.error("❌ No se encontró ID del estudiante:", id);
+        throw new Error("ID del estudiante no encontrado");
       }
-      
+
       return estudiantesService.toggleEstudianteStatus(id);
     },
     onMutate: () => {
-      const loadingToast = toast.loading('Cambiando estado del estudiante...', {
-        description: 'Procesando cambio...'
+      const loadingToast = toast.loading("Cambiando estado del estudiante...", {
+        description: "Procesando cambio...",
       });
       return { loadingToast };
     },
@@ -317,20 +229,20 @@ export const useToggleEstudianteStatus = () => {
       // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.lists() });
       queryClient.invalidateQueries({ queryKey: estudiantesKeys.detail(id) });
-      
-      toast.success('¡Estado del estudiante actualizado exitosamente!', {
+
+      toast.success("¡Estado del estudiante actualizado exitosamente!", {
         id: context.loadingToast,
-        description: 'El estado ha sido cambiado correctamente'
+        description: "El estado ha sido cambiado correctamente",
       });
-      
-      console.log('✅ Estado del estudiante actualizado y cache invalidado');
+
+      console.log("✅ Estado del estudiante actualizado y cache invalidado");
     },
     onError: (error, variables, context) => {
-      toast.error('Error al cambiar estado del estudiante', {
+      toast.error("Error al cambiar estado del estudiante", {
         id: context?.loadingToast,
-        description: error.message || 'Ocurrió un error inesperado'
+        description: error.message || "Ocurrió un error inesperado",
       });
-      console.error('❌ Error al cambiar estado del estudiante:', error);
-    }
+      console.error("❌ Error al cambiar estado del estudiante:", error);
+    },
   });
 };

@@ -1,14 +1,18 @@
 // src/hooks/queries/useCronogramaQueries.js
-import { useQuery } from '@tanstack/react-query';
-import cronogramaService from '../../services/cronogramaService';
+import { useQuery } from "@tanstack/react-query";
+import demoCronogramaService from "../../services/demoCronogramaService";
 
 /**
  * Keys para las queries del cronograma
  */
 export const CRONOGRAMA_QUERY_KEYS = {
-  all: ['cronograma'],
-  byAula: (idAula) => [...CRONOGRAMA_QUERY_KEYS.all, 'aula', idAula],
-  byMultiplesAulas: (idsAulas) => [...CRONOGRAMA_QUERY_KEYS.all, 'multiplesAulas', idsAulas],
+  all: ["cronograma"],
+  byAula: (idAula) => [...CRONOGRAMA_QUERY_KEYS.all, "aula", idAula],
+  byMultiplesAulas: (idsAulas) => [
+    ...CRONOGRAMA_QUERY_KEYS.all,
+    "multiplesAulas",
+    idsAulas,
+  ],
 };
 
 /**
@@ -19,12 +23,15 @@ export const useCronogramaPorAula = (idAula, options = {}) => {
     queryKey: CRONOGRAMA_QUERY_KEYS.byAula(idAula),
     queryFn: async () => {
       try {
-        console.log('🔍 Ejecutando query cronograma para aula:', idAula);
-        const resultado = await cronogramaService.getCronogramaPorAula(idAula);
-        console.log('✅ Resultado cronograma por aula:', resultado);
-        return resultado;
+        console.log("🔍 [DEMO] Ejecutando query cronograma para aula:", idAula);
+        const resultado = await demoCronogramaService.getCronogramaPorAula(
+          idAula
+        );
+        console.log("✅ [DEMO] Resultado cronograma por aula:", resultado);
+        // Extraer el array de cronogramas de la respuesta { success, cronogramas }
+        return resultado?.cronogramas || resultado || [];
       } catch (error) {
-        console.error('❌ Error en useCronogramaPorAula:', error);
+        console.error("❌ Error en useCronogramaPorAula:", error);
         throw error;
       }
     },
@@ -32,7 +39,7 @@ export const useCronogramaPorAula = (idAula, options = {}) => {
     staleTime: 2 * 60 * 1000, // 2 minutos
     gcTime: 5 * 60 * 1000, // 5 minutos
     refetchOnWindowFocus: false,
-    ...options
+    ...options,
   });
 };
 
@@ -45,12 +52,20 @@ export const useCronogramaMultiplesAulas = (idsAulas, options = {}) => {
     queryKey: CRONOGRAMA_QUERY_KEYS.byMultiplesAulas(idsAulas),
     queryFn: async () => {
       try {
-        console.log('🔍 Ejecutando query cronograma para múltiples aulas:', idsAulas);
-        const resultado = await cronogramaService.getCronogramaMultiplesAulas(idsAulas);
-        console.log('✅ Resultado cronograma múltiples aulas:', resultado);
-        return resultado;
+        console.log(
+          "🔍 [DEMO] Ejecutando query cronograma para múltiples aulas:",
+          idsAulas
+        );
+        const resultado =
+          await demoCronogramaService.getCronogramaMultiplesAulas(idsAulas);
+        console.log(
+          "✅ [DEMO] Resultado cronograma múltiples aulas:",
+          resultado
+        );
+        // Extraer el array de cronogramas de la respuesta { success, cronogramas }
+        return resultado?.cronogramas || resultado || [];
       } catch (error) {
-        console.error('❌ Error en useCronogramaMultiplesAulas:', error);
+        console.error("❌ Error en useCronogramaMultiplesAulas:", error);
         throw error;
       }
     },
@@ -59,7 +74,7 @@ export const useCronogramaMultiplesAulas = (idsAulas, options = {}) => {
     gcTime: 5 * 60 * 1000, // 5 minutos
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    ...options
+    ...options,
   });
 };
 
@@ -70,31 +85,45 @@ export const useCronogramaMultiplesAulas = (idsAulas, options = {}) => {
 export const useCronogramaDocente = (aulasTrabajadorData, options = {}) => {
   // Extraer el array de aulas desde la estructura de respuesta
   let aulasTrabajador = [];
-  
+
   if (Array.isArray(aulasTrabajadorData)) {
     // Si ya es un array, usarlo directamente
     aulasTrabajador = aulasTrabajadorData;
-  } else if (aulasTrabajadorData?.aulas && Array.isArray(aulasTrabajadorData.aulas)) {
+  } else if (
+    aulasTrabajadorData?.aulas &&
+    Array.isArray(aulasTrabajadorData.aulas)
+  ) {
     // Si tiene la estructura { success: true, aulas: [...] }
     aulasTrabajador = aulasTrabajadorData.aulas;
-  } else if (aulasTrabajadorData?.data && Array.isArray(aulasTrabajadorData.data)) {
+  } else if (
+    aulasTrabajadorData?.data &&
+    Array.isArray(aulasTrabajadorData.data)
+  ) {
     // Si tiene la estructura { data: [...] }
     aulasTrabajador = aulasTrabajadorData.data;
   }
 
-  console.log('🔍 [useCronogramaDocente] Datos recibidos:', aulasTrabajadorData);
-  console.log('🔍 [useCronogramaDocente] Aulas extraídas:', aulasTrabajador);
-  
+  console.log(
+    "🔍 [useCronogramaDocente] Datos recibidos:",
+    aulasTrabajadorData
+  );
+  console.log("🔍 [useCronogramaDocente] Aulas extraídas:", aulasTrabajador);
+
   // Extraer solo los IDs de las aulas
-  const idsAulas = aulasTrabajador?.map(aula => aula.id_aula || aula.idAula || aula.id) || [];
-  
-  console.log('🔍 [useCronogramaDocente] IDs de aulas:', idsAulas);
-  
+  const idsAulas =
+    aulasTrabajador?.map((aula) => aula.id_aula || aula.idAula || aula.id) ||
+    [];
+
+  console.log("🔍 [useCronogramaDocente] IDs de aulas:", idsAulas);
+
   return useCronogramaMultiplesAulas(idsAulas, {
     ...options,
-    enabled: !!aulasTrabajador && Array.isArray(aulasTrabajador) && aulasTrabajador.length > 0,
+    enabled:
+      !!aulasTrabajador &&
+      Array.isArray(aulasTrabajador) &&
+      aulasTrabajador.length > 0,
     staleTime: 0, // Forzar actualización inmediata
     refetchOnWindowFocus: true,
-    refetchOnMount: true
+    refetchOnMount: true,
   });
 };
