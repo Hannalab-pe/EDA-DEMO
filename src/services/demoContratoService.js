@@ -16,7 +16,9 @@ export const demoContratoService = {
 
     // Aplicar filtros si existen
     if (filters.estadoContrato) {
-      contratos = contratos.filter((c) => c.estadoContrato === filters.estadoContrato);
+      contratos = contratos.filter(
+        (c) => c.estadoContrato === filters.estadoContrato
+      );
     }
     if (filters.idTrabajador) {
       contratos = contratos.filter(
@@ -25,7 +27,8 @@ export const demoContratoService = {
     }
     if (filters.idTipoContrato) {
       contratos = contratos.filter(
-        (c) => c.idTipoContrato?.idTipoContrato === parseInt(filters.idTipoContrato)
+        (c) =>
+          c.idTipoContrato?.idTipoContrato === parseInt(filters.idTipoContrato)
       );
     }
 
@@ -94,7 +97,7 @@ export const demoContratoService = {
 
     const contratos = (mockData.contratos || []).filter((c) => {
       if (!c.fechaFin || c.estadoContrato !== "activo") return false;
-      
+
       const fechaFin = new Date(c.fechaFin);
       return fechaFin >= hoy && fechaFin <= treintaDias;
     });

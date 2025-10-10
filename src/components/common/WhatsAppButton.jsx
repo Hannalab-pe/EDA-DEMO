@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
-import { useSidebar } from '../../contexts/SidebarContext';
+import React, { useState } from "react";
+import { useSidebar } from "../../contexts/SidebarContext";
 
 const WhatsAppButton = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { isMobileSidebarOpen } = useSidebar();
-  const phoneNumber = '925223153'; // Número de WhatsApp
+  const phoneNumber = "925223153"; // Número de WhatsApp
 
   // Mensaje predeterminado
-  const defaultMessage = '¡Hola! Me gustaría obtener más información sobre EDA.';
+  const defaultMessage =
+    "¡Hola! Me gustaría obtener más información sobre EDA.";
 
   // Generar URL de WhatsApp
-  const whatsappUrl = `https://wa.me/51${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`;
+  const whatsappUrl = `https://wa.me/51${phoneNumber}?text=${encodeURIComponent(
+    defaultMessage
+  )}`;
 
   const handleClick = () => {
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
   // Logo oficial de WhatsApp en SVG
@@ -32,17 +35,22 @@ const WhatsAppButton = () => {
   return (
     <>
       {/* Contenedor del botón - cambia posición y tamaño en móvil cuando sidebar está abierto */}
-      <div 
+      <div
         className={`
           fixed z-50 transition-all duration-300
-          ${isMobileSidebarOpen 
-            ? 'bottom-6 right-6 lg:bottom-6 lg:left-1/2 lg:transform lg:-translate-x-1/2' 
-            : 'bottom-6 left-1/2 transform -translate-x-1/2'
+          ${
+            isMobileSidebarOpen
+              ? "bottom-6 right-6 lg:bottom-6 lg:left-1/2 lg:transform lg:-translate-x-1/2"
+              : "bottom-6 left-1/2 transform -translate-x-1/2"
           }
         `}
       >
         {/* Anillo de pulso suave (efecto de onda sutil) - oculto cuando sidebar está abierto en móvil */}
-        <div className={`absolute inset-0 flex items-center justify-center ${isMobileSidebarOpen ? 'lg:block hidden' : ''}`}>
+        <div
+          className={`absolute inset-0 flex items-center justify-center ${
+            isMobileSidebarOpen ? "lg:block hidden" : ""
+          }`}
+        >
           <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping-slow"></span>
         </div>
 
@@ -55,9 +63,10 @@ const WhatsAppButton = () => {
             relative flex items-center bg-[#25D366] hover:bg-[#128C7E] text-white 
             shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 
             animate-float group rounded-full
-            ${isMobileSidebarOpen 
-              ? 'gap-0 px-3 py-3 lg:gap-3 lg:px-6 lg:py-3.5' 
-              : 'gap-3 px-6 py-3.5'
+            ${
+              isMobileSidebarOpen
+                ? "gap-0 px-3 py-3 lg:gap-3 lg:px-6 lg:py-3.5"
+                : "gap-3 px-6 py-3.5"
             }
           `}
           aria-label="Contactar por WhatsApp"
@@ -70,18 +79,20 @@ const WhatsAppButton = () => {
           </div>
 
           {/* Texto "Contáctanos" - oculto en móvil cuando sidebar está abierto */}
-          <span className={`
+          <span
+            className={`
             font-semibold text-sm whitespace-nowrap transition-all duration-300
-            ${isMobileSidebarOpen ? 'hidden lg:inline' : ''}
-          `}>
-            Contáctanos
+            ${isMobileSidebarOpen ? "hidden lg:inline" : ""}
+          `}
+          >
+            CONTACTAR
           </span>
 
           {/* Icono de flecha sutil - oculto en móvil cuando sidebar está abierto */}
           <svg
             className={`
               w-4 h-4 transition-transform group-hover:translate-x-1
-              ${isMobileSidebarOpen ? 'hidden lg:block' : ''}
+              ${isMobileSidebarOpen ? "hidden lg:block" : ""}
             `}
             fill="none"
             stroke="currentColor"
@@ -101,7 +112,9 @@ const WhatsAppButton = () => {
       {isHovered && !isMobileSidebarOpen && (
         <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm animate-fade-in-up">
           <p className="font-bold text-center">¿Necesitas ayuda? 💬</p>
-          <p className="text-xs text-gray-300 text-center">Escríbenos por WhatsApp</p>
+          <p className="text-xs text-gray-300 text-center">
+            Escríbenos por WhatsApp
+          </p>
           {/* Flecha del tooltip */}
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-gray-900"></div>
         </div>
@@ -121,7 +134,8 @@ const WhatsAppButton = () => {
         }
 
         @keyframes float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {
@@ -130,7 +144,8 @@ const WhatsAppButton = () => {
         }
 
         @keyframes ping-slow {
-          75%, 100% {
+          75%,
+          100% {
             transform: scale(1.5);
             opacity: 0;
           }

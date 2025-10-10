@@ -9,7 +9,10 @@ const demoPeriodoEscolarService = {
    */
   getAll: async () => {
     await simulateApiDelay(300, 800);
-    console.log("[DEMO] Períodos escolares cargados:", mockData.periodosEscolares.length);
+    console.log(
+      "[DEMO] Períodos escolares cargados:",
+      mockData.periodosEscolares.length
+    );
     return [...mockData.periodosEscolares];
   },
 
@@ -32,7 +35,9 @@ const demoPeriodoEscolarService = {
    */
   getActivo: async () => {
     await simulateApiDelay(200, 500);
-    const periodoActivo = mockData.periodosEscolares.find((p) => p.estaActivo === true);
+    const periodoActivo = mockData.periodosEscolares.find(
+      (p) => p.estaActivo === true
+    );
     if (!periodoActivo) {
       throw new Error("No hay período escolar activo");
     }
@@ -44,9 +49,12 @@ const demoPeriodoEscolarService = {
    */
   create: async (data) => {
     await simulateApiDelay(500, 1000);
-    
+
     const nuevoId =
-      Math.max(...mockData.periodosEscolares.map((p) => p.idPeriodoEscolar), 0) + 1;
+      Math.max(
+        ...mockData.periodosEscolares.map((p) => p.idPeriodoEscolar),
+        0
+      ) + 1;
 
     const nuevoPeriodo = {
       idPeriodoEscolar: nuevoId,
@@ -68,7 +76,7 @@ const demoPeriodoEscolarService = {
 
     mockData.periodosEscolares.push(nuevoPeriodo);
     console.log("[DEMO] Período escolar creado:", nuevoPeriodo);
-    
+
     return { ...nuevoPeriodo };
   },
 
@@ -77,7 +85,7 @@ const demoPeriodoEscolarService = {
    */
   update: async (id, data) => {
     await simulateApiDelay(500, 1000);
-    
+
     const index = mockData.periodosEscolares.findIndex(
       (p) => p.idPeriodoEscolar === parseInt(id)
     );
@@ -112,7 +120,7 @@ const demoPeriodoEscolarService = {
    */
   delete: async (id) => {
     await simulateApiDelay(400, 700);
-    
+
     const index = mockData.periodosEscolares.findIndex(
       (p) => p.idPeriodoEscolar === parseInt(id)
     );
@@ -137,7 +145,7 @@ const demoPeriodoEscolarService = {
    */
   activar: async (id) => {
     await simulateApiDelay(400, 700);
-    
+
     // Desactivar todos
     mockData.periodosEscolares.forEach((p) => {
       p.estaActivo = false;

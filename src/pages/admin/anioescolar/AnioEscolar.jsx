@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, DollarSign, Plus, Settings, Edit, Eye, Table, FileText, BarChart3 } from 'lucide-react';
-import { toast } from 'sonner';
-import CrearPeriodoModal from './modales/CrearPeriodoModal';
-import EditarPeriodoModal from './modales/EditarPeriodoModal';
-import GenerarPensionesModal from './modales/GenerarPensionesModal';
-import GenerarBimestresModal from './modales/GenerarBimestresModal';
-import EditarBimestresModal from './modales/EditarBimestresModal';
-import demoPeriodoEscolarService from '../../../services/demoPeriodoEscolarService';
-import demoBimestreService from '../../../services/demoBimestreService';
+import React, { useState, useEffect } from "react";
+import {
+  Calendar,
+  DollarSign,
+  Plus,
+  Settings,
+  Edit,
+  Eye,
+  Table,
+  FileText,
+  BarChart3,
+} from "lucide-react";
+import { toast } from "sonner";
+import CrearPeriodoModal from "./modales/CrearPeriodoModal";
+import EditarPeriodoModal from "./modales/EditarPeriodoModal";
+import GenerarPensionesModal from "./modales/GenerarPensionesModal";
+import GenerarBimestresModal from "./modales/GenerarBimestresModal";
+import EditarBimestresModal from "./modales/EditarBimestresModal";
+import demoPeriodoEscolarService from "../../../services/demoPeriodoEscolarService";
+import demoBimestreService from "../../../services/demoBimestreService";
 
 const AnioEscolar = () => {
-  const [activeSection, setActiveSection] = useState('periodos');
+  const [activeSection, setActiveSection] = useState("periodos");
   const [modalCrearPeriodo, setModalCrearPeriodo] = useState(false);
   const [modalEditarPeriodo, setModalEditarPeriodo] = useState(false);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState(null);
@@ -18,7 +28,8 @@ const AnioEscolar = () => {
   const [modalGenerarBimestres, setModalGenerarBimestres] = useState(false);
   const [modalEditarBimestres, setModalEditarBimestres] = useState(false);
   const [bimestresSeleccionados, setBimestresSeleccionados] = useState([]);
-  const [periodoBimestresSeleccionado, setPeriodoBimestresSeleccionado] = useState(null);
+  const [periodoBimestresSeleccionado, setPeriodoBimestresSeleccionado] =
+    useState(null);
 
   // Estados para datos DEMO
   const [periodos, setPeriodos] = useState([]);
@@ -116,41 +127,45 @@ const AnioEscolar = () => {
             <Calendar className="w-8 h-8 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Gestión de Año Escolar</h1>
-            <p className="text-gray-600">Administra períodos escolares, bimestres y pensiones</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Gestión de Año Escolar
+            </h1>
+            <p className="text-gray-600">
+              Administra períodos escolares, bimestres y pensiones
+            </p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
           <button
-            onClick={() => setActiveSection('periodos')}
+            onClick={() => setActiveSection("periodos")}
             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeSection === 'periodos'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              activeSection === "periodos"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             <FileText className="w-4 h-4" />
             <span>Períodos</span>
           </button>
           <button
-            onClick={() => setActiveSection('bimestres')}
+            onClick={() => setActiveSection("bimestres")}
             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeSection === 'bimestres'
-                ? 'bg-white text-purple-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              activeSection === "bimestres"
+                ? "bg-white text-purple-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             <Table className="w-4 h-4" />
             <span>Bimestres</span>
           </button>
           <button
-            onClick={() => setActiveSection('acciones')}
+            onClick={() => setActiveSection("acciones")}
             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeSection === 'acciones'
-                ? 'bg-white text-green-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              activeSection === "acciones"
+                ? "bg-white text-green-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             <Settings className="w-4 h-4" />
@@ -160,7 +175,7 @@ const AnioEscolar = () => {
       </div>
 
       {/* Content Sections */}
-      {activeSection === 'periodos' && (
+      {activeSection === "periodos" && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -168,8 +183,12 @@ const AnioEscolar = () => {
                 <FileText className="w-8 h-8 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Períodos Escolares</h2>
-                <p className="text-gray-600">Gestiona los períodos escolares del sistema</p>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Períodos Escolares
+                </h2>
+                <p className="text-gray-600">
+                  Gestiona los períodos escolares del sistema
+                </p>
               </div>
             </div>
             <button
@@ -184,13 +203,17 @@ const AnioEscolar = () => {
           {loadingPeriodos ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="text-gray-500 mt-4">Cargando períodos escolares...</p>
+              <p className="text-gray-500 mt-4">
+                Cargando períodos escolares...
+              </p>
             </div>
           ) : periodos.length === 0 ? (
             <div className="text-center py-12">
               <div className="p-8 bg-gray-50 rounded-lg">
                 <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg mb-4">No hay períodos escolares registrados</p>
+                <p className="text-gray-500 text-lg mb-4">
+                  No hay períodos escolares registrados
+                </p>
                 <button
                   onClick={() => setModalCrearPeriodo(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -203,7 +226,10 @@ const AnioEscolar = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {periodos.map((periodo) => (
-                <div key={periodo.idPeriodoEscolar} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-gray-50">
+                <div
+                  key={periodo.idPeriodoEscolar}
+                  className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-gray-50"
+                >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-blue-100 rounded-lg">
@@ -233,19 +259,23 @@ const AnioEscolar = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Inicio:</span>
                       <span className="font-medium text-gray-900">
-                        {new Date(periodo.fechaInicio).toLocaleDateString('es-ES')}
+                        {new Date(periodo.fechaInicio).toLocaleDateString(
+                          "es-ES"
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Fin:</span>
                       <span className="font-medium text-gray-900">
-                        {new Date(periodo.fechaFin).toLocaleDateString('es-ES')}
+                        {new Date(periodo.fechaFin).toLocaleDateString("es-ES")}
                       </span>
                     </div>
                     {periodo.descripcion && (
                       <div className="pt-2 border-t border-gray-200">
                         <p className="text-gray-600 text-xs">Descripción:</p>
-                        <p className="text-gray-900 font-medium">{periodo.descripcion}</p>
+                        <p className="text-gray-900 font-medium">
+                          {periodo.descripcion}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -256,7 +286,7 @@ const AnioEscolar = () => {
         </div>
       )}
 
-      {activeSection === 'bimestres' && (
+      {activeSection === "bimestres" && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -264,8 +294,12 @@ const AnioEscolar = () => {
                 <Table className="w-8 h-8 text-purple-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Bimestres por Período</h2>
-                <p className="text-gray-600">Gestiona y edita los bimestres generados</p>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Bimestres por Período
+                </h2>
+                <p className="text-gray-600">
+                  Gestiona y edita los bimestres generados
+                </p>
               </div>
             </div>
             <button
@@ -282,11 +316,14 @@ const AnioEscolar = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
               <p className="text-gray-500 mt-4">Cargando bimestres...</p>
             </div>
-          ) : !bimestresData?.bimestres || bimestresData.bimestres.length === 0 ? (
+          ) : !bimestresData?.bimestres ||
+            bimestresData.bimestres.length === 0 ? (
             <div className="text-center py-12">
               <div className="p-8 bg-gray-50 rounded-lg">
                 <Table className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg mb-4">No hay bimestres registrados</p>
+                <p className="text-gray-500 text-lg mb-4">
+                  No hay bimestres registrados
+                </p>
                 <button
                   onClick={() => setModalGenerarBimestres(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
@@ -301,13 +338,17 @@ const AnioEscolar = () => {
               {/* Agrupar bimestres por período */}
               {periodos.map((periodo) => {
                 const bimestresDelPeriodo = bimestresData.bimestres.filter(
-                  bimestre => bimestre.idPeriodoEscolar === periodo.idPeriodoEscolar
+                  (bimestre) =>
+                    bimestre.idPeriodoEscolar === periodo.idPeriodoEscolar
                 );
 
                 if (bimestresDelPeriodo.length === 0) return null;
 
                 return (
-                  <div key={periodo.idPeriodoEscolar} className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div
+                    key={periodo.idPeriodoEscolar}
+                    className="border border-gray-200 rounded-lg overflow-hidden"
+                  >
                     <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -320,11 +361,14 @@ const AnioEscolar = () => {
                             </span>
                           )}
                           <span className="text-sm text-gray-500">
-                            ({bimestresDelPeriodo.length} bimestre{bimestresDelPeriodo.length !== 1 ? 's' : ''})
+                            ({bimestresDelPeriodo.length} bimestre
+                            {bimestresDelPeriodo.length !== 1 ? "s" : ""})
                           </span>
                         </div>
                         <button
-                          onClick={() => handleEditarBimestres(bimestresDelPeriodo, periodo)}
+                          onClick={() =>
+                            handleEditarBimestres(bimestresDelPeriodo, periodo)
+                          }
                           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors"
                         >
                           <Edit className="w-4 h-4" />
@@ -356,7 +400,10 @@ const AnioEscolar = () => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {bimestresDelPeriodo.map((bimestre) => (
-                            <tr key={bimestre.idBimestre} className="hover:bg-gray-50">
+                            <tr
+                              key={bimestre.idBimestre}
+                              className="hover:bg-gray-50"
+                            >
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm font-medium text-gray-900">
                                   {bimestre.numeroBimestre}° Bimestre
@@ -366,13 +413,19 @@ const AnioEscolar = () => {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {new Date(bimestre.fechaInicio).toLocaleDateString('es-ES')}
+                                {new Date(
+                                  bimestre.fechaInicio
+                                ).toLocaleDateString("es-ES")}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {new Date(bimestre.fechaFin).toLocaleDateString('es-ES')}
+                                {new Date(bimestre.fechaFin).toLocaleDateString(
+                                  "es-ES"
+                                )}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {new Date(bimestre.fechaLimiteProgramacion).toLocaleDateString('es-ES')}
+                                {new Date(
+                                  bimestre.fechaLimiteProgramacion
+                                ).toLocaleDateString("es-ES")}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 {bimestre.estaActivo ? (
@@ -398,7 +451,7 @@ const AnioEscolar = () => {
         </div>
       )}
 
-      {activeSection === 'acciones' && (
+      {activeSection === "acciones" && (
         <div className="space-y-6">
           {/* Generar Pensiones */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -407,8 +460,13 @@ const AnioEscolar = () => {
                 <DollarSign className="w-8 h-8 text-green-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900">Generar Pensiones</h3>
-                <p className="text-gray-600">Configura las pensiones automáticamente para un período escolar</p>
+                <h3 className="text-lg font-bold text-gray-900">
+                  Generar Pensiones
+                </h3>
+                <p className="text-gray-600">
+                  Configura las pensiones automáticamente para un período
+                  escolar
+                </p>
               </div>
             </div>
             <button
@@ -427,8 +485,12 @@ const AnioEscolar = () => {
                 <Settings className="w-8 h-8 text-purple-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900">Generar Bimestres</h3>
-                <p className="text-gray-600">Crea automáticamente los bimestres para un período escolar</p>
+                <h3 className="text-lg font-bold text-gray-900">
+                  Generar Bimestres
+                </h3>
+                <p className="text-gray-600">
+                  Crea automáticamente los bimestres para un período escolar
+                </p>
               </div>
             </div>
             <button

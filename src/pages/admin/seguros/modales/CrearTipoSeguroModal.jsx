@@ -73,7 +73,7 @@ const CrearTipoSeguroModal = ({ isOpen, onClose, onTipoSeguroCreado }) => {
 
       console.log("✅ Tipo de seguro creado:", nuevoSeguro);
       toast.success("Tipo de seguro creado exitosamente");
-      
+
       // Llamar al callback para recargar la lista
       onTipoSeguroCreado();
       onClose();

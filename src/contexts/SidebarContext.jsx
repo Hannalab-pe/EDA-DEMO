@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 const SidebarContext = createContext();
 
@@ -6,7 +6,9 @@ export const SidebarProvider = ({ children }) => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <SidebarContext.Provider value={{ isMobileSidebarOpen, setIsMobileSidebarOpen }}>
+    <SidebarContext.Provider
+      value={{ isMobileSidebarOpen, setIsMobileSidebarOpen }}
+    >
       {children}
     </SidebarContext.Provider>
   );

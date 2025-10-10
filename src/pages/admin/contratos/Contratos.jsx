@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Eye, AlertTriangle } from 'lucide-react';
-import { demoContratoService } from '../../../services/demoContratoService';
-import ModalVerContrato from './modales/ModalVerContrato';
+import React, { useState, useEffect } from "react";
+import { FileText, Plus, Eye, AlertTriangle } from "lucide-react";
+import { demoContratoService } from "../../../services/demoContratoService";
+import ModalVerContrato from "./modales/ModalVerContrato";
 
 const Contratos = () => {
   const [showModal, setShowModal] = useState(false);
@@ -32,9 +32,9 @@ const Contratos = () => {
       ]);
       setContratos(contratosData);
       setStatistics(stats);
-      console.log('[DEMO] Contratos cargados:', contratosData.length);
+      console.log("[DEMO] Contratos cargados:", contratosData.length);
     } catch (error) {
-      console.error('[DEMO] Error al cargar contratos:', error);
+      console.error("[DEMO] Error al cargar contratos:", error);
     } finally {
       setLoading(false);
     }
@@ -54,8 +54,12 @@ const Contratos = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Gestión de Contratos</h1>
-            <p className="text-gray-600 mt-1">Administra los contratos de los empleados</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Gestión de Contratos
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Administra los contratos de los empleados
+            </p>
           </div>
         </div>
 
@@ -65,8 +69,12 @@ const Contratos = () => {
             <div className="flex items-center">
               <FileText className="w-8 h-8 text-blue-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-blue-600">Total Contratos</p>
-                <p className="text-2xl font-bold text-blue-900">{statistics.total}</p>
+                <p className="text-sm font-medium text-blue-600">
+                  Total Contratos
+                </p>
+                <p className="text-2xl font-bold text-blue-900">
+                  {statistics.total}
+                </p>
               </div>
             </div>
           </div>
@@ -75,8 +83,12 @@ const Contratos = () => {
             <div className="flex items-center">
               <FileText className="w-8 h-8 text-green-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-green-600">Contratos Activos</p>
-                <p className="text-2xl font-bold text-green-900">{statistics.active}</p>
+                <p className="text-sm font-medium text-green-600">
+                  Contratos Activos
+                </p>
+                <p className="text-2xl font-bold text-green-900">
+                  {statistics.active}
+                </p>
               </div>
             </div>
           </div>
@@ -85,8 +97,12 @@ const Contratos = () => {
             <div className="flex items-center">
               <AlertTriangle className="w-8 h-8 text-yellow-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-yellow-600">Por Vencer (30 días)</p>
-                <p className="text-2xl font-bold text-yellow-900">{statistics.expiringSoon}</p>
+                <p className="text-sm font-medium text-yellow-600">
+                  Por Vencer (30 días)
+                </p>
+                <p className="text-2xl font-bold text-yellow-900">
+                  {statistics.expiringSoon}
+                </p>
               </div>
             </div>
           </div>
@@ -95,8 +111,12 @@ const Contratos = () => {
             <div className="flex items-center">
               <FileText className="w-8 h-8 text-red-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-red-600">Contratos Vencidos</p>
-                <p className="text-2xl font-bold text-red-900">{statistics.expired}</p>
+                <p className="text-sm font-medium text-red-600">
+                  Contratos Vencidos
+                </p>
+                <p className="text-2xl font-bold text-red-900">
+                  {statistics.expired}
+                </p>
               </div>
             </div>
           </div>
@@ -151,28 +171,37 @@ const Contratos = () => {
                       #{contrato.idContrato}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.idTipoContrato?.nombreTipo || 'Sin tipo'}
+                      {contrato.idTipoContrato?.nombreTipo || "Sin tipo"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.idTrabajador?.nombre} {contrato.idTrabajador?.apellido}
+                      {contrato.idTrabajador?.nombre}{" "}
+                      {contrato.idTrabajador?.apellido}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.idTrabajador?.idRol?.nombreRol || 'Sin cargo'}
+                      {contrato.idTrabajador?.idRol?.nombreRol || "Sin cargo"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(contrato.fechaInicio).toLocaleDateString('es-ES')}
+                      {new Date(contrato.fechaInicio).toLocaleDateString(
+                        "es-ES"
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {contrato.fechaFin ? new Date(contrato.fechaFin).toLocaleDateString('es-ES') : 'Indefinido'}
+                      {contrato.fechaFin
+                        ? new Date(contrato.fechaFin).toLocaleDateString(
+                            "es-ES"
+                          )
+                        : "Indefinido"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        contrato.estadoContrato === 'activo'
-                          ? 'bg-green-100 text-green-800'
-                          : contrato.estadoContrato === 'vencido'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          contrato.estadoContrato === "activo"
+                            ? "bg-green-100 text-green-800"
+                            : contrato.estadoContrato === "vencido"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
                         {contrato.estadoContrato.toUpperCase()}
                       </span>
                     </td>

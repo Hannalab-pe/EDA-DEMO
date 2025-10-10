@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Info } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { X, DollarSign, Info } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const GenerarPensionesModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     anioEscolar: new Date().getFullYear(),
     diaVencimientoPersonalizado: 15,
-    descripcion: '',
+    descripcion: "",
     regenerarExistentes: false,
-    aplicarDescuentosPagoAdelantado: false
+    aplicarDescuentosPagoAdelantado: false,
   });
 
   useEffect(() => {
     // Actualizar descripción por defecto
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      descripcion: `Generación automática de pensiones para el año escolar ${new Date().getFullYear()}`
+      descripcion: `Generación automática de pensiones para el año escolar ${new Date().getFullYear()}`,
     }));
   }, [isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -33,8 +33,9 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y generar pensiones automáticamente.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y generar pensiones automáticamente.",
       duration: 5000,
     });
   };
@@ -74,7 +75,10 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
                     <div className="p-2 bg-green-100 rounded-lg">
                       <DollarSign className="w-6 h-6 text-green-600" />
                     </div>
-                    <Dialog.Title as="h2" className="text-xl font-bold text-gray-900">
+                    <Dialog.Title
+                      as="h2"
+                      className="text-xl font-bold text-gray-900"
+                    >
                       Generar Pensiones
                     </Dialog.Title>
                   </div>
@@ -164,8 +168,6 @@ const GenerarPensionesModal = ({ isOpen, onClose }) => {
                       Aplicar descuentos por pago adelantado
                     </label>
                   </div>
-
-
 
                   {/* Buttons */}
                   <div className="flex space-x-3 pt-4">

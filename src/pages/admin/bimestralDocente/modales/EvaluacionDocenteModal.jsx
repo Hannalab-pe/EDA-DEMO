@@ -1,25 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { X, Loader2, Award, UserCheck, Calendar, FileText } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { X, Loader2, Award, UserCheck, Calendar, FileText } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from "sonner";
 // 🎭 DEMO MODE: Usar datos de mockData y servicio demo
-import { mockData } from '../../../../data/mockData';
-import demoEvaluacionBimestralService from '../../../../services/demoEvaluacionBimestralService';
+import { mockData } from "../../../../data/mockData";
+import demoEvaluacionBimestralService from "../../../../services/demoEvaluacionBimestralService";
 
 const schema = yup.object({
-  puntajePlanificacion: yup.number().min(0).max(20).required('Puntaje de planificación es requerido'),
-  puntajeMetodologia: yup.number().min(0).max(20).required('Puntaje de metodología es requerido'),
-  puntajePuntualidad: yup.number().min(0).max(20).required('Puntaje de puntualidad es requerido'),
-  puntajeCreatividad: yup.number().min(0).max(20).required('Puntaje de creatividad es requerido'),
-  puntajeComunicacion: yup.number().min(0).max(20).required('Puntaje de comunicación es requerido'),
-  idTrabajador: yup.string().required('Docente es requerido'),
-  idBimestre: yup.string().required('Bimestre es requerido'),
-  observaciones: yup.string().required('Observaciones son requeridas'),
-  fechaEvaluacion: yup.date().required('Fecha de evaluación es requerida'),
+  puntajePlanificacion: yup
+    .number()
+    .min(0)
+    .max(20)
+    .required("Puntaje de planificación es requerido"),
+  puntajeMetodologia: yup
+    .number()
+    .min(0)
+    .max(20)
+    .required("Puntaje de metodología es requerido"),
+  puntajePuntualidad: yup
+    .number()
+    .min(0)
+    .max(20)
+    .required("Puntaje de puntualidad es requerido"),
+  puntajeCreatividad: yup
+    .number()
+    .min(0)
+    .max(20)
+    .required("Puntaje de creatividad es requerido"),
+  puntajeComunicacion: yup
+    .number()
+    .min(0)
+    .max(20)
+    .required("Puntaje de comunicación es requerido"),
+  idTrabajador: yup.string().required("Docente es requerido"),
+  idBimestre: yup.string().required("Bimestre es requerido"),
+  observaciones: yup.string().required("Observaciones son requeridas"),
+  fechaEvaluacion: yup.date().required("Fecha de evaluación es requerida"),
 });
 
 const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
@@ -28,7 +48,12 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -44,17 +69,20 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
       // 🎭 DEMO: Obtener datos directamente de mockData
       const docentes = mockData.trabajadores.filter(
         (trabajador) =>
-          trabajador.idRol?.nombre === 'DOCENTE' || trabajador.rol?.nombre === 'DOCENTE'
+          trabajador.idRol?.nombre === "DOCENTE" ||
+          trabajador.rol?.nombre === "DOCENTE"
       );
 
       // Obtener el bimestre activo
-      const bimestreActivo = mockData.bimestres.find((b) => b.estaActivo === true);
+      const bimestreActivo = mockData.bimestres.find(
+        (b) => b.estaActivo === true
+      );
 
       setTrabajadores(docentes);
       setBimestres(bimestreActivo ? [bimestreActivo] : mockData.bimestres);
 
-      console.log('[DEMO] Docentes cargados:', docentes.length);
-      console.log('[DEMO] Bimestre activo:', bimestreActivo);
+      console.log("[DEMO] Docentes cargados:", docentes.length);
+      console.log("[DEMO] Bimestre activo:", bimestreActivo);
 
       // Preseleccionar el bimestre activo si existe
       if (bimestreActivo) {
@@ -64,8 +92,8 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
         }));
       }
     } catch (error) {
-      console.error('Error loading data:', error);
-      toast.error('Error al cargar los datos');
+      console.error("Error loading data:", error);
+      toast.error("Error al cargar los datos");
     } finally {
       setLoading(false);
     }
@@ -76,7 +104,9 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       // 🎭 DEMO: Obtener idCoordinador del auth store (simulado)
       const authData = JSON.parse(
-        localStorage.getItem('auth-storage') || localStorage.getItem('auth') || '{}'
+        localStorage.getItem("auth-storage") ||
+          localStorage.getItem("auth") ||
+          "{}"
       );
       const idCoordinador = authData.state?.user?.entidadId || 1;
 
@@ -91,22 +121,22 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
         puntajeCreatividad: parseFloat(data.puntajeCreatividad),
         puntajeComunicacion: parseFloat(data.puntajeComunicacion),
         fechaEvaluacion: data.fechaEvaluacion
-          ? new Date(data.fechaEvaluacion).toISOString().split('T')[0]
+          ? new Date(data.fechaEvaluacion).toISOString().split("T")[0]
           : null,
       };
 
-      console.log('[DEMO] Creando evaluación:', evaluationData);
+      console.log("[DEMO] Creando evaluación:", evaluationData);
 
       // 🎭 DEMO: Usar servicio demo en lugar de API
       await demoEvaluacionBimestralService.create(evaluationData);
 
-      toast.success('Evaluación creada exitosamente');
+      toast.success("Evaluación creada exitosamente");
       reset();
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error('Error submitting evaluation:', error);
-      toast.error('Error al crear la evaluación');
+      console.error("Error submitting evaluation:", error);
+      toast.error("Error al crear la evaluación");
     } finally {
       setSubmitting(false);
     }
@@ -140,7 +170,10 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 flex items-center">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900 flex items-center"
+                  >
                     <Award className="w-5 h-5 mr-2 text-blue-600" />
                     Evaluar Docente
                   </Dialog.Title>
@@ -158,234 +191,277 @@ const EvaluacionDocenteModal = ({ isOpen, onClose, onSuccess }) => {
                     <Loader2 className="animate-spin" size={32} />
                   </div>
                 ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Sección de selección */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Sección de selección */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Docente *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <UserCheck className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <select
+                            {...register("idTrabajador")}
+                            disabled={loading}
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">Seleccionar docente</option>
+                            {trabajadores.map((trabajador) => (
+                              <option
+                                key={trabajador.idTrabajador}
+                                value={trabajador.idTrabajador}
+                              >
+                                {trabajador.nombre} {trabajador.apellido}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {errors.idTrabajador && (
+                          <p className="text-red-500 text-sm">
+                            {errors.idTrabajador.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Bimestre Activo *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Calendar className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <select
+                            {...register("idBimestre")}
+                            disabled={loading}
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">Seleccionar bimestre</option>
+                            {bimestres.map((bimestre) => (
+                              <option
+                                key={bimestre.idBimestre}
+                                value={bimestre.idBimestre}
+                              >
+                                {bimestre.nombreBimestre} (Activo)
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {errors.idBimestre && (
+                          <p className="text-red-500 text-sm">
+                            {errors.idBimestre.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {/* Sección de puntajes */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Docente *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <UserCheck className="h-5 w-5 text-gray-400" />
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">
+                        Puntajes de Evaluación
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Planificación *
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Award className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="20"
+                              {...register("puntajePlanificacion")}
+                              disabled={loading}
+                              placeholder="18.5"
+                              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Puntaje de 0 a 20
+                          </p>
+                          {errors.puntajePlanificacion && (
+                            <p className="text-red-500 text-sm">
+                              {errors.puntajePlanificacion.message}
+                            </p>
+                          )}
                         </div>
-                        <select
-                          {...register('idTrabajador')}
-                          disabled={loading}
-                          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Seleccionar docente</option>
-                          {trabajadores.map((trabajador) => (
-                            <option key={trabajador.idTrabajador} value={trabajador.idTrabajador}>
-                              {trabajador.nombre} {trabajador.apellido}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      {errors.idTrabajador && <p className="text-red-500 text-sm">{errors.idTrabajador.message}</p>}
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Bimestre Activo *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Calendar className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Metodología *
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Award className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="20"
+                              {...register("puntajeMetodologia")}
+                              disabled={loading}
+                              placeholder="16.5"
+                              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Puntaje de 0 a 20
+                          </p>
+                          {errors.puntajeMetodologia && (
+                            <p className="text-red-500 text-sm">
+                              {errors.puntajeMetodologia.message}
+                            </p>
+                          )}
                         </div>
-                        <select
-                          {...register('idBimestre')}
-                          disabled={loading}
-                          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Seleccionar bimestre</option>
-                          {bimestres.map((bimestre) => (
-                            <option key={bimestre.idBimestre} value={bimestre.idBimestre}>
-                              {bimestre.nombreBimestre} (Activo)
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      {errors.idBimestre && <p className="text-red-500 text-sm">{errors.idBimestre.message}</p>}
-                    </div>
-                  </div>
 
-                  {/* Sección de puntajes */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-3">Puntajes de Evaluación</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Puntualidad *
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Award className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="20"
+                              {...register("puntajePuntualidad")}
+                              disabled={loading}
+                              placeholder="15.0"
+                              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Puntaje de 0 a 20
+                          </p>
+                          {errors.puntajePuntualidad && (
+                            <p className="text-red-500 text-sm">
+                              {errors.puntajePuntualidad.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Creatividad *
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Award className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="20"
+                              {...register("puntajeCreatividad")}
+                              disabled={loading}
+                              placeholder="17.0"
+                              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Puntaje de 0 a 20
+                          </p>
+                          {errors.puntajeCreatividad && (
+                            <p className="text-red-500 text-sm">
+                              {errors.puntajeCreatividad.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Comunicación *
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Award className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="20"
+                              {...register("puntajeComunicacion")}
+                              disabled={loading}
+                              placeholder="19.0"
+                              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Puntaje de 0 a 20
+                          </p>
+                          {errors.puntajeComunicacion && (
+                            <p className="text-red-500 text-sm">
+                              {errors.puntajeComunicacion.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Sección de observaciones y fecha */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Planificación *
+                          Observaciones *
                         </label>
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Award className="h-5 w-5 text-gray-400" />
+                          <div className="absolute top-2 left-3 pointer-events-none">
+                            <FileText className="h-5 w-5 text-gray-400" />
                           </div>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="20"
-                            {...register('puntajePlanificacion')}
+                          <textarea
+                            {...register("observaciones")}
+                            rows={4}
                             disabled={loading}
-                            placeholder="18.5"
+                            placeholder="Comentarios sobre el desempeño del docente"
                             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          Puntaje de 0 a 20
+                          Comentarios detallados sobre la evaluación
                         </p>
-                        {errors.puntajePlanificacion && <p className="text-red-500 text-sm">{errors.puntajePlanificacion.message}</p>}
+                        {errors.observaciones && (
+                          <p className="text-red-500 text-sm">
+                            {errors.observaciones.message}
+                          </p>
+                        )}
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Metodología *
+                          Fecha de Evaluación *
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Award className="h-5 w-5 text-gray-400" />
+                            <Calendar className="h-5 w-5 text-gray-400" />
                           </div>
                           <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="20"
-                            {...register('puntajeMetodologia')}
+                            type="date"
+                            {...register("fechaEvaluacion")}
                             disabled={loading}
-                            placeholder="16.5"
                             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          Puntaje de 0 a 20
+                          Fecha en que se realiza la evaluación
                         </p>
-                        {errors.puntajeMetodologia && <p className="text-red-500 text-sm">{errors.puntajeMetodologia.message}</p>}
+                        {errors.fechaEvaluacion && (
+                          <p className="text-red-500 text-sm">
+                            {errors.fechaEvaluacion.message}
+                          </p>
+                        )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Puntualidad *
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Award className="h-5 w-5 text-gray-400" />
-                          </div>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="20"
-                            {...register('puntajePuntualidad')}
-                            disabled={loading}
-                            placeholder="15.0"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Puntaje de 0 a 20
-                        </p>
-                        {errors.puntajePuntualidad && <p className="text-red-500 text-sm">{errors.puntajePuntualidad.message}</p>}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Creatividad *
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Award className="h-5 w-5 text-gray-400" />
-                          </div>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="20"
-                            {...register('puntajeCreatividad')}
-                            disabled={loading}
-                            placeholder="17.0"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Puntaje de 0 a 20
-                        </p>
-                        {errors.puntajeCreatividad && <p className="text-red-500 text-sm">{errors.puntajeCreatividad.message}</p>}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Comunicación *
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Award className="h-5 w-5 text-gray-400" />
-                          </div>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="20"
-                            {...register('puntajeComunicacion')}
-                            disabled={loading}
-                            placeholder="19.0"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Puntaje de 0 a 20
-                        </p>
-                        {errors.puntajeComunicacion && <p className="text-red-500 text-sm">{errors.puntajeComunicacion.message}</p>}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Sección de observaciones y fecha */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Observaciones *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute top-2 left-3 pointer-events-none">
-                          <FileText className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <textarea
-                          {...register('observaciones')}
-                          rows={4}
-                          disabled={loading}
-                          placeholder="Comentarios sobre el desempeño del docente"
-                          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Comentarios detallados sobre la evaluación
-                      </p>
-                      {errors.observaciones && <p className="text-red-500 text-sm">{errors.observaciones.message}</p>}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Fecha de Evaluación *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Calendar className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="date"
-                          {...register('fechaEvaluacion')}
-                          disabled={loading}
-                          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Fecha en que se realiza la evaluación
-                      </p>
-                      {errors.fechaEvaluacion && <p className="text-red-500 text-sm">{errors.fechaEvaluacion.message}</p>}
-                    </div>
-                  </div>                    <div className="flex justify-end space-x-3 pt-4">
+                    </div>{" "}
+                    <div className="flex justify-end space-x-3 pt-4">
                       <button
                         type="button"
                         onClick={onClose}

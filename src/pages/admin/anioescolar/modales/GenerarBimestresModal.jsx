@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { X, Settings, Info } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
-import demoPeriodoEscolarService from '../../../../services/demoPeriodoEscolarService';
+import React, { useState, useEffect } from "react";
+import { X, Settings, Info } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
+import demoPeriodoEscolarService from "../../../../services/demoPeriodoEscolarService";
 
 const GenerarBimestresModal = ({ isOpen, onClose }) => {
-  const [selectedPeriodo, setSelectedPeriodo] = useState('');
+  const [selectedPeriodo, setSelectedPeriodo] = useState("");
   const [periodos, setPeriodos] = useState([]);
   const [loadingPeriodos, setLoadingPeriodos] = useState(true);
 
@@ -37,8 +37,9 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
     }
 
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y generar bimestres automáticamente.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y generar bimestres automáticamente.",
       duration: 5000,
     });
   };
@@ -83,7 +84,8 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
                         Generar Bimestres
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Selecciona un período para generar bimestres automáticamente
+                        Selecciona un período para generar bimestres
+                        automáticamente
                       </p>
                     </div>
                   </div>
@@ -109,10 +111,15 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
                       disabled={loadingPeriodos}
                     >
                       <option value="">
-                        {loadingPeriodos ? 'Cargando períodos...' : 'Selecciona un período'}
+                        {loadingPeriodos
+                          ? "Cargando períodos..."
+                          : "Selecciona un período"}
                       </option>
                       {periodos.map((periodo) => (
-                        <option key={periodo.idPeriodoEscolar} value={periodo.idPeriodoEscolar}>
+                        <option
+                          key={periodo.idPeriodoEscolar}
+                          value={periodo.idPeriodoEscolar}
+                        >
                           {periodo.descripcion} ({periodo.anioEscolar})
                         </option>
                       ))}
@@ -123,13 +130,31 @@ const GenerarBimestresModal = ({ isOpen, onClose }) => {
                   {selectedPeriodo && (
                     <div className="p-3 bg-purple-50 rounded-lg">
                       {(() => {
-                        const periodo = periodos.find(p => p.idPeriodoEscolar === parseInt(selectedPeriodo));
+                        const periodo = periodos.find(
+                          (p) =>
+                            p.idPeriodoEscolar === parseInt(selectedPeriodo)
+                        );
                         return periodo ? (
                           <div className="text-sm text-purple-800">
-                            <p><strong>Año:</strong> {periodo.anioEscolar}</p>
-                            <p><strong>Inicio:</strong> {new Date(periodo.fechaInicio).toLocaleDateString('es-ES')}</p>
-                            <p><strong>Fin:</strong> {new Date(periodo.fechaFin).toLocaleDateString('es-ES')}</p>
-                            <p><strong>Estado:</strong> {periodo.estaActivo ? 'Activo' : 'Inactivo'}</p>
+                            <p>
+                              <strong>Año:</strong> {periodo.anioEscolar}
+                            </p>
+                            <p>
+                              <strong>Inicio:</strong>{" "}
+                              {new Date(periodo.fechaInicio).toLocaleDateString(
+                                "es-ES"
+                              )}
+                            </p>
+                            <p>
+                              <strong>Fin:</strong>{" "}
+                              {new Date(periodo.fechaFin).toLocaleDateString(
+                                "es-ES"
+                              )}
+                            </p>
+                            <p>
+                              <strong>Estado:</strong>{" "}
+                              {periodo.estaActivo ? "Activo" : "Inactivo"}
+                            </p>
                           </div>
                         ) : null;
                       })()}

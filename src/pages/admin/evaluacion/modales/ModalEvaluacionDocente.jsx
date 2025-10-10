@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import React, { useState, useRef, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   X,
   Upload,
@@ -9,10 +9,10 @@ import {
   Save,
   Loader,
   AlertCircle,
-  CheckCircle
-} from 'lucide-react';
+  CheckCircle,
+} from "lucide-react";
 // 🎭 DEMO MODE: Firebase imports removidos - no se usan
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 const ModalEvaluacionDocente = ({
   isOpen,
@@ -20,14 +20,14 @@ const ModalEvaluacionDocente = ({
   evaluacion,
   trabajadores,
   onGuardar,
-  coordinadorId
+  coordinadorId,
 }) => {
   const [formData, setFormData] = useState({
-    motivo: '',
-    descripcion: '',
-    archivoUrl: '',
-    idTrabajador: '',
-    idCoordinador: coordinadorId || ''
+    motivo: "",
+    descripcion: "",
+    archivoUrl: "",
+    idTrabajador: "",
+    idCoordinador: coordinadorId || "",
   });
 
   const [errors, setErrors] = useState({});
@@ -42,21 +42,22 @@ const ModalEvaluacionDocente = ({
       if (evaluacion) {
         // Modo edición
         setFormData({
-          motivo: evaluacion.motivo || '',
-          descripcion: evaluacion.descripcion || '',
-          archivoUrl: evaluacion.archivoUrl || '',
-          idTrabajador: evaluacion.idTrabajador?.idTrabajador || '',
-          idCoordinador: evaluacion.idCoordinador?.idCoordinador || coordinadorId || ''
+          motivo: evaluacion.motivo || "",
+          descripcion: evaluacion.descripcion || "",
+          archivoUrl: evaluacion.archivoUrl || "",
+          idTrabajador: evaluacion.idTrabajador?.idTrabajador || "",
+          idCoordinador:
+            evaluacion.idCoordinador?.idCoordinador || coordinadorId || "",
         });
         setSelectedFile(null);
       } else {
         // Modo creación
         setFormData({
-          motivo: '',
-          descripcion: '',
-          archivoUrl: '',
-          idTrabajador: '',
-          idCoordinador: coordinadorId || ''
+          motivo: "",
+          descripcion: "",
+          archivoUrl: "",
+          idTrabajador: "",
+          idCoordinador: coordinadorId || "",
         });
         setSelectedFile(null);
       }
@@ -69,21 +70,21 @@ const ModalEvaluacionDocente = ({
     const newErrors = {};
 
     if (!formData.motivo.trim()) {
-      newErrors.motivo = 'El motivo es obligatorio';
+      newErrors.motivo = "El motivo es obligatorio";
     }
 
     if (!formData.descripcion.trim()) {
-      newErrors.descripcion = 'La descripción es obligatoria';
+      newErrors.descripcion = "La descripción es obligatoria";
     } else if (formData.descripcion.trim().length < 10) {
-      newErrors.descripcion = 'La descripción debe tener mínimo 10 caracteres';
+      newErrors.descripcion = "La descripción debe tener mínimo 10 caracteres";
     }
 
     if (!formData.idTrabajador) {
-      newErrors.idTrabajador = 'Debe seleccionar un trabajador';
+      newErrors.idTrabajador = "Debe seleccionar un trabajador";
     }
 
     if (!formData.idCoordinador) {
-      newErrors.idCoordinador = 'No se pudo obtener el ID del coordinador';
+      newErrors.idCoordinador = "No se pudo obtener el ID del coordinador";
     }
 
     setErrors(newErrors);
@@ -95,20 +96,25 @@ const ModalEvaluacionDocente = ({
     const file = event.target.files[0];
     if (file) {
       // Validar tipo de archivo
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+      const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+      ];
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Solo se permiten archivos PDF e imágenes (JPG, PNG)');
+        toast.error("Solo se permiten archivos PDF e imágenes (JPG, PNG)");
         return;
       }
 
       // Validar tamaño (máximo 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('El archivo no puede superar los 10MB');
+        toast.error("El archivo no puede superar los 10MB");
         return;
       }
 
       setSelectedFile(file);
-      setFormData(prev => ({ ...prev, archivoUrl: '' })); // Limpiar URL anterior
+      setFormData((prev) => ({ ...prev, archivoUrl: "" })); // Limpiar URL anterior
     }
   };
 
@@ -116,32 +122,32 @@ const ModalEvaluacionDocente = ({
   const uploadFileToFirebase = async (file) => {
     try {
       setUploading(true);
-      toast.loading('Subiendo archivo...', { id: 'upload-file' });
+      toast.loading("Subiendo archivo...", { id: "upload-file" });
 
       // Simular tiempo de carga realista
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       // Generar URL falsa pero realista
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
       const fakeDownloadURL = `https://demo-storage.local/evaluaciones-docentes/${fileName}`;
 
-      console.log('📁 [DEMO MODE] Archivo simulado:', {
+      console.log("📁 [DEMO MODE] Archivo simulado:", {
         nombre: file.name,
         tamaño: `${(file.size / 1024).toFixed(2)} KB`,
         tipo: file.type,
-        urlFalsa: fakeDownloadURL
+        urlFalsa: fakeDownloadURL,
       });
 
-      toast.dismiss('upload-file');
-      toast.success('Archivo subido exitosamente');
+      toast.dismiss("upload-file");
+      toast.success("Archivo subido exitosamente");
 
       return fakeDownloadURL;
     } catch (error) {
-      console.error('Error al subir archivo:', error);
-      toast.dismiss('upload-file');
-      toast.error('Error al subir el archivo');
-      throw new Error('Error al subir el archivo');
+      console.error("Error al subir archivo:", error);
+      toast.dismiss("upload-file");
+      toast.error("Error al subir el archivo");
+      throw new Error("Error al subir el archivo");
     } finally {
       setUploading(false);
     }
@@ -157,7 +163,7 @@ const ModalEvaluacionDocente = ({
 
     try {
       setSaving(true);
-      toast.loading('Guardando evaluación...', { id: 'save-evaluation' });
+      toast.loading("Guardando evaluación...", { id: "save-evaluation" });
 
       let archivoUrl = formData.archivoUrl;
 
@@ -169,18 +175,17 @@ const ModalEvaluacionDocente = ({
       // Preparar datos finales - si no hay archivoUrl, mandar null
       const evaluacionData = {
         ...formData,
-        archivoUrl: archivoUrl || null // Si no hay URL, mandar null
+        archivoUrl: archivoUrl || null, // Si no hay URL, mandar null
       };
 
       // Llamar a la función de guardar
       await onGuardar(evaluacionData);
 
-      toast.dismiss('save-evaluation');
-
+      toast.dismiss("save-evaluation");
     } catch (error) {
-      console.error('Error al guardar evaluación:', error);
-      toast.dismiss('save-evaluation');
-      toast.error('Error al guardar la evaluación: ' + error.message);
+      console.error("Error al guardar evaluación:", error);
+      toast.dismiss("save-evaluation");
+      toast.error("Error al guardar la evaluación: " + error.message);
     } finally {
       setSaving(false);
     }
@@ -188,10 +193,10 @@ const ModalEvaluacionDocente = ({
 
   // Manejar cambios en el formulario
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Limpiar error del campo
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -230,10 +235,14 @@ const ModalEvaluacionDocente = ({
                     </div>
                     <div>
                       <Dialog.Title className="text-lg font-semibold text-white">
-                        {evaluacion ? 'Editar Evaluación' : 'Nueva Evaluación Docente'}
+                        {evaluacion
+                          ? "Editar Evaluación"
+                          : "Nueva Evaluación Docente"}
                       </Dialog.Title>
                       <p className="text-sm text-blue-100">
-                        {evaluacion ? 'Modificar evaluación existente' : 'Crear nueva evaluación docente'}
+                        {evaluacion
+                          ? "Modificar evaluación existente"
+                          : "Crear nueva evaluación docente"}
                       </p>
                     </div>
                   </div>
@@ -256,16 +265,24 @@ const ModalEvaluacionDocente = ({
                     <div className="relative">
                       <select
                         value={formData.idTrabajador}
-                        onChange={(e) => handleChange('idTrabajador', e.target.value)}
+                        onChange={(e) =>
+                          handleChange("idTrabajador", e.target.value)
+                        }
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 ${
-                          errors.idTrabajador ? 'border-red-500' : 'border-gray-300'
+                          errors.idTrabajador
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         disabled={saving}
                       >
                         <option value="">Seleccionar docente...</option>
                         {trabajadores.map((trabajador) => (
-                          <option key={trabajador.idTrabajador} value={trabajador.idTrabajador}>
-                            {trabajador.nombre} {trabajador.apellido} - {trabajador.idRol?.nombre}
+                          <option
+                            key={trabajador.idTrabajador}
+                            value={trabajador.idTrabajador}
+                          >
+                            {trabajador.nombre} {trabajador.apellido} -{" "}
+                            {trabajador.idRol?.nombre}
                           </option>
                         ))}
                       </select>
@@ -287,10 +304,10 @@ const ModalEvaluacionDocente = ({
                     <input
                       type="text"
                       value={formData.motivo}
-                      onChange={(e) => handleChange('motivo', e.target.value)}
+                      onChange={(e) => handleChange("motivo", e.target.value)}
                       placeholder="Ej: Excelente desempeño en clases"
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.motivo ? 'border-red-500' : 'border-gray-300'
+                        errors.motivo ? "border-red-500" : "border-gray-300"
                       }`}
                       disabled={saving}
                     />
@@ -310,11 +327,15 @@ const ModalEvaluacionDocente = ({
                     <div className="relative">
                       <textarea
                         value={formData.descripcion}
-                        onChange={(e) => handleChange('descripcion', e.target.value)}
+                        onChange={(e) =>
+                          handleChange("descripcion", e.target.value)
+                        }
                         placeholder="Describa detalladamente la evaluación del docente (mínimo 10 caracteres)..."
                         rows={4}
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
-                          errors.descripcion ? 'border-red-500' : 'border-gray-300'
+                          errors.descripcion
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         disabled={saving}
                       />
@@ -324,7 +345,13 @@ const ModalEvaluacionDocente = ({
                       <p className="text-xs text-gray-500">
                         Mínimo 10 caracteres
                       </p>
-                      <p className={`text-xs ${formData.descripcion.length < 10 ? 'text-red-500' : 'text-green-500'}`}>
+                      <p
+                        className={`text-xs ${
+                          formData.descripcion.length < 10
+                            ? "text-red-500"
+                            : "text-green-500"
+                        }`}
+                      >
                         {formData.descripcion.length}/10 caracteres
                       </p>
                     </div>
@@ -359,7 +386,9 @@ const ModalEvaluacionDocente = ({
                           disabled={saving || uploading}
                         >
                           <Upload className="w-4 h-4" />
-                          {selectedFile ? 'Cambiar archivo' : 'Seleccionar archivo'}
+                          {selectedFile
+                            ? "Cambiar archivo"
+                            : "Seleccionar archivo"}
                         </button>
 
                         {uploading && (
@@ -375,7 +404,8 @@ const ModalEvaluacionDocente = ({
                         <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <span className="text-sm text-gray-700">
-                            {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                            {selectedFile.name} (
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
                           </span>
                         </div>
                       )}
@@ -423,7 +453,7 @@ const ModalEvaluacionDocente = ({
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          {evaluacion ? 'Actualizar' : 'Guardar'} Evaluación
+                          {evaluacion ? "Actualizar" : "Guardar"} Evaluación
                         </>
                       )}
                     </button>

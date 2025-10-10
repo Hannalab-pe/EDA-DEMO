@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { UserCheck, RefreshCw } from 'lucide-react';
-import EvaluacionDocenteModal from './modales/EvaluacionDocenteModal';
-import ModalVerEvaluacion from './modales/ModalVerEvaluacion';
-import TablaEvaluacionesDocente from './tablas/TablaEvaluacionesDocente';
+import React, { useState, useEffect } from "react";
+import { UserCheck, RefreshCw } from "lucide-react";
+import EvaluacionDocenteModal from "./modales/EvaluacionDocenteModal";
+import ModalVerEvaluacion from "./modales/ModalVerEvaluacion";
+import TablaEvaluacionesDocente from "./tablas/TablaEvaluacionesDocente";
 // 🎭 DEMO MODE: Usar servicio demo en lugar de API
-import demoEvaluacionBimestralService from '../../../services/demoEvaluacionBimestralService';
-import { toast } from 'sonner';
+import demoEvaluacionBimestralService from "../../../services/demoEvaluacionBimestralService";
+import { toast } from "sonner";
 
 const BimestralDocente = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,11 +18,11 @@ const BimestralDocente = () => {
     try {
       setLoading(true);
       const response = await demoEvaluacionBimestralService.getAll();
-      console.log('[DEMO] Evaluaciones cargadas:', response.evaluaciones);
+      console.log("[DEMO] Evaluaciones cargadas:", response.evaluaciones);
       setEvaluaciones(response.evaluaciones || []);
     } catch (error) {
-      console.error('Error fetching evaluaciones:', error);
-      toast.error('Error al cargar las evaluaciones');
+      console.error("Error fetching evaluaciones:", error);
+      toast.error("Error al cargar las evaluaciones");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ const BimestralDocente = () => {
               className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md cursor-pointer flex items-center gap-2"
               disabled={loading}
             >
-              <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
               Actualizar
             </button>
             <button

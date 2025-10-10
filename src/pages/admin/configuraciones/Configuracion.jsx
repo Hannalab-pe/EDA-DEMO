@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { 
-  Settings, 
-  Save, 
-  Eye, 
+import React, { useState } from "react";
+import {
+  Settings,
+  Save,
+  Eye,
   EyeOff,
   Bell,
   Lock,
@@ -22,27 +22,27 @@ import {
   Moon,
   Volume2,
   VolumeX,
-  Check
-} from 'lucide-react';
+  Check,
+} from "lucide-react";
 
 const ConfiguracionPage = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
   const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState({
     // General
-    institutionName: 'Nido Pro - Centro Educativo',
-    address: 'Av. Universitaria 123, San Miguel, Lima',
-    phone: '+51 987 654 321',
-    email: 'contacto@nidopro.edu.pe',
-    website: 'www.nidopro.edu.pe',
-    
+    institutionName: "EDA - Centro Educativo",
+    address: "Av. Universitaria 123, San Miguel, Lima",
+    phone: "+51 925 223 153",
+    email: "ventas@hannahlab.com",
+    website: "www.hannahlab.com",
+
     // Security
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
     twoFactorAuth: false,
-    sessionTimeout: '30',
-    
+    sessionTimeout: "30",
+
     // Notifications
     emailNotifications: true,
     smsNotifications: false,
@@ -50,52 +50,54 @@ const ConfiguracionPage = () => {
     weeklyReports: true,
     paymentAlerts: true,
     attendanceAlerts: true,
-    
+
     // Academic
-    academicYear: '2024',
-    gradingScale: '20',
-    attendanceMinimum: '75',
+    academicYear: "2024",
+    gradingScale: "20",
+    attendanceMinimum: "75",
     semesterSystem: true,
-    
+
     // Appearance
-    theme: 'light',
-    language: 'es',
-    dateFormat: 'dd/mm/yyyy',
-    currency: 'PEN',
-    
+    theme: "light",
+    language: "es",
+    dateFormat: "dd/mm/yyyy",
+    currency: "PEN",
+
     // System
-    backupFrequency: 'daily',
+    backupFrequency: "daily",
     autoUpdates: true,
     debugMode: false,
-    maintenanceMode: false
+    maintenanceMode: false,
   });
 
   const tabs = [
-    { id: 'general', name: 'General', icon: Building },
-    { id: 'security', name: 'Seguridad', icon: Shield },
-    { id: 'notifications', name: 'Notificaciones', icon: Bell },
-    { id: 'academic', name: 'Académico', icon: FileText },
-    { id: 'appearance', name: 'Apariencia', icon: Palette },
-    { id: 'system', name: 'Sistema', icon: Settings }
+    { id: "general", name: "General", icon: Building },
+    { id: "security", name: "Seguridad", icon: Shield },
+    { id: "notifications", name: "Notificaciones", icon: Bell },
+    { id: "academic", name: "Académico", icon: FileText },
+    { id: "appearance", name: "Apariencia", icon: Palette },
+    { id: "system", name: "Sistema", icon: Settings },
   ];
 
   const handleInputChange = (field, value) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSave = () => {
     // Simular guardado
-    console.log('Configuraciones guardadas:', settings);
+    console.log("Configuraciones guardadas:", settings);
     // Aquí iría la lógica para guardar en el backend
   };
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Información Institucional</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Información Institucional
+        </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -104,11 +106,13 @@ const ConfiguracionPage = () => {
             <input
               type="text"
               value={settings.institutionName}
-              onChange={(e) => handleInputChange('institutionName', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("institutionName", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Teléfono
@@ -116,11 +120,11 @@ const ConfiguracionPage = () => {
             <input
               type="tel"
               value={settings.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Institucional
@@ -128,11 +132,11 @@ const ConfiguracionPage = () => {
             <input
               type="email"
               value={settings.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Sitio Web
@@ -140,19 +144,19 @@ const ConfiguracionPage = () => {
             <input
               type="url"
               value={settings.website}
-              onChange={(e) => handleInputChange('website', e.target.value)}
+              onChange={(e) => handleInputChange("website", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
-        
+
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Dirección
           </label>
           <textarea
             value={settings.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
+            onChange={(e) => handleInputChange("address", e.target.value)}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -164,7 +168,9 @@ const ConfiguracionPage = () => {
   const renderSecuritySettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Seguridad de la Cuenta</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Seguridad de la Cuenta
+        </h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -172,9 +178,11 @@ const ConfiguracionPage = () => {
             </label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={settings.currentPassword}
-                onChange={(e) => handleInputChange('currentPassword', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("currentPassword", e.target.value)
+                }
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button
@@ -182,11 +190,15 @@ const ConfiguracionPage = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -195,11 +207,13 @@ const ConfiguracionPage = () => {
               <input
                 type="password"
                 value={settings.newPassword}
-                onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("newPassword", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirmar Contraseña
@@ -207,40 +221,52 @@ const ConfiguracionPage = () => {
               <input
                 type="password"
                 value={settings.confirmPassword}
-                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("confirmPassword", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
         </div>
       </div>
-      
+
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Configuraciones de Seguridad</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Configuraciones de Seguridad
+        </h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
-              <div className="font-medium text-gray-900">Autenticación de Dos Factores</div>
-              <div className="text-sm text-gray-500">Agrega una capa extra de seguridad</div>
+              <div className="font-medium text-gray-900">
+                Autenticación de Dos Factores
+              </div>
+              <div className="text-sm text-gray-500">
+                Agrega una capa extra de seguridad
+              </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={settings.twoFactorAuth}
-                onChange={(e) => handleInputChange('twoFactorAuth', e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("twoFactorAuth", e.target.checked)
+                }
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tiempo de Sesión (minutos)
             </label>
             <select
               value={settings.sessionTimeout}
-              onChange={(e) => handleInputChange('sessionTimeout', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("sessionTimeout", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="15">15 minutos</option>
@@ -258,17 +284,46 @@ const ConfiguracionPage = () => {
   const renderNotificationSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Preferencias de Notificación</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Preferencias de Notificación
+        </h3>
         <div className="space-y-4">
           {[
-            { key: 'emailNotifications', label: 'Notificaciones por Email', desc: 'Recibir notificaciones importantes por correo' },
-            { key: 'smsNotifications', label: 'Notificaciones SMS', desc: 'Recibir alertas críticas por mensaje de texto' },
-            { key: 'pushNotifications', label: 'Notificaciones Push', desc: 'Notificaciones en tiempo real en la aplicación' },
-            { key: 'weeklyReports', label: 'Reportes Semanales', desc: 'Resumen semanal de actividades' },
-            { key: 'paymentAlerts', label: 'Alertas de Pagos', desc: 'Notificaciones sobre pagos pendientes y recibidos' },
-            { key: 'attendanceAlerts', label: 'Alertas de Asistencia', desc: 'Notificaciones sobre problemas de asistencia' }
+            {
+              key: "emailNotifications",
+              label: "Notificaciones por Email",
+              desc: "Recibir notificaciones importantes por correo",
+            },
+            {
+              key: "smsNotifications",
+              label: "Notificaciones SMS",
+              desc: "Recibir alertas críticas por mensaje de texto",
+            },
+            {
+              key: "pushNotifications",
+              label: "Notificaciones Push",
+              desc: "Notificaciones en tiempo real en la aplicación",
+            },
+            {
+              key: "weeklyReports",
+              label: "Reportes Semanales",
+              desc: "Resumen semanal de actividades",
+            },
+            {
+              key: "paymentAlerts",
+              label: "Alertas de Pagos",
+              desc: "Notificaciones sobre pagos pendientes y recibidos",
+            },
+            {
+              key: "attendanceAlerts",
+              label: "Alertas de Asistencia",
+              desc: "Notificaciones sobre problemas de asistencia",
+            },
           ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div
+              key={item.key}
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+            >
               <div>
                 <div className="font-medium text-gray-900">{item.label}</div>
                 <div className="text-sm text-gray-500">{item.desc}</div>
@@ -277,7 +332,9 @@ const ConfiguracionPage = () => {
                 <input
                   type="checkbox"
                   checked={settings[item.key]}
-                  onChange={(e) => handleInputChange(item.key, e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange(item.key, e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -292,7 +349,9 @@ const ConfiguracionPage = () => {
   const renderAcademicSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Configuración Académica</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Configuración Académica
+        </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -300,21 +359,25 @@ const ConfiguracionPage = () => {
             </label>
             <select
               value={settings.academicYear}
-              onChange={(e) => handleInputChange('academicYear', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("academicYear", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="2024">2024</option>
               <option value="2025">2025</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Escala de Calificación
             </label>
             <select
               value={settings.gradingScale}
-              onChange={(e) => handleInputChange('gradingScale', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("gradingScale", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="20">Vigesimal (0-20)</option>
@@ -322,7 +385,7 @@ const ConfiguracionPage = () => {
               <option value="letter">Letras (A-F)</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Asistencia Mínima (%)
@@ -332,21 +395,27 @@ const ConfiguracionPage = () => {
               min="0"
               max="100"
               value={settings.attendanceMinimum}
-              onChange={(e) => handleInputChange('attendanceMinimum', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("attendanceMinimum", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <div className="font-medium text-gray-900">Sistema Semestral</div>
-              <div className="text-sm text-gray-500">Dividir el año en semestres</div>
+              <div className="text-sm text-gray-500">
+                Dividir el año en semestres
+              </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={settings.semesterSystem}
-                onChange={(e) => handleInputChange('semesterSystem', e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("semesterSystem", e.target.checked)
+                }
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -360,7 +429,9 @@ const ConfiguracionPage = () => {
   const renderAppearanceSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Preferencias de Apariencia</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Preferencias de Apariencia
+        </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -368,17 +439,17 @@ const ConfiguracionPage = () => {
             </label>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { value: 'light', label: 'Claro', icon: Sun },
-                { value: 'dark', label: 'Oscuro', icon: Moon },
-                { value: 'auto', label: 'Auto', icon: Monitor }
+                { value: "light", label: "Claro", icon: Sun },
+                { value: "dark", label: "Oscuro", icon: Moon },
+                { value: "auto", label: "Auto", icon: Monitor },
               ].map((theme) => (
                 <button
                   key={theme.value}
-                  onClick={() => handleInputChange('theme', theme.value)}
+                  onClick={() => handleInputChange("theme", theme.value)}
                   className={`flex flex-col items-center p-3 border rounded-lg transition-colors ${
                     settings.theme === theme.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 hover:bg-gray-50'
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-300 hover:bg-gray-50"
                   }`}
                 >
                   <theme.icon className="w-6 h-6 mb-2" />
@@ -387,14 +458,14 @@ const ConfiguracionPage = () => {
               ))}
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Idioma
             </label>
             <select
               value={settings.language}
-              onChange={(e) => handleInputChange('language', e.target.value)}
+              onChange={(e) => handleInputChange("language", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="es">Español</option>
@@ -402,14 +473,14 @@ const ConfiguracionPage = () => {
               <option value="pt">Português</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Formato de Fecha
             </label>
             <select
               value={settings.dateFormat}
-              onChange={(e) => handleInputChange('dateFormat', e.target.value)}
+              onChange={(e) => handleInputChange("dateFormat", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="dd/mm/yyyy">DD/MM/YYYY</option>
@@ -417,14 +488,14 @@ const ConfiguracionPage = () => {
               <option value="yyyy-mm-dd">YYYY-MM-DD</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Moneda
             </label>
             <select
               value={settings.currency}
-              onChange={(e) => handleInputChange('currency', e.target.value)}
+              onChange={(e) => handleInputChange("currency", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="PEN">Soles Peruanos (S/)</option>
@@ -440,7 +511,9 @@ const ConfiguracionPage = () => {
   const renderSystemSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Configuración del Sistema</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Configuración del Sistema
+        </h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -448,7 +521,9 @@ const ConfiguracionPage = () => {
             </label>
             <select
               value={settings.backupFrequency}
-              onChange={(e) => handleInputChange('backupFrequency', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("backupFrequency", e.target.value)
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="daily">Diario</option>
@@ -456,13 +531,28 @@ const ConfiguracionPage = () => {
               <option value="monthly">Mensual</option>
             </select>
           </div>
-          
+
           {[
-            { key: 'autoUpdates', label: 'Actualizaciones Automáticas', desc: 'Instalar actualizaciones de seguridad automáticamente' },
-            { key: 'debugMode', label: 'Modo de Depuración', desc: 'Habilitar logs detallados para soporte técnico' },
-            { key: 'maintenanceMode', label: 'Modo de Mantenimiento', desc: 'Activar cuando se requiera mantenimiento del sistema' }
+            {
+              key: "autoUpdates",
+              label: "Actualizaciones Automáticas",
+              desc: "Instalar actualizaciones de seguridad automáticamente",
+            },
+            {
+              key: "debugMode",
+              label: "Modo de Depuración",
+              desc: "Habilitar logs detallados para soporte técnico",
+            },
+            {
+              key: "maintenanceMode",
+              label: "Modo de Mantenimiento",
+              desc: "Activar cuando se requiera mantenimiento del sistema",
+            },
           ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div
+              key={item.key}
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+            >
               <div>
                 <div className="font-medium text-gray-900">{item.label}</div>
                 <div className="text-sm text-gray-500">{item.desc}</div>
@@ -471,7 +561,9 @@ const ConfiguracionPage = () => {
                 <input
                   type="checkbox"
                   checked={settings[item.key]}
-                  onChange={(e) => handleInputChange(item.key, e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange(item.key, e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -485,13 +577,20 @@ const ConfiguracionPage = () => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'general': return renderGeneralSettings();
-      case 'security': return renderSecuritySettings();
-      case 'notifications': return renderNotificationSettings();
-      case 'academic': return renderAcademicSettings();
-      case 'appearance': return renderAppearanceSettings();
-      case 'system': return renderSystemSettings();
-      default: return renderGeneralSettings();
+      case "general":
+        return renderGeneralSettings();
+      case "security":
+        return renderSecuritySettings();
+      case "notifications":
+        return renderNotificationSettings();
+      case "academic":
+        return renderAcademicSettings();
+      case "appearance":
+        return renderAppearanceSettings();
+      case "system":
+        return renderSystemSettings();
+      default:
+        return renderGeneralSettings();
     }
   };
 
@@ -509,8 +608,8 @@ const ConfiguracionPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   <tab.icon className="w-5 h-5" />
@@ -527,7 +626,7 @@ const ConfiguracionPage = () => {
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {tabs.find(tab => tab.id === activeTab)?.name}
+                  {tabs.find((tab) => tab.id === activeTab)?.name}
                 </h2>
                 <button
                   onClick={handleSave}
@@ -538,10 +637,8 @@ const ConfiguracionPage = () => {
                 </button>
               </div>
             </div>
-            
-            <div className="p-6">
-              {renderTabContent()}
-            </div>
+
+            <div className="p-6">{renderTabContent()}</div>
           </div>
         </div>
       </div>

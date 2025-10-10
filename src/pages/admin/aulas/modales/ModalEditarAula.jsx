@@ -1,11 +1,11 @@
-﻿import React, { useState, useEffect } from 'react';
-import { X, Users, Info } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+﻿import React, { useState, useEffect } from "react";
+import { X, Users, Info } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const ModalEditarAula = ({ isOpen, onClose, aula, onSuccess }) => {
-  const [cantidadEstudiantes, setCantidadEstudiantes] = useState('');
+  const [cantidadEstudiantes, setCantidadEstudiantes] = useState("");
 
   // Cargar datos del aula cuando se abre el modal
   useEffect(() => {
@@ -18,14 +18,15 @@ const ModalEditarAula = ({ isOpen, onClose, aula, onSuccess }) => {
     e.preventDefault();
 
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y editar aulas reales.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y editar aulas reales.",
       duration: 5000,
     });
   };
 
   const handleClose = () => {
-    setCantidadEstudiantes('');
+    setCantidadEstudiantes("");
     onClose();
   };
 
@@ -63,7 +64,10 @@ const ModalEditarAula = ({ isOpen, onClose, aula, onSuccess }) => {
                       <Users className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <Dialog.Title as="h3" className="text-lg font-semibold text-gray-900">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-semibold text-gray-900"
+                      >
                         Editar Capacidad Máxima
                       </Dialog.Title>
                       <p className="text-sm text-gray-500">

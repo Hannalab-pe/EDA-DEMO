@@ -188,7 +188,10 @@ class DemoComentariosDocentesService {
       idTrabajador: trabajadorInfo,
     };
 
-    console.log("✅ [DEMO] Comentario actualizado:", mockData.comentariosDocentes[index]);
+    console.log(
+      "✅ [DEMO] Comentario actualizado:",
+      mockData.comentariosDocentes[index]
+    );
 
     return {
       success: true,

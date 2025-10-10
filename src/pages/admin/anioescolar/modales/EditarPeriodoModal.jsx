@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { X, Calendar, Info, Edit } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { X, Calendar, Info, Edit } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
   const [formData, setFormData] = useState({
-    anioEscolar: '',
-    fechaInicio: '',
-    fechaFin: '',
+    anioEscolar: "",
+    fechaInicio: "",
+    fechaFin: "",
     estaActivo: true,
-    descripcion: ''
+    descripcion: "",
   });
 
   // Cargar datos del período cuando se abre el modal
   useEffect(() => {
     if (isOpen && periodo) {
       setFormData({
-        anioEscolar: periodo.anioEscolar || '',
-        fechaInicio: periodo.fechaInicio || '',
-        fechaFin: periodo.fechaFin || '',
+        anioEscolar: periodo.anioEscolar || "",
+        fechaInicio: periodo.fechaInicio || "",
+        fechaFin: periodo.fechaFin || "",
         estaActivo: periodo.estaActivo ?? true,
-        descripcion: periodo.descripcion || ''
+        descripcion: periodo.descripcion || "",
       });
     }
   }, [isOpen, periodo]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -38,8 +38,9 @@ const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
     e.preventDefault();
 
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y editar períodos escolares reales.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y editar períodos escolares reales.",
       duration: 5000,
     });
   };
@@ -79,7 +80,10 @@ const EditarPeriodoModal = ({ isOpen, onClose, periodo }) => {
                     <div className="p-2 bg-orange-100 rounded-lg">
                       <Edit className="w-6 h-6 text-orange-600" />
                     </div>
-                    <Dialog.Title as="h2" className="text-xl font-bold text-gray-900">
+                    <Dialog.Title
+                      as="h2"
+                      className="text-xl font-bold text-gray-900"
+                    >
                       Editar Período Escolar
                     </Dialog.Title>
                   </div>

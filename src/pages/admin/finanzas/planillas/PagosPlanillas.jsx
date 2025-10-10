@@ -16,7 +16,7 @@ import {
   UserCheck
 } from 'lucide-react'
 import { toast } from 'sonner'
-import planillaService from '../../../../services/planillaService'
+import demoPlanillaMensualService from '../../../../services/demoPlanillaMensualService'
 
 const PagosPlanillas = () => {
   const [loading, setLoading] = useState(false)
@@ -28,8 +28,7 @@ const PagosPlanillas = () => {
   const [filterMes, setFilterMes] = useState('')
   const [filterAnio, setFilterAnio] = useState(new Date().getFullYear())
   
-  // Estado para aprobación masiva
-  const [loadingAprobacion, setLoadingAprobacion] = useState(false)
+  // Estado para observaciones
   const [observaciones, setObservaciones] = useState('')
 
   // Cargar planillas al montar componente
@@ -75,13 +74,13 @@ const PagosPlanillas = () => {
   const cargarPlanillas = async () => {
     setLoading(true)
     try {
-      console.log('🔄 Cargando planillas...')
-      const response = await planillaService.obtenerPlanillasMensuales()
+      console.log('🔄 Cargando planillas (modo demo)...')
+      const response = await demoPlanillaMensualService.obtenerPlanillasMensuales()
       
       if (response.success) {
-        setPlanillas(response.planillas)
-        console.log('✅ Planillas cargadas:', response.planillas.length)
-        toast.success(`${response.planillas.length} planillas cargadas`)
+        setPlanillas(response.data)
+        console.log('✅ Planillas cargadas (demo):', response.data.length)
+        toast.success(`${response.data.length} planillas cargadas (modo demo)`)
       }
     } catch (error) {
       console.error('❌ Error al cargar planillas:', error)
@@ -126,51 +125,18 @@ const PagosPlanillas = () => {
       return
     }
 
-    setLoadingAprobacion(true)
-    try {
-      // Obtener entidadId del localStorage
-      let entidadId = null;
-      try {
-        const authState = localStorage.getItem('auth-storage');
-        if (authState) {
-          const parsedAuthState = JSON.parse(authState);
-          entidadId = parsedAuthState?.state?.user?.entidadId;
-        }
-      } catch (error) {
-        console.error('Error al obtener entidadId:', error);
+    // En modo demo, solo mostramos mensaje informativo
+    toast.info(
+      '📋 Para aprobar planillas mensuales y procesar pagos reales, adquiere el software completo. Contáctanos en ventas@hannahlab.com o WhatsApp +51 925 223 153',
+      { 
+        duration: 7000,
+        description: `${selectedPlanillas.length} planilla(s) seleccionada(s)`
       }
-
-      if (!entidadId) {
-        toast.error('No se encontró información del usuario. Inicie sesión nuevamente.');
-        return;
-      }
-
-      const datosAprobacion = {
-        idsPlanillas: selectedPlanillas,
-        aprobadoPor: entidadId,
-        observaciones: observaciones || 'Planillas aprobadas masivamente después de revisión de cálculos'
-      }
-
-      console.log('📤 Aprobando planillas:', datosAprobacion)
-
-      const response = await planillaService.aprobarPlanillasMasivo(datosAprobacion)
-      
-      if (response.success) {
-        toast.success(`${selectedPlanillas.length} planillas aprobadas exitosamente`)
-        
-        // Limpiar selección y observaciones
-        setSelectedPlanillas([])
-        setObservaciones('')
-        
-        // Recargar planillas
-        cargarPlanillas()
-      }
-    } catch (error) {
-      console.error('❌ Error al aprobar planillas:', error)
-      toast.error(error.message || 'Error al aprobar las planillas')
-    } finally {
-      setLoadingAprobacion(false)
-    }
+    )
+    
+    // Limpiar selección y observaciones
+    setSelectedPlanillas([])
+    setObservaciones('')
   }
 
   const formatFecha = (fecha) => {
@@ -342,14 +308,10 @@ const PagosPlanillas = () => {
 
               <button
                 onClick={aprobarPlanillas}
-                disabled={loadingAprobacion || selectedPlanillas.length === 0}
+                disabled={selectedPlanillas.length === 0}
                 className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2"
               >
-                {loadingAprobacion ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <UserCheck className="w-4 h-4" />
-                )}
+                <UserCheck className="w-4 h-4" />
                 <span>Aprobar Planillas ({selectedPlanillas.length})</span>
               </button>
             </div>

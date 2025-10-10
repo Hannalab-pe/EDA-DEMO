@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { Info, School, X } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { Info, School, X } from "lucide-react";
+import { toast } from "sonner";
 
 const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
   const [form, setForm] = useState({
-    seccion: '',
-    cantidadEstudiantes: '',
-    descripcion: '',
-    ubicacion: '',
-    equipamiento: '',
-    idGrado: ''
+    seccion: "",
+    cantidadEstudiantes: "",
+    descripcion: "",
+    ubicacion: "",
+    equipamiento: "",
+    idGrado: "",
   });
 
   // Cargar datos de la asignación cuando se abre el modal
@@ -19,12 +19,15 @@ const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
     if (asignacion && isOpen) {
       const aula = asignacion.idAula || {};
       setForm({
-        seccion: aula.seccion || '',
-        cantidadEstudiantes: aula.capacidad?.toString() || aula.cantidadEstudiantes?.toString() || '',
-        descripcion: aula.descripcion || '',
-        ubicacion: aula.ubicacion || '',
-        equipamiento: aula.equipamiento || '',
-        idGrado: aula.idGrado?.idGrado || ''
+        seccion: aula.seccion || "",
+        cantidadEstudiantes:
+          aula.capacidad?.toString() ||
+          aula.cantidadEstudiantes?.toString() ||
+          "",
+        descripcion: aula.descripcion || "",
+        ubicacion: aula.ubicacion || "",
+        equipamiento: aula.equipamiento || "",
+        idGrado: aula.idGrado?.idGrado || "",
       });
     }
   }, [asignacion, isOpen]);
@@ -33,27 +36,28 @@ const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo con todas las funcionalidades de gestión de asignaciones de aulas.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo con todas las funcionalidades de gestión de asignaciones de aulas.",
       duration: 5000,
     });
   };
 
   const handleClose = () => {
     setForm({
-      seccion: '',
-      cantidadEstudiantes: '',
-      descripcion: '',
-      ubicacion: '',
-      equipamiento: '',
-      idGrado: ''
+      seccion: "",
+      cantidadEstudiantes: "",
+      descripcion: "",
+      ubicacion: "",
+      equipamiento: "",
+      idGrado: "",
     });
     onClose();
   };
@@ -86,7 +90,10 @@ const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 flex items-center">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900 flex items-center"
+                  >
                     <School className="w-5 h-5 mr-2 text-blue-600" />
                     Editar Asignación de Aula
                   </Dialog.Title>
@@ -102,7 +109,10 @@ const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
                   {/* Información básica */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="seccion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="seccion"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Sección
                       </label>
                       <input
@@ -118,7 +128,10 @@ const ModalEditarAula = ({ isOpen, onClose, asignacion }) => {
                     </div>
 
                     <div>
-                      <label htmlFor="cantidadEstudiantes" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="cantidadEstudiantes"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Capacidad de Estudiantes
                       </label>
                       <input

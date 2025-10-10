@@ -1,32 +1,33 @@
-import React, { useState } from 'react';
-import { X, Calendar, Info } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { X, Calendar, Info } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const CrearPeriodoModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     anioEscolar: new Date().getFullYear(),
-    fechaInicio: '',
-    fechaFin: '',
+    fechaInicio: "",
+    fechaFin: "",
     estaActivo: true,
-    descripcion: ''
+    descripcion: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y gestionar períodos escolares reales.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y gestionar períodos escolares reales.",
       duration: 5000,
     });
   };
@@ -66,7 +67,10 @@ const CrearPeriodoModal = ({ isOpen, onClose }) => {
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <Calendar className="w-6 h-6 text-blue-600" />
                     </div>
-                    <Dialog.Title as="h2" className="text-xl font-bold text-gray-900">
+                    <Dialog.Title
+                      as="h2"
+                      className="text-xl font-bold text-gray-900"
+                    >
                       Crear Período Escolar
                     </Dialog.Title>
                   </div>

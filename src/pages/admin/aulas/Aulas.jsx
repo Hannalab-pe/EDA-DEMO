@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Edit,
@@ -7,19 +7,19 @@ import {
   MapPin,
   Settings,
   BookOpen,
-  Eye
-} from 'lucide-react';
-import { toast } from 'sonner';
-import demoAulaService from '../../../services/demoAulaService';
-import ModalEditarAula from './modales/ModalEditarAula';
-import ModalAgregarAula from './modales/ModalAgregarAula';
+  Eye,
+} from "lucide-react";
+import { toast } from "sonner";
+import demoAulaService from "../../../services/demoAulaService";
+import ModalEditarAula from "./modales/ModalEditarAula";
+import ModalAgregarAula from "./modales/ModalAgregarAula";
 
 const Aulas = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [modalEditarAula, setModalEditarAula] = useState(false);
   const [modalAgregarAula, setModalAgregarAula] = useState(false);
   const [aulaSeleccionada, setAulaSeleccionada] = useState(null);
-  
+
   // Estados para datos DEMO
   const [aulas, setAulas] = useState([]);
   const [loadingAulas, setLoadingAulas] = useState(true);
@@ -54,10 +54,11 @@ const Aulas = () => {
   };
 
   // Filtrar aulas por búsqueda
-  const aulasFiltradas = aulas.filter(aula =>
-    aula.seccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aula.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aula.ubicacion?.toLowerCase().includes(searchTerm.toLowerCase())
+  const aulasFiltradas = aulas.filter(
+    (aula) =>
+      aula.seccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      aula.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      aula.ubicacion?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEditarAula = (aula) => {
@@ -80,8 +81,12 @@ const Aulas = () => {
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Gestión de Aulas</h1>
-              <p className="text-gray-600">Administra las aulas del centro educativo</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Gestión de Aulas
+              </h1>
+              <p className="text-gray-600">
+                Administra las aulas del centro educativo
+              </p>
             </div>
           </div>
           <button
@@ -120,7 +125,9 @@ const Aulas = () => {
             <div className="p-8 bg-gray-50 rounded-lg">
               <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg mb-4">
-                {searchTerm ? 'No se encontraron aulas con ese criterio de búsqueda' : 'No hay aulas registradas'}
+                {searchTerm
+                  ? "No se encontraron aulas con ese criterio de búsqueda"
+                  : "No hay aulas registradas"}
               </p>
               {!searchTerm && (
                 <button

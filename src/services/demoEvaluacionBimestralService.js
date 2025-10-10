@@ -192,10 +192,7 @@ class DemoEvaluacionBimestralService {
 
     mockData.evaluacionesBimestralesDocentes.push(nuevaEvaluacion);
 
-    console.log(
-      "✅ [DEMO] Evaluación creada exitosamente:",
-      nuevaEvaluacion
-    );
+    console.log("✅ [DEMO] Evaluación creada exitosamente:", nuevaEvaluacion);
 
     return {
       success: true,
@@ -218,8 +215,8 @@ class DemoEvaluacionBimestralService {
     }
 
     // Recalcular promedio si se actualizan puntajes
-    let promedioFinal = mockData.evaluacionesBimestralesDocentes[index]
-      .promedioFinal;
+    let promedioFinal =
+      mockData.evaluacionesBimestralesDocentes[index].promedioFinal;
 
     if (
       evaluacionData.puntajePlanificacion !== undefined ||
@@ -269,8 +266,7 @@ class DemoEvaluacionBimestralService {
     }
 
     // Actualizar bimestre si cambió
-    let bimestreInfo =
-      mockData.evaluacionesBimestralesDocentes[index].bimestre;
+    let bimestreInfo = mockData.evaluacionesBimestralesDocentes[index].bimestre;
     if (
       evaluacionData.idBimestre &&
       evaluacionData.idBimestre !==
@@ -310,8 +306,7 @@ class DemoEvaluacionBimestralService {
       puntajeComunicacion:
         evaluacionData.puntajeComunicacion !== undefined
           ? parseFloat(evaluacionData.puntajeComunicacion)
-          : mockData.evaluacionesBimestralesDocentes[index]
-              .puntajeComunicacion,
+          : mockData.evaluacionesBimestralesDocentes[index].puntajeComunicacion,
       promedioFinal: promedioFinal,
       observaciones:
         evaluacionData.observaciones ||
@@ -455,9 +450,7 @@ class DemoEvaluacionBimestralService {
     console.log(`[DEMO] Obteniendo ${limit} evaluaciones recientes`);
 
     const evaluaciones = [...mockData.evaluacionesBimestralesDocentes]
-      .sort(
-        (a, b) => new Date(b.fechaEvaluacion) - new Date(a.fechaEvaluacion)
-      )
+      .sort((a, b) => new Date(b.fechaEvaluacion) - new Date(a.fechaEvaluacion))
       .slice(0, limit);
 
     return {

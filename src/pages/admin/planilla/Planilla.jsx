@@ -122,7 +122,7 @@ const Planilla = () => {
     }
 
     toast.info(
-      `Para generar planillas con ${selectedTrabajadores.length} trabajador(es), por favor contáctanos en soporte@colegio.edu.pe o al WhatsApp +51 987 654 321. ¡Estamos aquí para ayudarte! 📋`,
+      `Para generar planillas con ${selectedTrabajadores.length} trabajador(es), por favor contáctanos en ventas@hannahlab.com o al WhatsApp +51 925 223 153. ¡Estamos aquí para ayudarte! 📋`,
       { duration: 6000 }
     );
 

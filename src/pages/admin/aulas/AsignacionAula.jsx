@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  BookOpen, 
+import React, { useState, useEffect } from "react";
+import {
+  BookOpen,
   Users,
   GraduationCap,
   Calendar,
   School,
   MapPin,
   UserCheck,
-  Plus
-} from 'lucide-react';
-import TablaAulas from './tablas/TablaAula';
-import { demoAsignacionAulaService } from '../../../services/demoAsignacionAulaService';
-import ModalAgregarAula from './modales/ModalAgregarAula';
-import ModalVerAula from './modales/ModalVerAula';
-import ModalEditarAula from './modales/ModalEditarAula';
-import ModalEliminarAula from './modales/ModalEliminarAula';
+  Plus,
+} from "lucide-react";
+import TablaAulas from "./tablas/TablaAula";
+import { demoAsignacionAulaService } from "../../../services/demoAsignacionAulaService";
+import ModalAgregarAula from "./modales/ModalAgregarAula";
+import ModalVerAula from "./modales/ModalVerAula";
+import ModalEditarAula from "./modales/ModalEditarAula";
+import ModalEliminarAula from "./modales/ModalEliminarAula";
 
 const AsignacionAula = () => {
   // Estados para gestión de datos DEMO
@@ -31,9 +31,9 @@ const AsignacionAula = () => {
     try {
       const data = await demoAsignacionAulaService.getAllAsignaciones();
       setAsignaciones(data);
-      console.log('[DEMO] Asignaciones de aulas cargadas:', data.length);
+      console.log("[DEMO] Asignaciones de aulas cargadas:", data.length);
     } catch (error) {
-      console.error('[DEMO] Error al cargar asignaciones:', error);
+      console.error("[DEMO] Error al cargar asignaciones:", error);
     } finally {
       setLoadingAsignaciones(false);
     }
@@ -48,28 +48,37 @@ const AsignacionAula = () => {
 
   // Funciones para calcular estadísticas desde las asignaciones
   const getTotalAulasAsignadas = () => {
-    return asignaciones?.filter(asignacion => asignacion.estadoActivo)?.length || 0;
+    return (
+      asignaciones?.filter((asignacion) => asignacion.estadoActivo)?.length || 0
+    );
   };
 
   const getTotalDocentes = () => {
     const docentesUnicos = new Set(
       asignaciones
-        ?.filter(asignacion => asignacion.estadoActivo)
-        ?.map(asignacion => asignacion.idTrabajador?.idTrabajador)
+        ?.filter((asignacion) => asignacion.estadoActivo)
+        ?.map((asignacion) => asignacion.idTrabajador?.idTrabajador)
     );
     return docentesUnicos.size;
   };
 
   const getTotalEstudiantesEnAulas = () => {
-    return asignaciones
-      ?.filter(asignacion => asignacion.estadoActivo)
-      ?.reduce((total, asignacion) => {
-        return total + (asignacion.idAula?.capacidad || asignacion.idAula?.cantidadEstudiantes || 0);
-      }, 0) || 0;
+    return (
+      asignaciones
+        ?.filter((asignacion) => asignacion.estadoActivo)
+        ?.reduce((total, asignacion) => {
+          return (
+            total +
+            (asignacion.idAula?.capacidad ||
+              asignacion.idAula?.cantidadEstudiantes ||
+              0)
+          );
+        }, 0) || 0
+    );
   };
 
   const getTotalClases = () => {
-    return asignaciones?.filter(a => a.estadoActivo)?.length || 0;
+    return asignaciones?.filter((a) => a.estadoActivo)?.length || 0;
   };
 
   return (
@@ -77,8 +86,13 @@ const AsignacionAula = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Gestión de Asignaciones de Aula</h1>
-            <p className="text-gray-600 mt-1">Administra las asignaciones de docentes a aulas del centro educativo</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Gestión de Asignaciones de Aula
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Administra las asignaciones de docentes a aulas del centro
+              educativo
+            </p>
           </div>
         </div>
 
@@ -88,38 +102,54 @@ const AsignacionAula = () => {
             <div className="flex items-center">
               <School className="w-8 h-8 text-blue-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-blue-600">Aulas Asignadas</p>
-                <p className="text-2xl font-bold text-blue-900">{getTotalAulasAsignadas()}</p>
+                <p className="text-sm font-medium text-blue-600">
+                  Aulas Asignadas
+                </p>
+                <p className="text-2xl font-bold text-blue-900">
+                  {getTotalAulasAsignadas()}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="flex items-center">
               <UserCheck className="w-8 h-8 text-green-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-green-600">Docentes Asignados</p>
-                <p className="text-2xl font-bold text-green-900">{getTotalDocentes()}</p>
+                <p className="text-sm font-medium text-green-600">
+                  Docentes Asignados
+                </p>
+                <p className="text-2xl font-bold text-green-900">
+                  {getTotalDocentes()}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-purple-50 p-4 rounded-lg">
             <div className="flex items-center">
               <Users className="w-8 h-8 text-purple-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-purple-600">Estudiantes en Aulas</p>
-                <p className="text-2xl font-bold text-purple-900">{getTotalEstudiantesEnAulas()}</p>
+                <p className="text-sm font-medium text-purple-600">
+                  Estudiantes en Aulas
+                </p>
+                <p className="text-2xl font-bold text-purple-900">
+                  {getTotalEstudiantesEnAulas()}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-orange-50 p-4 rounded-lg">
             <div className="flex items-center">
               <BookOpen className="w-8 h-8 text-orange-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-orange-600">Total Clases</p>
-                <p className="text-2xl font-bold text-orange-900">{getTotalClases() || 0}</p>
+                <p className="text-sm font-medium text-orange-600">
+                  Total Clases
+                </p>
+                <p className="text-2xl font-bold text-orange-900">
+                  {getTotalClases() || 0}
+                </p>
               </div>
             </div>
           </div>

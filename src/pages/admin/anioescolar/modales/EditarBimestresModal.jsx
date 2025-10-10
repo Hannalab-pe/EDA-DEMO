@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X, Calendar, Info, Edit } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { X, Calendar, Info, Edit } from "lucide-react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { toast } from "sonner";
 
 const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
   const [bimestresData, setBimestresData] = useState([]);
@@ -11,30 +11,31 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
   useEffect(() => {
     if (isOpen && bimestres && bimestres.length > 0) {
       setBimestresData(
-        bimestres.map(bimestre => ({
+        bimestres.map((bimestre) => ({
           id: bimestre.idBimestre,
           numeroBimestre: bimestre.numeroBimestre,
           nombreBimestre: bimestre.nombreBimestre,
           fechaInicio: bimestre.fechaInicio,
           fechaFin: bimestre.fechaFin,
-          fechaLimiteProgramacion: bimestre.fechaLimiteProgramacion
+          fechaLimiteProgramacion: bimestre.fechaLimiteProgramacion,
         }))
       );
     }
   }, [isOpen, bimestres]);
 
   const handleInputChange = (index, field, value) => {
-    setBimestresData(prev => prev.map((item, i) =>
-      i === index ? { ...item, [field]: value } : item
-    ));
+    setBimestresData((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // MODO DEMO: Mostrar toast informativo
-    toast.info('📢 Funcionalidad no disponible en modo demo', {
-      description: 'Contáctanos para obtener el sistema completo y editar fechas de bimestres reales.',
+    toast.info("📢 Funcionalidad no disponible en modo demo", {
+      description:
+        "Contáctanos para obtener el sistema completo y editar fechas de bimestres reales.",
       duration: 5000,
     });
   };
@@ -74,7 +75,10 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <Edit className="w-6 h-6 text-blue-600" />
                     </div>
-                    <Dialog.Title as="h2" className="text-xl font-bold text-gray-900">
+                    <Dialog.Title
+                      as="h2"
+                      className="text-xl font-bold text-gray-900"
+                    >
                       Editar Fechas de Bimestres
                     </Dialog.Title>
                   </div>
@@ -91,7 +95,9 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                 {periodo && (
                   <div className="px-6 py-3 bg-gray-50 border-b">
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Período:</span> Año {periodo.anioEscolar} - {periodo.descripcion || 'Sin descripción'}
+                      <span className="font-medium">Período:</span> Año{" "}
+                      {periodo.anioEscolar} -{" "}
+                      {periodo.descripcion || "Sin descripción"}
                     </p>
                   </div>
                 )}
@@ -100,9 +106,13 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                 <form onSubmit={handleSubmit} className="p-6">
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {bimestresData.map((bimestre, index) => (
-                      <div key={bimestre.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={bimestre.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <h4 className="font-medium text-gray-900 mb-3">
-                          {bimestre.numeroBimestre}° Bimestre - {bimestre.nombreBimestre}
+                          {bimestre.numeroBimestre}° Bimestre -{" "}
+                          {bimestre.nombreBimestre}
                         </h4>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -113,7 +123,13 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                             <input
                               type="date"
                               value={bimestre.fechaInicio}
-                              onChange={(e) => handleInputChange(index, 'fechaInicio', e.target.value)}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  index,
+                                  "fechaInicio",
+                                  e.target.value
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                           </div>
@@ -125,7 +141,13 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                             <input
                               type="date"
                               value={bimestre.fechaFin}
-                              onChange={(e) => handleInputChange(index, 'fechaFin', e.target.value)}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  index,
+                                  "fechaFin",
+                                  e.target.value
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                           </div>
@@ -137,7 +159,13 @@ const EditarBimestresModal = ({ isOpen, onClose, bimestres, periodo }) => {
                             <input
                               type="date"
                               value={bimestre.fechaLimiteProgramacion}
-                              onChange={(e) => handleInputChange(index, 'fechaLimiteProgramacion', e.target.value)}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  index,
+                                  "fechaLimiteProgramacion",
+                                  e.target.value
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                           </div>

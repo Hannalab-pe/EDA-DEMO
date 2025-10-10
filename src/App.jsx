@@ -122,81 +122,86 @@ function App() {
               v7_relativeSplatPath: true,
             }}
           >
-          <Routes>
-            {/* Ruta raíz - redirige según autenticación */}
-            <Route
-              path="/"
-              element={
-                isAuthenticated ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
+            <Routes>
+              {/* Ruta raíz - redirige según autenticación */}
+              <Route
+                path="/"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/dashboard" replace />
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
+                }
+              />
 
-            {/* Login - solo accesible si no está autenticado */}
-            <Route
-              path="/login"
-              element={
-                isAuthenticated ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Login />
-                )
-              }
-            />
+              {/* Login - solo accesible si no está autenticado */}
+              <Route
+                path="/login"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/dashboard" replace />
+                  ) : (
+                    <Login />
+                  )
+                }
+              />
 
-            {/* Dashboard protegido */}
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Dashboard protegido */}
+              <Route
+                path="/dashboard/*"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Ruta 404 */}
-            <Route
-              path="*"
-              element={
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                  <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                      404
-                    </h1>
-                    <p className="text-gray-600 mb-4">Página no encontrada</p>
-                    <Navigate
-                      to={isAuthenticated ? "/dashboard" : "/login"}
-                      replace
-                    />
+              {/* Ruta 404 */}
+              <Route
+                path="*"
+                element={
+                  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                    <div className="text-center">
+                      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        404
+                      </h1>
+                      <p className="text-gray-600 mb-4">Página no encontrada</p>
+                      <Navigate
+                        to={isAuthenticated ? "/dashboard" : "/login"}
+                        replace
+                      />
+                    </div>
                   </div>
-                </div>
-              }
-            />
-          </Routes>
-        </Router>
+                }
+              />
+            </Routes>
+          </Router>
 
-        {/* Toaster para notificaciones globales */}
-        <Toaster position="top-right" richColors closeButton duration={4000} />
-
-        {/* Modal de cambio de contraseña obligatorio */}
-        {showPasswordModal && user && (
-          <ChangePasswordModal
-            isOpen={showPasswordModal}
-            onClose={handlePasswordChangeSuccess}
-            userId={user.id}
-            userName={user.nombre || user.fullName}
+          {/* Toaster para notificaciones globales */}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
           />
-        )}
 
-        {/* Botón flotante de WhatsApp - visible en toda la aplicación */}
-        <WhatsAppButton />
-      </div>
+          {/* Modal de cambio de contraseña obligatorio */}
+          {showPasswordModal && user && (
+            <ChangePasswordModal
+              isOpen={showPasswordModal}
+              onClose={handlePasswordChangeSuccess}
+              userId={user.id}
+              userName={user.nombre || user.fullName}
+            />
+          )}
 
-      {/* React Query DevTools - solo en desarrollo */}
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+          {/* Botón flotante de WhatsApp - visible en toda la aplicación */}
+          <WhatsAppButton />
+        </div>
+
+        {/* React Query DevTools - solo en desarrollo */}
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
       </SidebarProvider>
     </QueryClientProvider>
   );
