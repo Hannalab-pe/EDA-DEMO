@@ -2,17 +2,11 @@ class OpenAIService {
   constructor() {
     this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     this.baseURL = 'https://api.openai.com/v1';
-    
-    // Solo mostrar warning si no está en modo demo
-    const isDemoMode = () => {
-      const token = localStorage.getItem('token');
-      return token && token.startsWith('demo-token-');
-    };
-    
-    if (!this.apiKey && !isDemoMode()) {
-      console.warn('OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your .env file');
-    } else if (!this.apiKey && isDemoMode()) {
-      console.log('🎭 Demo Mode: OpenAI funcionará con respuestas de fallback si no hay API key');
+
+    // En modo demo, no mostrar warnings sobre API key
+    // El servicio funcionará con respuestas de fallback si no hay API key configurada
+    if (!this.apiKey) {
+      console.log('🎭 Modo Demo: El asistente IA funcionará con respuestas predefinidas. Para usar OpenAI, configura VITE_OPENAI_API_KEY en tu archivo .env');
     }
   }
 

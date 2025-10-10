@@ -26,6 +26,7 @@ import {
   Menu,
   DollarSign,
   Bell,
+  User,
 } from "lucide-react";
 import Reportes from "../parent/reportes/Reportes";
 import Tareas from "../parent/tareas/Tareas";
