@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { X, Calendar, FileText, BookOpen, Save } from "lucide-react";
 import { toast } from "sonner";
+import { agregarEvaluacionDemo } from "../evaluacionesStore";
 
 const CrearEvaluacionModal = ({
   isOpen,
@@ -107,22 +108,37 @@ const CrearEvaluacionModal = ({
     setIsSubmitting(true);
 
     try {
-      console.log("💾 Guardando evaluación (DEMO):", formData);
+      console.log("🎭 [DEMO] Guardando evaluación:", formData);
 
       // Simular delay de guardado
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Simular éxito del guardado
-      toast.success(
-        evaluacion
-          ? "Evaluación actualizada correctamente"
-          : "Evaluación creada correctamente"
-      );
+      if (evaluacion) {
+        // MODO EDICIÓN - Solo actualizar descripción
+        console.log("✏️ [DEMO] Editando evaluación existente");
+        toast.success("Evaluación actualizada correctamente");
+      } else {
+        // MODO CREACIÓN - Agregar nueva evaluación al store temporal
+        const nuevaEvaluacion = {
+          idEvaluacion: `eval-custom-${Date.now()}`,
+          fecha: formData.fecha,
+          descripcion: formData.descripcion,
+          tipoEvaluacion: formData.tipoEvaluacion,
+          idCurso: formData.idCurso,
+          docenteId: "2",
+        };
+
+        // Agregar al store temporal
+        agregarEvaluacionDemo(nuevaEvaluacion);
+
+        console.log("➕ [DEMO] Nueva evaluación creada:", nuevaEvaluacion);
+        toast.success("Evaluación creada correctamente");
+      }
 
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Error saving evaluacion (DEMO):", error);
+      console.error("❌ Error saving evaluacion (DEMO):", error);
       toast.error("Error al guardar la evaluación");
     } finally {
       setIsSubmitting(false);

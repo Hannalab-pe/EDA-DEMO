@@ -5,6 +5,7 @@ import {
   createDemoMutationFn,
 } from "./useDemoQuery";
 import { mockData } from "../../data/mockData";
+import { planificacionesStore } from "../../store/planificacionesStore";
 
 /**
  * Hook para obtener planificaciones
@@ -24,25 +25,184 @@ export const usePlanificacionesTrabajadorDemo = (trabajadorId) => {
   return useDemoQuery({
     queryKey: ["planificaciones", "trabajador", trabajadorId],
     queryFn: async () => {
-      const planificaciones = mockData.planificaciones
-        .filter((p) => p.docenteId === trabajadorId)
-        .map((p) => {
-          const aula = mockData.aulas.find((a) => a.id === p.aulaId);
-          const grado = mockData.grados.find((g) => g.id === p.gradoId);
-          return {
-            ...p,
-            aulaInfo: aula,
-            gradoInfo: grado,
-            aula: aula?.nombre || "Aula no encontrada",
-            grado: grado?.nombre || "Grado no encontrado",
-          };
-        });
+      console.log(
+        "🎭 [PLANIFICACIONES DEMO] Generando planificaciones para trabajador:",
+        trabajadorId
+      );
 
-      return planificaciones.sort(
-        (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion)
+      // Simular delay
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      // Obtener planificaciones temporales del store
+      const planificacionesTemporales =
+        planificacionesStore.obtenerPlanificaciones();
+      console.log(
+        "📦 [STORE] Planificaciones temporales:",
+        planificacionesTemporales.length
+      );
+
+      // Planificaciones ficticias base
+      const planificacionesFicticias = [
+        {
+          idPlanificacion: "plan-1",
+          titulo: "Unidad 1: Introducción a las Fracciones",
+          descripcion:
+            "Planificación completa para la introducción del concepto de fracciones, operaciones básicas y aplicaciones en la vida cotidiana.",
+          fechaInicio: "2025-10-14",
+          fechaFin: "2025-10-31",
+          estado: "EN PROGRESO",
+          curso: {
+            idCurso: "1",
+            nombreCurso: "Matemática",
+          },
+          grado: {
+            idGrado: "4",
+            nombreGrado: "4to Primaria",
+          },
+          bimestre: "III Bimestre",
+          competencias: [
+            "Resuelve problemas de cantidad",
+            "Razona y argumenta",
+          ],
+          materias: ["Fracciones", "Operaciones", "Problemas"],
+          sesiones: 12,
+          sesionesCompletadas: 7,
+          progreso: 58,
+          docenteId: trabajadorId || "1",
+        },
+        {
+          idPlanificacion: "plan-2",
+          titulo: "Unidad 2: Comprensión Lectora Nivel Inferencial",
+          descripcion:
+            "Desarrollo de estrategias de comprensión lectora con enfoque en inferencias y pensamiento crítico mediante textos narrativos.",
+          fechaInicio: "2025-10-07",
+          fechaFin: "2025-10-28",
+          estado: "EN PROGRESO",
+          curso: {
+            idCurso: "2",
+            nombreCurso: "Comunicación",
+          },
+          grado: {
+            idGrado: "4",
+            nombreGrado: "4to Primaria",
+          },
+          bimestre: "III Bimestre",
+          competencias: [
+            "Lee diversos tipos de textos",
+            "Se comunica oralmente",
+          ],
+          materias: ["Comprensión lectora", "Análisis", "Reflexión"],
+          sesiones: 10,
+          sesionesCompletadas: 6,
+          progreso: 60,
+          docenteId: trabajadorId || "1",
+        },
+        {
+          idPlanificacion: "plan-3",
+          titulo: "Unidad 3: Sistema Solar y Planetas",
+          descripcion:
+            "Exploración del sistema solar, características de los planetas y movimientos de la Tierra. Incluye experimentos prácticos.",
+          fechaInicio: "2025-10-01",
+          fechaFin: "2025-10-22",
+          estado: "COMPLETADA",
+          curso: {
+            idCurso: "3",
+            nombreCurso: "Ciencia y Tecnología",
+          },
+          grado: {
+            idGrado: "4",
+            nombreGrado: "4to Primaria",
+          },
+          bimestre: "III Bimestre",
+          competencias: [
+            "Explica el mundo físico",
+            "Indaga mediante métodos científicos",
+          ],
+          materias: ["Astronomía", "Sistema Solar", "Experimentos"],
+          sesiones: 8,
+          sesionesCompletadas: 8,
+          progreso: 100,
+          docenteId: trabajadorId || "1",
+        },
+        {
+          idPlanificacion: "plan-4",
+          titulo: "Proyecto: Historia del Perú Antiguo",
+          descripcion:
+            "Proyecto integrador sobre las principales culturas preincas del Perú: Chavín, Moche, Nazca y sus aportes culturales.",
+          fechaInicio: "2025-10-15",
+          fechaFin: "2025-11-05",
+          estado: "PLANIFICADA",
+          curso: {
+            idCurso: "4",
+            nombreCurso: "Personal Social",
+          },
+          grado: {
+            idGrado: "4",
+            nombreGrado: "4to Primaria",
+          },
+          bimestre: "III Bimestre",
+          competencias: [
+            "Construye interpretaciones históricas",
+            "Gestiona responsablemente el espacio",
+          ],
+          materias: ["Historia", "Culturas preincas", "Patrimonio"],
+          sesiones: 15,
+          sesionesCompletadas: 0,
+          progreso: 0,
+          docenteId: trabajadorId || "1",
+        },
+        {
+          idPlanificacion: "plan-5",
+          titulo: "Taller: Técnicas de Pintura y Color",
+          descripcion:
+            "Taller práctico de técnicas de pintura: acuarela, témpera y collage. Desarrollo de la creatividad y expresión artística.",
+          fechaInicio: "2025-10-08",
+          fechaFin: "2025-10-29",
+          estado: "EN PROGRESO",
+          curso: {
+            idCurso: "5",
+            nombreCurso: "Arte y Cultura",
+          },
+          grado: {
+            idGrado: "4",
+            nombreGrado: "4to Primaria",
+          },
+          bimestre: "III Bimestre",
+          competencias: [
+            "Crea proyectos artísticos",
+            "Aprecia manifestaciones artístico-culturales",
+          ],
+          materias: ["Pintura", "Color", "Técnicas artísticas"],
+          sesiones: 8,
+          sesionesCompletadas: 4,
+          progreso: 50,
+          docenteId: trabajadorId || "1",
+        },
+      ];
+
+      // Combinar: temporales primero (más recientes), luego ficticias
+      const todasLasPlanificaciones = [
+        ...planificacionesTemporales,
+        ...planificacionesFicticias,
+      ];
+
+      console.log(
+        "✅ [PLANIFICACIONES DEMO] Total:",
+        todasLasPlanificaciones.length,
+        "(Temporales:",
+        planificacionesTemporales.length,
+        "+ Base:",
+        planificacionesFicticias.length,
+        ")"
+      );
+
+      return todasLasPlanificaciones.sort(
+        (a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio)
       );
     },
     enabled: !!trabajadorId,
+    refetchOnMount: "always",
+    staleTime: 0,
     defaultData: [],
   });
 };

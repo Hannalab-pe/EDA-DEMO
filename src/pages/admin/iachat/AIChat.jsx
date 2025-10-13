@@ -24,14 +24,21 @@ import {
   FileText,
   BarChart3,
 } from "lucide-react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AIChat = () => {
+  // Configurar Gemini 2.5 Flash con API Key
+  const genAI = new GoogleGenerativeAI(
+    import.meta.env.VITE_GEMINI_API_KEY || ""
+  );
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: "ai",
       content:
-        "👩‍💼 ¡Hola Directora! Soy tu **Asistente Educativo EDA** especializado en jardines infantiles.\n\n🎨 Estoy aquí para ayudarte con:\n• Desarrollo infantil y actividades lúdicas\n• Mejora continua de profesores\n• Comunicación efectiva con padres\n• Gestión de conflictos en el aula\n• Planes de mejora educativa\n• Salud y seguridad infantil\n• Organización de eventos especiales\n• Evaluación del desarrollo infantil\n\n🎯 **¿En qué puedo ayudarte hoy?** Como directora de kinder, sé que tienes muchos desafíos diarios. ¡Estoy aquí para apoyarte!",
+        "👩‍💼 ¡Hola Directora! Soy tu **Asistente Educativo EDA** impulsado por **Google**.\n\n🎨 Estoy aquí para ayudarte con:\n• Desarrollo infantil y actividades lúdicas\n• Mejora continua de profesores\n• Comunicación efectiva con padres\n• Gestión de conflictos en el aula\n• Planes de mejora educativa\n• Salud y seguridad infantil\n• Organización de eventos especiales\n• Evaluación del desarrollo infantil\n\n🎯 **¿En qué puedo ayudarte hoy?** Como directora de kinder, sé que tienes muchos desafíos diarios. ¡Estoy aquí para apoyarte!",
       timestamp: new Date(Date.now() - 60000),
     },
   ]);
@@ -39,63 +46,21 @@ const AIChat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
-  const [apiStatus, setApiStatus] = useState("checking"); // 'checking', 'connected', 'error'
+  const [apiStatus, setApiStatus] = useState("checking");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Función para generar respuestas demo de AI
-  const getDemoAIResponse = (userMessage) => {
-    const message = userMessage.toLowerCase();
-
-    if (
-      message.includes("profesor") ||
-      message.includes("maestr") ||
-      message.includes("docent")
-    ) {
-      return `👩‍🏫 **Estrategias para Mejorar el Desempeño Docente**\n\n🎯 **Capacitación Continua:**\n• Talleres mensuales de metodologías lúdicas\n• Certificaciones en desarrollo infantil\n• Intercambio de experiencias entre maestros\n\n📊 **Evaluación y Feedback:**\n• Observaciones de clase estructuradas\n• Reuniones individuales semanales\n• Reconocimiento público de logros\n\n🌟 **Motivación y Bienestar:**\n• Programa de incentivos por desempeño\n• Espacios de relajación y descanso\n• Celebración de fechas especiales\n\n¿Te gustaría profundizar en alguna de estas estrategias?`;
-    }
-
-    if (
-      message.includes("padre") ||
-      message.includes("familia") ||
-      message.includes("apoderado")
-    ) {
-      return `👨‍👩‍👧‍👦 **Mejorando la Comunicación con Padres**\n\n💬 **Canales de Comunicación:**\n• App móvil para mensajes instantáneos\n• Reuniones virtuales mensuales\n• Boletines informativos semanales\n\n📱 **Herramientas Digitales:**\n• Fotos y videos del progreso diario\n• Reportes de actividades en tiempo real\n• Agenda digital de eventos\n\n🤝 **Participación Activa:**\n• Talleres para padres sobre desarrollo infantil\n• Actividades familiares en el jardín\n• Comités de padres colaboradores\n\n¿Qué aspecto te interesa implementar primero?`;
-    }
-
-    if (
-      message.includes("actividad") ||
-      message.includes("juego") ||
-      message.includes("lúdic")
-    ) {
-      return `🎨 **Actividades Lúdicas para Desarrollo Integral**\n\n🧠 **Desarrollo Cognitivo:**\n• Juegos de memoria con colores y formas\n• Rompecabezas adaptados por edad\n• Cuentos interactivos con preguntas\n\n🤸‍♀️ **Desarrollo Motor:**\n• Circuitos de psicomotricidad\n• Bailes y canciones con movimientos\n• Actividades de arte manual\n\n💭 **Desarrollo Emocional:**\n• Teatro de emociones\n• Rincón de la calma\n• Juegos cooperativos\n\n🎯 **Para 3-5 años:** Todas adaptables por nivel de dificultad.\n\n¿Necesitas ideas específicas para algún grupo de edad?`;
-    }
-
-    if (
-      message.includes("conflict") ||
-      message.includes("problema") ||
-      message.includes("disciplina")
-    ) {
-      return `🕊️ **Gestión de Conflictos en el Aula**\n\n🔍 **Prevención:**\n• Reglas claras y visuales\n• Rutinas estructuradas\n• Espacios bien organizados\n\n⚖️ **Resolución:**\n• Técnica del semáforo emocional\n• Tiempo de reflexión guiada\n• Mediación entre niños\n\n👥 **Trabajo en Equipo:**\n• Círculos de conversación\n• Actividades de empatía\n• Reconocimiento de comportamientos positivos\n\n📋 **Seguimiento:**\n• Registro de incidentes\n• Comunicación con padres\n• Planes de mejora individualizados\n\n¿Hay algún tipo de conflicto específico que quieres abordar?`;
-    }
-
-    if (
-      message.includes("salud") ||
-      message.includes("seguridad") ||
-      message.includes("higiene")
-    ) {
-      return `🏥 **Salud y Seguridad Infantil**\n\n🧼 **Protocolos de Higiene:**\n• Lavado de manos cada 2 horas\n• Desinfección de juguetes diaria\n• Control de temperatura al ingreso\n\n🚨 **Medidas de Seguridad:**\n• Simulacros mensuales de evacuación\n• Botiquín completo y actualizado\n• Personal capacitado en primeros auxilios\n\n🍎 **Alimentación Saludable:**\n• Menús nutritivos balanceados\n• Control de alergias alimentarias\n• Educación sobre hábitos saludables\n\n📋 **Documentación:**\n• Fichas médicas actualizadas\n• Registro de incidentes\n• Comunicación inmediata con padres\n\n¿Necesitas ayuda con algún protocolo específico?`;
-    }
-
-    // Respuesta genérica
-    return `🤖 **¡Excelente pregunta!**\n\nComo tu asistente educativo especializado en jardines infantiles, estoy aquí para ayudarte con cualquier desafío administrativo o pedagógico.\n\n🎯 **Temas en los que puedo ayudarte:**\n• Gestión de personal docente\n• Comunicación con padres de familia\n• Actividades pedagógicas innovadoras\n• Resolución de conflictos\n• Planificación educativa\n• Salud y seguridad\n• Gestión financiera\n• Eventos y celebraciones\n\n💡 **Consejo:** Sé más específico en tu consulta para darte una respuesta más detallada y práctica.\n\n¿En qué área específica necesitas mi apoyo hoy?`;
-  };
-
-  // Verificar estado de la API al cargar - DEMO VERSION
+  // Verificar estado de la API de Gemini al cargar
   useEffect(() => {
     const checkApiStatus = () => {
-      // Siempre configurado en modo demo
-      setApiStatus("connected");
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (apiKey && apiKey !== "your_gemini_api_key_here") {
+        setApiStatus("connected");
+        console.log("✅ Google Gemini 2.5 Flash conectado correctamente");
+      } else {
+        setApiStatus("error");
+        console.warn("⚠️ API Key de Gemini no configurada");
+      }
     };
 
     checkApiStatus();
@@ -152,17 +117,58 @@ const AIChat = () => {
     setIsTyping(true);
 
     try {
-      // Preparar historial de conversación para la respuesta demo
-      const history = conversationHistory.slice(-6); // Limitar a últimos 6 mensajes para contexto
+      console.log("🤖 [GEMINI] Procesando mensaje:", userMessage);
 
-      // Simular respuesta de AI con datos demo
-      const aiResponse = getDemoAIResponse(userMessage);
+      // Crear contexto del sistema para directora de kinder
+      const systemPrompt = `Eres un asistente educativo experto especializado en gestión de jardines infantiles y educación inicial (3-5 años). 
+      Tu objetivo es ayudar a directoras y administradoras con:
+      - Desarrollo de personal docente y capacitación continua
+      - Actividades lúdicas y pedagógicas para educación inicial
+      - Gestión de relaciones con padres de familia
+      - Resolución de conflictos y manejo de situaciones difíciles
+      - Planificación curricular para desarrollo integral infantil
+      - Salud, seguridad e higiene en entornos infantiles
+      - Organización de eventos y actividades especiales
+      - Estrategias administrativas y financieras
+      
+      Proporciona respuestas prácticas, aplicables y específicas para el contexto de jardines infantiles.
+      Usa emojis para hacer las respuestas más amigables y da ejemplos concretos cuando sea posible.`;
+
+      // Preparar historial de conversación para contexto
+      const history = conversationHistory.slice(-6).map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }],
+      }));
+
+      // Crear chat con historial
+      const chat = model.startChat({
+        history: history,
+        generationConfig: {
+          maxOutputTokens: 2048,
+          temperature: 0.7,
+          topP: 0.8,
+          topK: 40,
+        },
+      });
+
+      // Combinar system prompt con el mensaje del usuario
+      const fullMessage =
+        conversationHistory.length === 0
+          ? `${systemPrompt}\n\nUsuario: ${userMessage}`
+          : userMessage;
+
+      // Enviar mensaje y obtener respuesta
+      const result = await chat.sendMessage(fullMessage);
+      const response = await result.response;
+      const aiResponseContent = response.text();
+
+      console.log("✅ [GEMINI] Respuesta generada exitosamente");
 
       // Agregar respuesta a los mensajes
       const newAiMessage = {
         id: Date.now(),
         type: "ai",
-        content: aiResponse,
+        content: aiResponseContent,
         timestamp: new Date(),
       };
 
@@ -172,16 +178,16 @@ const AIChat = () => {
       setConversationHistory((prev) => [
         ...prev,
         { role: "user", content: userMessage },
-        { role: "assistant", content: aiResponse },
+        { role: "assistant", content: aiResponseContent },
       ]);
     } catch (error) {
-      console.error("Error getting AI response:", error);
+      console.error("❌ [GEMINI] Error:", error);
 
-      // Mensaje de error amigable
+      // Mensaje de error con información útil
       const errorMessage = {
         id: Date.now(),
         type: "ai",
-        content: `❌ **Disculpa, hay un problema temporal**\n\nNo pude procesar tu consulta en este momento. Esto puede deberse a:\n\n🔧 Configuración de API pendiente\n🌐 Problemas de conectividad\n⚡ Límites de uso alcanzados\n\n💡 **Mientras tanto:**\n• Usa las consultas frecuentes\n• Intenta reformular tu pregunta\n• Contacta al soporte técnico\n\n¿Te gustaría intentar con una pregunta más específica?`,
+        content: `❌ **Error al procesar tu consulta**\n\nOcurrió un problema al conectar con Google Gemini:\n\n${error.message}\n\n💡 **Posibles soluciones:**\n• Verifica tu conexión a internet\n• La API key podría haber alcanzado su límite\n• Intenta reformular tu pregunta\n\n¿Te gustaría intentar de nuevo?`,
         timestamp: new Date(),
       };
 
@@ -219,7 +225,7 @@ const AIChat = () => {
         id: 1,
         type: "ai",
         content:
-          "🔄 **Conversación reiniciada**\n\n👩‍💼 ¡Hola de nuevo Directora! Soy tu **Asistente Educativo EDA**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?",
+          "🔄 **Conversación reiniciada**\n\n👩‍💼 ¡Hola de nuevo Directora! Soy tu **Asistente Educativo EDA** impulsado por **Google**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?",
         timestamp: new Date(),
       },
     ]);
@@ -254,7 +260,7 @@ const AIChat = () => {
               <h1 className="text-base md:text-lg font-semibold text-gray-900 flex items-center space-x-2 truncate">
                 <span>Asistente Educativo Kinder</span>
                 <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full hidden sm:inline">
-                  ChatGPT
+                  Gemini 2.5 Flash
                 </span>
               </h1>
               <div className="flex items-center space-x-2">
@@ -507,7 +513,7 @@ const AIChat = () => {
             {apiStatus === "connected" && (
               <span className="flex items-center space-x-1 text-green-600">
                 <CheckCircle className="w-3 h-3" />
-                <span className="hidden sm:inline">ChatGPT Conectado</span>
+                <span className="hidden sm:inline">Gemini Conectado</span>
                 <span className="sm:hidden">Conectado</span>
               </span>
             )}

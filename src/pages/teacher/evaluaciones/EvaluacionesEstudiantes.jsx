@@ -10,6 +10,7 @@ import {
 import { toast } from "sonner";
 import CrearEvaluacionModal from "./modales/CrearEvaluacionModal";
 import EvaluarEstudianteModal from "./modales/EvaluarEstudianteModal";
+import { obtenerEvaluacionesDemo } from "./evaluacionesStore";
 
 const EvaluacionesEstudiantes = () => {
   const [evaluaciones, setEvaluaciones] = useState([]);
@@ -19,27 +20,84 @@ const EvaluacionesEstudiantes = () => {
   const [isEvaluarModalOpen, setIsEvaluarModalOpen] = useState(false);
   const [selectedEvaluacion, setSelectedEvaluacion] = useState(null);
 
+  // Generar evaluaciones ficticias para el demo
+  const generarEvaluacionesFicticias = () => {
+    const evaluacionesFicticias = [
+      {
+        idEvaluacion: "eval-est-1",
+        fecha: "2025-10-15T10:00:00",
+        descripcion: "Examen de Matemática - Operaciones Básicas",
+        tipoEvaluacion: "EXAMEN",
+        idCurso: "1",
+        docenteId: "2",
+      },
+      {
+        idEvaluacion: "eval-est-2",
+        fecha: "2025-10-16T14:30:00",
+        descripcion: "Trabajo Práctico de Comunicación - Comprensión Lectora",
+        tipoEvaluacion: "TRABAJO",
+        idCurso: "2",
+        docenteId: "2",
+      },
+      {
+        idEvaluacion: "eval-est-3",
+        fecha: "2025-10-17T09:00:00",
+        descripcion: "Quiz de Ciencia y Tecnología - Ecosistemas",
+        tipoEvaluacion: "QUIZ",
+        idCurso: "3",
+        docenteId: "2",
+      },
+      {
+        idEvaluacion: "eval-est-4",
+        fecha: "2025-10-18T11:00:00",
+        descripcion: "Proyecto de Arte - Expresión Creativa",
+        tipoEvaluacion: "PROYECTO",
+        idCurso: "4",
+        docenteId: "2",
+      },
+      {
+        idEvaluacion: "eval-est-5",
+        fecha: "2025-10-19T15:00:00",
+        descripcion: "Tarea de Personal Social - Identidad Cultural",
+        tipoEvaluacion: "TAREA",
+        idCurso: "5",
+        docenteId: "2",
+      },
+    ];
+
+    return evaluacionesFicticias;
+  };
+
   // Obtener evaluaciones del profesor (DEMO)
   const fetchEvaluaciones = async () => {
     try {
-      console.log("🔍 Cargando evaluaciones (DEMO)");
+      console.log(
+        "🎭 [EVALUACIONES ESTUDIANTES DEMO] Cargando evaluaciones ficticias"
+      );
 
       // Simular delay de carga
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Importar datos demo
-      const { mockData } = await import("../../../data/mockData.js");
+      // Combinar evaluaciones ficticias con las creadas en la sesión
+      const evaluacionesFicticias = generarEvaluacionesFicticias();
+      const evaluacionesCreadas = obtenerEvaluacionesDemo();
+      const todasEvaluaciones = [
+        ...evaluacionesFicticias,
+        ...evaluacionesCreadas,
+      ];
 
-      // Para este demo, mostrar todas las evaluaciones
-      setEvaluaciones(mockData.evaluaciones);
+      setEvaluaciones(todasEvaluaciones);
 
       console.log(
-        "✅ Evaluaciones cargadas (DEMO):",
-        mockData.evaluaciones.length
+        "✅ [DEMO] Evaluaciones cargadas:",
+        todasEvaluaciones.length,
+        {
+          ficticias: evaluacionesFicticias.length,
+          creadas: evaluacionesCreadas.length,
+        }
       );
-      toast.success("Evaluaciones cargadas correctamente");
     } catch (error) {
-      console.error("Error loading evaluaciones (DEMO):", error);
+      console.error("❌ Error loading evaluaciones (DEMO):", error);
       toast.error("Error al cargar evaluaciones");
     } finally {
       setIsLoading(false);
@@ -49,15 +107,21 @@ const EvaluacionesEstudiantes = () => {
   // Obtener cursos disponibles (DEMO)
   const fetchCursos = async () => {
     try {
-      console.log("🔍 Cargando cursos (DEMO)");
+      console.log("🎭 [DEMO] Cargando cursos ficticios");
 
-      // Importar datos demo
-      const { mockData } = await import("../../../data/mockData.js");
-      setCursos(mockData.cursos);
+      // Cursos ficticios
+      const cursosFicticios = [
+        { idCurso: "1", nombreCurso: "Matemática" },
+        { idCurso: "2", nombreCurso: "Comunicación" },
+        { idCurso: "3", nombreCurso: "Ciencia y Tecnología" },
+        { idCurso: "4", nombreCurso: "Arte y Cultura" },
+        { idCurso: "5", nombreCurso: "Personal Social" },
+      ];
 
-      console.log("✅ Cursos cargados (DEMO):", mockData.cursos.length);
+      setCursos(cursosFicticios);
+      console.log("✅ [DEMO] Cursos cargados:", cursosFicticios.length);
     } catch (error) {
-      console.error("Error loading cursos (DEMO):", error);
+      console.error("❌ Error loading cursos (DEMO):", error);
       toast.error("Error al cargar cursos");
     }
   };
@@ -90,16 +154,26 @@ const EvaluacionesEstudiantes = () => {
     setSelectedEvaluacion(null);
   };
 
-  // Función para manejar la evaluación de estudiantes
+  // Función para manejar la evaluación de estudiantes (DEMO - Simplificado)
   const handleEvaluarEstudiante = (evaluacion) => {
-    setSelectedEvaluacion(evaluacion);
-    setIsEvaluarModalOpen(true);
+    // Modo demo: mostrar toast en lugar de abrir modal complejo
+    toast.info(
+      "📊 Esta es una demostración. Contáctenos para acceder a la funcionalidad completa de calificación de estudiantes",
+      {
+        duration: 4000,
+      }
+    );
   };
 
-  // Función para manejar la edición de evaluación
+  // Función para manejar la edición de evaluación (DEMO - Simplificado)
   const handleEditarEvaluacion = (evaluacion) => {
-    setSelectedEvaluacion(evaluacion);
-    setIsModalOpen(true);
+    // Modo demo: mostrar toast en lugar de editar realmente
+    toast.info(
+      "✏️ Esta es una demostración. Contáctenos para acceder a la funcionalidad completa de edición de evaluaciones",
+      {
+        duration: 4000,
+      }
+    );
   };
 
   // Función para manejar el cierre del modal de evaluación

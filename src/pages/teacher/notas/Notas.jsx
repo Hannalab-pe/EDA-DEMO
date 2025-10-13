@@ -21,14 +21,14 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
-import { ModalAgregarNota, ModalEditarNota } from "./modales";
-import ModalConfirmarEliminar from "./modales/ModalConfirmarEliminar";
+import { ModalAgregarNota } from "./modales";
 import { useAuthStore } from "../../../store/useAuthStore";
 import {
   useAnotacionesByTrabajadorDemo,
   useAnotacionesDemo,
 } from "../../../hooks/demo/useAnotacionesDemo";
 import { AnotacionCard } from "./components";
+import { toast } from "sonner";
 
 const Notas = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -228,27 +228,31 @@ const Notas = () => {
 
   // Handlers para las acciones
   const handleEditAnotacion = (anotacion) => {
-    setAnotacionSeleccionada(anotacion);
-    setShowModalEditar(true);
+    // Modo demo: mostrar toast en lugar de abrir modal complejo
+    toast.info(
+      "✏️ Esta es una demostración. Contáctenos para acceder a la funcionalidad completa de edición de anotaciones",
+      {
+        duration: 4000,
+      }
+    );
   };
 
   const handleDeleteAnotacion = (anotacion) => {
-    setAnotacionAEliminar(anotacion);
-    setShowModalEliminar(true);
+    // Modo demo: mostrar toast en lugar de eliminar realmente
+    toast.info(
+      "🗑️ Esta es una demostración. Contáctenos para acceder a la funcionalidad completa de eliminación de anotaciones",
+      {
+        duration: 4000,
+      }
+    );
   };
 
   const handleConfirmDelete = async () => {
+    // Ya no se usa, pero mantenemos por compatibilidad
     if (!anotacionAEliminar) return;
-
-    try {
-      await deleteAnotacion(anotacionAEliminar.idAnotacionAlumno);
-      refetchAnotaciones(); // Recargar la lista después de eliminar
-      setShowModalEliminar(false);
-      setAnotacionAEliminar(null);
-    } catch (error) {
-      console.error("Error al eliminar anotación:", error);
-      // El error ya se maneja en el hook useAnotaciones
-    }
+    toast.info("Esta función está deshabilitada en modo demo");
+    setShowModalEliminar(false);
+    setAnotacionAEliminar(null);
   };
 
   const handleRefresh = () => {
@@ -389,143 +393,7 @@ const Notas = () => {
         </div>
       </div>
 
-      {/* Create/Edit Form */}
-      {(isCreating || editingNote) && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {isCreating ? "Nueva Anotación" : "Editar Anotación"}
-            </h3>
-            <button
-              onClick={() => {
-                setIsCreating(false);
-                setEditingNote(null);
-                setNewNote({
-                  student: "",
-                  category: "academic",
-                  title: "",
-                  content: "",
-                  priority: "medium",
-                });
-              }}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Estudiante
-              </label>
-              <select
-                value={newNote.student}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, student: e.target.value }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              >
-                <option value="">Seleccionar estudiante</option>
-                {students.map((student) => (
-                  <option key={student.id} value={student.name}>
-                    {student.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Categoría
-              </label>
-              <select
-                value={newNote.category}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, category: e.target.value }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              >
-                {categories
-                  .filter((cat) => cat.id !== "all")
-                  .map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Prioridad
-              </label>
-              <select
-                value={newNote.priority}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, priority: e.target.value }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              >
-                {priorities.map((priority) => (
-                  <option key={priority.id} value={priority.id}>
-                    {priority.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Título
-              </label>
-              <input
-                type="text"
-                value={newNote.title}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, title: e.target.value }))
-                }
-                placeholder="Título de la anotación"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contenido
-            </label>
-            <textarea
-              value={newNote.content}
-              onChange={(e) =>
-                setNewNote((prev) => ({ ...prev, content: e.target.value }))
-              }
-              placeholder="Describe la observación, logro o preocupación..."
-              rows="4"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            />
-          </div>
-
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={() => {
-                setIsCreating(false);
-                setEditingNote(null);
-              }}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleCreateNote}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Save className="w-4 h-4" />
-              <span>Guardar</span>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Create/Edit Form - ELIMINADO (No se usa en modo demo, se usa modal) */}
 
       {/* Anotaciones List - Formato Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -596,23 +464,7 @@ const Notas = () => {
         onSuccess={handleModalSuccess}
       />
 
-      {/* Modal para editar anotación */}
-      <ModalEditarNota
-        isOpen={showModalEditar}
-        onClose={handleCloseModalEditar}
-        onSuccess={handleModalEditarSuccess}
-        anotacion={anotacionSeleccionada}
-      />
-
-      {/* Modal para confirmar eliminación */}
-      <ModalConfirmarEliminar
-        isOpen={showModalEliminar}
-        onClose={handleCloseModalEliminar}
-        onConfirm={handleConfirmDelete}
-        titulo="Eliminar Anotación"
-        mensaje={`¿Estás seguro de que quieres eliminar la anotación "${anotacionAEliminar?.titulo}"? Esta acción no se puede deshacer.`}
-        loading={deleting}
-      />
+      {/* Modales de editar y eliminar deshabilitados en modo demo */}
     </div>
   );
 };

@@ -59,12 +59,20 @@ const CrearTareaModal = ({ isOpen, onClose, onSave }) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const trabajadorId = user?.id || "2"; // Carlos Ruiz como default
-      console.log("👨‍� [CREAR TAREA DEMO] ID Trabajador:", trabajadorId);
+      console.log("👨‍🏫 [CREAR TAREA DEMO] ID Trabajador:", trabajadorId);
 
       // Obtener aulas del profesor desde mockData
-      const aulasAsignadas = mockData.aulas.filter(
+      let aulasAsignadas = mockData.aulas.filter(
         (aula) => aula.docenteId === trabajadorId
       );
+
+      // Si no tiene aulas asignadas en mockData, usar aulas generales para DEMO
+      if (aulasAsignadas.length === 0) {
+        console.log(
+          "🎭 [DEMO] No hay aulas asignadas en mockData, usando aulas ficticias..."
+        );
+        aulasAsignadas = mockData.aulas.slice(0, 5); // Tomar las primeras 5 aulas
+      }
 
       // Enriquecer aulas con información adicional
       const aulasEnriquecidas = aulasAsignadas.map((aula) => ({
@@ -72,10 +80,9 @@ const CrearTareaModal = ({ isOpen, onClose, onSave }) => {
         id_aula: aula.id,
         grado:
           mockData.grados.find((g) => g.id === aula.gradoId)?.nombre ||
-          "Sin grado",
-        cantidadEstudiantes: mockData.estudiantes.filter(
-          (e) => e.aulaId === aula.id
-        ).length,
+          "3ro Primaria",
+        cantidadEstudiantes:
+          mockData.estudiantes.filter((e) => e.aulaId === aula.id).length || 15, // Default 15 si no hay estudiantes
       }));
 
       console.log(
@@ -233,18 +240,27 @@ const CrearTareaModal = ({ isOpen, onClose, onSave }) => {
     if (!formData.idAula) {
       newErrors.idAula = "Debe seleccionar un aula";
     } else {
-      // Validar que el idAula sea un UUID válido o al menos que exista en las aulas
+      // Validar que el aula exista en la lista (modo DEMO - más flexible)
       const aulaExiste = aulas.find(
         (aula) =>
-          aula.id_aula === formData.idAula || aula.idAula === formData.idAula
+          String(aula.id_aula) === String(formData.idAula) ||
+          String(aula.idAula) === String(formData.idAula) ||
+          String(aula.id) === String(formData.idAula)
       );
       if (!aulaExiste) {
         newErrors.idAula = "El aula seleccionada no es válida";
         console.error(
           "❌ [CREAR TAREA] Aula no encontrada. idAula:",
           formData.idAula,
+          "Tipo:",
+          typeof formData.idAula,
           "Aulas disponibles:",
-          aulas
+          aulas.map((a) => ({
+            id: a.id,
+            id_aula: a.id_aula,
+            idAula: a.idAula,
+            tipos: `${typeof a.id}, ${typeof a.id_aula}, ${typeof a.idAula}`,
+          }))
         );
       }
     }

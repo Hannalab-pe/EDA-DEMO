@@ -19,16 +19,21 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AIChat = () => {
-  // Demo AI Chat - Respuestas simuladas sin backend
+  // Configurar Gemini 2.5 Flash con API Key
+  const genAI = new GoogleGenerativeAI(
+    import.meta.env.VITE_GEMINI_API_KEY || ""
+  );
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: "ai",
       content:
-        "🌟 ¡Hola! Soy tu **Asistente Pedagógico EDA** (Demo).\n\n📚 Esta es una **demostración** de cómo funcionaría el chat con IA.\n\n🎯 **Funcionalidades demo:**\n• Respuestas educativas pregeneradas\n• Simulación de IA pedagógica\n• Consultas rápidas funcionales\n• Interfaz completa operativa\n\n💡 **Prueba haciendo preguntas** o usa las consultas rápidas de abajo.",
+        "🌟 ¡Hola! Soy tu **Asistente Pedagógico EDA** impulsado por **Google Gemini 2.5 Flash**.\n\n📚 Estoy aquí para ayudarte con:\n• Planificación de clases innovadoras\n• Estrategias de enseñanza efectivas\n• Manejo del aula y disciplina positiva\n• Recursos educativos creativos\n• Evaluación de aprendizajes\n• Adaptación curricular\n• Motivación estudiantil\n• Resolución de problemas pedagógicos\n\n💡 **Hazme cualquier pregunta** sobre educación y te daré respuestas personalizadas y detalladas.",
       timestamp: new Date(Date.now() - 60000),
     },
   ]);
@@ -36,54 +41,106 @@ const AIChat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
-  const [apiStatus, setApiStatus] = useState("connected"); // Demo: siempre conectado
+  const [apiStatus, setApiStatus] = useState("checking");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Demo: Respuestas predefinidas para simular IA
-  const demoResponses = {
-    "ideas para clases":
-      '📚 **Ideas Creativas para Clases de Matemáticas - Fracciones (5to Grado)**\n\n**1. 🍕 Pizza Fractionaria**\n• Usa pizzas de cartón divididas en porciones\n• Los estudiantes "ordenan" diferentes fracciones\n• Suman y restan fracciones físicamente\n\n**2. 🎯 Juego de Dardos Fraccionarios**\n• Tablero dividido en secciones fraccionarias\n• Calculan probabilidades y suman puntos\n\n**3. 🏗️ Construcción con Bloques**\n• LEGO o bloques para representar fracciones\n• Construyen edificios usando medidas fraccionarias\n\n**4. 🎨 Arte Fraccionario**\n• Dibujos divididos en partes iguales\n• Colorean fracciones específicas\n\n**5. 🍎 Recetas de Cocina**\n• Ajustar ingredientes usando fracciones\n• Práctica real de suma/resta de fracciones\n\n**Recursos necesarios:** Cartón, colores, bloques, ingredientes básicos\n\n¿Te gustaría que desarrolle alguna de estas ideas más detalladamente?',
+  // Verificar estado de la API de Gemini al cargar
+  useEffect(() => {
+    const checkApiStatus = () => {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (apiKey && apiKey !== "your_gemini_api_key_here") {
+        setApiStatus("connected");
+        console.log("✅ Google Gemini 2.5 Flash conectado correctamente");
+      } else {
+        setApiStatus("error");
+        console.warn("⚠️ API Key de Gemini no configurada");
+      }
+    };
 
-    "estrategias enseñanza":
-      "🎯 **Estrategias de Enseñanza Efectivas**\n\n**Para Inicial (3-5 años):**\n• 🎭 Aprendizaje a través del juego\n• 🎵 Canciones y rimas educativas\n• 📖 Cuentos interactivos\n• 🖐️ Actividades sensoriales\n\n**Técnicas Generales:**\n• 🔄 Rotación por estaciones\n• 👥 Trabajo colaborativo\n• 🎨 Integración de artes\n• 📱 Tecnología educativa\n• 🏆 Gamificación del aprendizaje\n\n**Tips clave:**\n• Adapta a diferentes estilos de aprendizaje\n• Usa el refuerzo positivo constantemente\n• Incluye movimiento y actividad física\n• Conecta con experiencias previas\n\n¿Qué nivel o materia específica te interesa?",
+    checkApiStatus();
+  }, []);
 
-    "manejo aula":
-      "🏫 **Estrategias de Manejo del Aula**\n\n**Disciplina Positiva:**\n• ✅ Establece expectativas claras desde el inicio\n• 🏆 Sistema de recompensas grupales e individuales\n• 📋 Rutinas predecibles y consistentes\n• 🤝 Acuerdos de convivencia co-creados\n\n**Técnicas Efectivas:**\n• 🚦 Semáforo del comportamiento\n• ⏱️ Tiempo fuera reflexivo (no punitivo)\n• 🎵 Canciones para transiciones\n• 👁️ Contacto visual y proximidad física\n\n**Para Problemas Específicos:**\n• 🗣️ Habla privada, no pública corrección\n• 🔄 Redirige comportamientos negativos\n• 💪 Fortalece comportamientos positivos\n• 👨‍👩‍👧‍👦 Involucra a los padres como aliados\n\n**Ambiente físico:**\n• Espacios definidos y organizados\n• Materiales accesibles y rotulados\n• Áreas de calma y reflexión\n\n¿Qué desafío específico estás enfrentando?",
+  const simulateAIResponse = async (userMessage) => {
+    setIsTyping(true);
 
-    evaluación:
-      "📊 **Estrategias de Evaluación Integral**\n\n**Tipos de Evaluación:**\n• 🔍 **Diagnóstica:** Al inicio del tema\n• 📈 **Formativa:** Durante el proceso (continua)\n• ✅ **Sumativa:** Al final del período\n\n**Herramientas Prácticas:**\n• 📋 Rúbricas detalladas\n• 📁 Portafolios de evidencias\n• 🎯 Listas de cotejo\n• 📝 Autoevaluación estudiantil\n• 👥 Coevaluación entre pares\n\n**Para Inicial:**\n• 📸 Observación y registro fotográfico\n• 🎨 Trabajos artísticos y creativos\n• 🗣️ Evaluación oral individual\n• 🎭 Juegos evaluativos\n\n**Feedback Efectivo:**\n• Específico y actionable\n• Balanceado (fortalezas + áreas de mejora)\n• Oportuno (inmediato cuando sea posible)\n• Enfocado en el proceso, no solo el resultado\n\n¿Qué tipo de evaluación necesitas diseñar?",
+    try {
+      console.log("🤖 [GEMINI] Procesando mensaje:", userMessage);
 
-    "recursos educativos":
-      "🎒 **Recursos Educativos Accesibles**\n\n**Digitales Gratuitos:**\n• 🌐 Khan Academy Kids\n• 📚 Recursos del Ministerio de Educación\n• 🎥 Videos educativos de YouTube\n• 📱 Apps educativas gratuitas\n\n**Materiales Caseros:**\n• 🧮 Contadores con tapas de botellas\n• 📏 Reglas con palitos de helado\n• 🎨 Pintura con témperas caseras\n• 🔤 Letras móviles con cartón\n\n**Reciclables:**\n• 📦 Cajas para construcciones\n• 🥛 Envases para experimentos\n• 📰 Periódicos para lectura y manualidades\n• 🧴 Botellas para juegos sensoriales\n\n**Espacios Alternativos:**\n• 🌳 Aula al aire libre\n• 📚 Rincones temáticos\n• 🎭 Área de dramatización\n• 🔬 Zona de experimentos\n\n¿Qué materia o actividad específica necesitas recursos?",
+      // Crear contexto del sistema para el asistente pedagógico
+      const systemPrompt = `Eres un asistente pedagógico experto especializado en educación inicial y primaria. 
+      Tu objetivo es ayudar a profesores con:
+      - Planificación de clases creativas e innovadoras
+      - Estrategias de enseñanza adaptadas a diferentes estilos de aprendizaje
+      - Manejo del aula y disciplina positiva
+      - Recursos educativos accesibles y prácticos
+      - Evaluación formativa y sumativa
+      - Desarrollo de actividades lúdicas y significativas
+      
+      Proporciona respuestas detalladas, prácticas y aplicables. Usa emojis para hacer las respuestas más amigables.
+      Si te preguntan sobre un tema específico, da ejemplos concretos y paso a paso.`;
 
-    default:
-      '🤖 **Respuesta Demo de IA Pedagógica**\n\nEsta es una **simulación** de cómo respondería el asistente de IA.\n\n📚 **Temas que puedo ayudarte:**\n• Planificación de clases\n• Estrategias de enseñanza\n• Manejo del aula\n• Recursos educativos\n• Evaluación de aprendizajes\n\n💡 **Prueba preguntando sobre:**\n• "Ideas para clases de [materia]"\n• "Estrategias de enseñanza para [nivel]"\n• "Cómo manejar [situación del aula]"\n• "Recursos para enseñar [tema]"\n\n🎯 ¿Sobre qué tema educativo específico te gustaría que te ayude?',
-  };
+      // Preparar historial de conversación para contexto
+      const history = conversationHistory.slice(-6).map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }],
+      }));
 
-  // Función para obtener respuesta demo basada en el mensaje
-  const getDemoResponse = (message) => {
-    const msgLower = message.toLowerCase();
+      // Crear chat con historial
+      const chat = model.startChat({
+        history: history,
+        generationConfig: {
+          maxOutputTokens: 2048,
+          temperature: 0.7,
+          topP: 0.8,
+          topK: 40,
+        },
+      });
 
-    if (msgLower.includes("idea") && msgLower.includes("clase")) {
-      return demoResponses["ideas para clases"];
-    } else if (
-      msgLower.includes("estrategia") &&
-      msgLower.includes("enseñanza")
-    ) {
-      return demoResponses["estrategias enseñanza"];
-    } else if (msgLower.includes("manejo") && msgLower.includes("aula")) {
-      return demoResponses["manejo aula"];
-    } else if (
-      msgLower.includes("evaluación") ||
-      msgLower.includes("evaluacion")
-    ) {
-      return demoResponses["evaluación"];
-    } else if (msgLower.includes("recurso")) {
-      return demoResponses["recursos educativos"];
-    } else {
-      return demoResponses["default"];
+      // Combinar system prompt con el mensaje del usuario
+      const fullMessage =
+        conversationHistory.length === 0
+          ? `${systemPrompt}\n\nUsuario: ${userMessage}`
+          : userMessage;
+
+      // Enviar mensaje y obtener respuesta
+      const result = await chat.sendMessage(fullMessage);
+      const response = await result.response;
+      const aiResponseContent = response.text();
+
+      console.log("✅ [GEMINI] Respuesta generada exitosamente");
+
+      // Agregar respuesta a los mensajes
+      const newAiMessage = {
+        id: Date.now(),
+        type: "ai",
+        content: aiResponseContent,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, newAiMessage]);
+
+      // Actualizar historial de conversación
+      setConversationHistory((prev) => [
+        ...prev,
+        { role: "user", content: userMessage },
+        { role: "assistant", content: aiResponseContent },
+      ]);
+    } catch (error) {
+      console.error("❌ [GEMINI] Error:", error);
+
+      // Mensaje de error con información útil
+      const errorMessage = {
+        id: Date.now(),
+        type: "ai",
+        content: `❌ **Error al procesar tu consulta**\n\nOcurrió un problema al conectar con Google Gemini:\n\n${error.message}\n\n💡 **Posibles soluciones:**\n• Verifica tu conexión a internet\n• La API key podría haber alcanzado su límite\n• Intenta reformular tu pregunta\n\n¿Te gustaría intentar de nuevo?`,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
     }
+
+    setIsTyping(false);
   };
 
   const scrollToBottom = () => {
@@ -133,55 +190,6 @@ const AIChat = () => {
     },
   ];
 
-  const simulateAIResponse = async (userMessage) => {
-    setIsTyping(true);
-
-    try {
-      console.log("🤖 [DEMO AI] Procesando mensaje:", userMessage);
-
-      // Simular delay de procesamiento de IA
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1500 + Math.random() * 1000)
-      );
-
-      // Obtener respuesta demo basada en el contenido del mensaje
-      const aiResponseContent = getDemoResponse(userMessage);
-
-      // Agregar respuesta a los mensajes
-      const newAiMessage = {
-        id: Date.now(),
-        type: "ai",
-        content: aiResponseContent,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, newAiMessage]);
-
-      // Actualizar historial de conversación (para mantener contexto demo)
-      setConversationHistory((prev) => [
-        ...prev,
-        { role: "user", content: userMessage },
-        { role: "assistant", content: aiResponseContent },
-      ]);
-
-      console.log("✅ [DEMO AI] Respuesta generada exitosamente");
-    } catch (error) {
-      console.error("❌ [DEMO AI] Error simulado:", error);
-
-      // Mensaje de error demo
-      const errorMessage = {
-        id: Date.now(),
-        type: "ai",
-        content: `🤖 **Demo: Simulando error de IA**\n\nEsta sería la respuesta en caso de error:\n\n📋 **En la versión real:**\n• Se conectaría con OpenAI ChatGPT\n• Procesaría consultas complejas\n• Mantendría contexto de conversación\n• Daría respuestas personalizadas\n\n💡 **Ahora en demo:** Respuestas predefinidas pero funcionales\n\n¿Te gustaría probar otra consulta?`,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
-    }
-
-    setIsTyping(false);
-  };
-
   const handleSendMessage = async (messageContent = newMessage) => {
     if (!messageContent.trim()) return;
 
@@ -210,7 +218,7 @@ const AIChat = () => {
         id: 1,
         type: "ai",
         content:
-          "🔄 **Conversación reiniciada**\n\n🌟 ¡Hola de nuevo! Soy tu **Asistente Pedagógico EDA**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?",
+          "🔄 **Conversación reiniciada**\n\n🌟 ¡Hola de nuevo! Soy tu **Asistente Pedagógico EDA** impulsado por **Google Gemini 2.5 Flash**.\n\n¿En qué nuevo desafío educativo puedo ayudarte hoy?",
         timestamp: new Date(),
       },
     ]);
@@ -245,7 +253,7 @@ const AIChat = () => {
               <h1 className="text-base md:text-lg font-semibold text-gray-900 flex items-center space-x-2 truncate">
                 <span>Asistente Pedagógico IA</span>
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full hidden sm:inline">
-                  ChatGPT
+                  Gemini 2.5 Flash
                 </span>
               </h1>
               <div className="flex items-center space-x-2">
@@ -495,7 +503,7 @@ const AIChat = () => {
             {apiStatus === "connected" && (
               <span className="flex items-center space-x-1 text-green-600">
                 <CheckCircle className="w-3 h-3" />
-                <span className="hidden sm:inline">ChatGPT Conectado</span>
+                <span className="hidden sm:inline">Gemini Conectado</span>
                 <span className="sm:hidden">Conectado</span>
               </span>
             )}

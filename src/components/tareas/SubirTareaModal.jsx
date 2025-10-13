@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { X, Upload, FileText, Camera, Check, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import tareaService from '../../services/tareaService';
-import { FirebaseStorageService } from '../../services/firebaseStorageService';
+import React, { useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { X, Upload, FileText, Camera, Check, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import tareaService from "../../services/tareaService";
+import { FirebaseStorageService } from "../../services/firebaseStorageService";
 
 const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
   const [formData, setFormData] = useState({
-    observaciones: '',
-    archivoUrl: '',
-    realizoTarea: true
+    observaciones: "",
+    archivoUrl: "",
+    realizoTarea: true,
   });
   const [loading, setLoading] = useState(false);
   const [archivo, setArchivo] = useState(null);
@@ -18,9 +18,9 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
 
   const handleClose = () => {
     setFormData({
-      observaciones: '',
-      archivoUrl: '',
-      realizoTarea: true
+      observaciones: "",
+      archivoUrl: "",
+      realizoTarea: true,
     });
     setArchivo(null);
     setUploadingFile(false);
@@ -31,16 +31,25 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
     const file = event.target.files[0];
     if (file) {
       // Validar tipo de archivo
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Tipo de archivo no permitido. Solo se permiten imágenes, PDF y documentos de Word.');
+        toast.error(
+          "Tipo de archivo no permitido. Solo se permiten imágenes, PDF y documentos de Word."
+        );
         return;
       }
 
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('El archivo es demasiado grande. Máximo 5MB permitido.');
+        toast.error("El archivo es demasiado grande. Máximo 5MB permitido.");
         return;
       }
 
@@ -48,20 +57,28 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
       setUploadingFile(true);
 
       try {
-        // Subir archivo a Firebase Storage
-        const uploadResult = await FirebaseStorageService.uploadFile(file, 'tareas');
-        
-        console.log('✅ Archivo subido exitosamente a Firebase:', uploadResult);
-        
-        setFormData(prev => ({
+        // MODO DEMO: Simular subida de archivo sin Firebase
+        console.log("📤 [DEMO] Simulando subida de archivo:", file.name);
+
+        // Simular delay de subida
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+        // URL ficticia para modo demo
+        const fakeUrl = `https://demo.example.com/tareas/${Date.now()}_${
+          file.name
+        }`;
+
+        console.log("✅ [DEMO] Archivo simulado exitosamente:", fakeUrl);
+
+        setFormData((prev) => ({
           ...prev,
-          archivoUrl: uploadResult.url
+          archivoUrl: fakeUrl,
         }));
-        
-        toast.success('Archivo subido exitosamente');
+
+        toast.success("Archivo cargado (modo demo)");
       } catch (error) {
-        console.error('❌ Error al subir archivo a Firebase:', error);
-        toast.error('Error al subir el archivo. Inténtalo de nuevo.');
+        console.error("❌ Error al simular subida de archivo:", error);
+        toast.error("Error al cargar el archivo. Inténtalo de nuevo.");
         setArchivo(null);
       } finally {
         setUploadingFile(false);
@@ -71,49 +88,43 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.observaciones.trim()) {
-      toast.error('Por favor, agrega observaciones sobre la tarea realizada.');
+      toast.error("Por favor, agrega observaciones sobre la tarea realizada.");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Obtener idEstudiante del localStorage
-      const authStorage = localStorage.getItem('auth-storage');
-      const authData = JSON.parse(authStorage);
-      const idEstudiante = authData?.state?.user?.entidadId;
-
-      if (!idEstudiante) {
-        throw new Error('No se pudo obtener el ID del estudiante');
-      }
-
-      const payload = {
+      // MODO DEMO: Simular entrega exitosa sin conexión al backend
+      console.log("📤 [DEMO] Simulando entrega de tarea:", {
         idTarea: tarea.idTarea,
-        idEstudiante: idEstudiante,
-        realizoTarea: formData.realizoTarea,
+        titulo: tarea.title,
         observaciones: formData.observaciones.trim(),
-        archivoUrl: formData.archivoUrl || null
-      };
+        archivoUrl: formData.archivoUrl || null,
+        realizoTarea: true,
+      });
 
-      console.log('📤 Enviando entrega de tarea:', payload);
+      // Simular delay de red
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Usar el servicio de tareas
-      await tareaService.entregarTarea(payload);
-      
-      toast.success('¡Tarea entregada exitosamente!');
-      
+      // Mostrar toast informativo para modo demo
+      toast.info("Funcionalidad de demostración", {
+        description:
+          "En la versión completa, esta tarea se entregaría al profesor. Para activar esta funcionalidad, contáctanos.",
+        duration: 5000,
+      });
+
       // Llamar callback de éxito para refrescar la lista
       if (onSuccess) {
         onSuccess();
       }
-      
-      handleClose();
 
+      handleClose();
     } catch (error) {
-      console.error('❌ Error al enviar tarea:', error);
-      toast.error(error.message || 'Error al enviar la tarea');
+      console.error("❌ Error al enviar tarea:", error);
+      toast.error(error.message || "Error al enviar la tarea");
     } finally {
       setLoading(false);
     }
@@ -155,12 +166,13 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                       <Upload className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <Dialog.Title as="h3" className="text-lg font-semibold text-gray-900">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-semibold text-gray-900"
+                      >
                         Entregar Tarea
                       </Dialog.Title>
-                      <p className="text-sm text-gray-600">
-                        {tarea.title}
-                      </p>
+                      <p className="text-sm text-gray-600">{tarea.title}</p>
                     </div>
                   </div>
                   <button
@@ -176,12 +188,19 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                   <div className="flex items-start space-x-3">
                     <div className="text-2xl">{tarea.emoji}</div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 mb-2">{tarea.title}</h4>
-                      <p className="text-sm text-gray-600 mb-3">{tarea.description}</p>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        {tarea.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {tarea.description}
+                      </p>
                       <div className="flex flex-wrap gap-4 text-xs text-gray-500">
                         <span>📚 {tarea.subject}</span>
                         <span>👨‍🏫 Prof. {tarea.profesor}</span>
-                        <span>📅 Vence: {new Date(tarea.dueDate).toLocaleDateString('es-ES')}</span>
+                        <span>
+                          📅 Vence:{" "}
+                          {new Date(tarea.dueDate).toLocaleDateString("es-ES")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -191,13 +210,21 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Observaciones */}
                   <div>
-                    <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="observaciones"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Observaciones sobre la tarea realizada *
                     </label>
                     <textarea
                       id="observaciones"
                       value={formData.observaciones}
-                      onChange={(e) => setFormData(prev => ({ ...prev, observaciones: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          observaciones: e.target.value,
+                        }))
+                      }
                       placeholder="Describe cómo se realizó la tarea, si hubo dificultades, si necesitó ayuda, etc."
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
@@ -218,15 +245,21 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                         <div className="flex items-center justify-center space-x-3">
                           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Subiendo archivo...</p>
-                            <p className="text-xs text-gray-500">Por favor espera</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              Subiendo archivo...
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Por favor espera
+                            </p>
                           </div>
                         </div>
                       ) : archivo ? (
                         <div className="flex items-center justify-center space-x-3">
                           <FileText className="w-8 h-8 text-blue-600" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{archivo.name}</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {archivo.name}
+                            </p>
                             <p className="text-xs text-gray-500">
                               {(archivo.size / 1024 / 1024).toFixed(2)} MB
                             </p>
@@ -235,7 +268,10 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                             type="button"
                             onClick={() => {
                               setArchivo(null);
-                              setFormData(prev => ({ ...prev, archivoUrl: '' }));
+                              setFormData((prev) => ({
+                                ...prev,
+                                archivoUrl: "",
+                              }));
                               setUploadingFile(false);
                             }}
                             className="p-1 hover:bg-red-100 rounded-full transition-colors"
@@ -259,7 +295,11 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                           />
                           <label
                             htmlFor="archivo"
-                            className={`inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer ${
+                              uploadingFile
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
                           >
                             <Upload className="w-4 h-4 mr-2" />
                             Seleccionar archivo
@@ -281,7 +321,8 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                           Marcando tarea como completada
                         </p>
                         <p className="text-xs text-green-600">
-                          Al enviar esta entrega, la tarea se marcará como realizada
+                          Al enviar esta entrega, la tarea se marcará como
+                          realizada
                         </p>
                       </div>
                     </div>
@@ -299,7 +340,11 @@ const SubirTareaModal = ({ isOpen, onClose, tarea, onSuccess }) => {
                     </button>
                     <button
                       type="submit"
-                      disabled={loading || uploadingFile || !formData.observaciones.trim()}
+                      disabled={
+                        loading ||
+                        uploadingFile ||
+                        !formData.observaciones.trim()
+                      }
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
                     >
                       {loading ? (

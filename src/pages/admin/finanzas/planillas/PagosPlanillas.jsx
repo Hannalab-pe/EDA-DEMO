@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { 
+import React, { useState, useEffect } from "react";
+import {
   ArrowLeft,
   Search,
   Check,
@@ -13,180 +13,205 @@ import {
   CheckCircle2,
   FileText,
   Filter,
-  UserCheck
-} from 'lucide-react'
-import { toast } from 'sonner'
-import demoPlanillaMensualService from '../../../../services/demoPlanillaMensualService'
+  UserCheck,
+} from "lucide-react";
+import { toast } from "sonner";
+import demoPlanillaMensualService from "../../../../services/demoPlanillaMensualService";
 
 const PagosPlanillas = () => {
-  const [loading, setLoading] = useState(false)
-  const [planillas, setPlanillas] = useState([])
-  const [filteredPlanillas, setFilteredPlanillas] = useState([])
-  const [selectedPlanillas, setSelectedPlanillas] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterEstado, setFilterEstado] = useState('TODOS')
-  const [filterMes, setFilterMes] = useState('')
-  const [filterAnio, setFilterAnio] = useState(new Date().getFullYear())
-  
+  const [loading, setLoading] = useState(false);
+  const [planillas, setPlanillas] = useState([]);
+  const [filteredPlanillas, setFilteredPlanillas] = useState([]);
+  const [selectedPlanillas, setSelectedPlanillas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterEstado, setFilterEstado] = useState("TODOS");
+  const [filterMes, setFilterMes] = useState("");
+  const [filterAnio, setFilterAnio] = useState(new Date().getFullYear());
+
   // Estado para observaciones
-  const [observaciones, setObservaciones] = useState('')
+  const [observaciones, setObservaciones] = useState("");
 
   // Cargar planillas al montar componente
   useEffect(() => {
-    cargarPlanillas()
-  }, [])
+    cargarPlanillas();
+  }, []);
 
   // Filtrar planillas cuando cambian los filtros
   useEffect(() => {
-    let filtered = planillas
+    let filtered = planillas;
 
     // Filtro por término de búsqueda
     if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase()
-      filtered = filtered.filter(planilla => 
-        planilla.detallePlanillas?.some(detalle => 
-          detalle.trabajador?.nombre?.toLowerCase().includes(searchLower) ||
-          detalle.trabajador?.apellido?.toLowerCase().includes(searchLower) ||
-          detalle.trabajador?.nroDocumento?.includes(searchTerm)
-        ) ||
-        planilla.observaciones?.toLowerCase().includes(searchLower)
-      )
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (planilla) =>
+          planilla.detallePlanillas?.some(
+            (detalle) =>
+              detalle.trabajador?.nombre?.toLowerCase().includes(searchLower) ||
+              detalle.trabajador?.apellido
+                ?.toLowerCase()
+                .includes(searchLower) ||
+              detalle.trabajador?.nroDocumento?.includes(searchTerm)
+          ) || planilla.observaciones?.toLowerCase().includes(searchLower)
+      );
     }
 
     // Filtro por estado
-    if (filterEstado !== 'TODOS') {
-      filtered = filtered.filter(planilla => planilla.estadoPlanilla === filterEstado)
+    if (filterEstado !== "TODOS") {
+      filtered = filtered.filter(
+        (planilla) => planilla.estadoPlanilla === filterEstado
+      );
     }
 
     // Filtro por mes
     if (filterMes) {
-      filtered = filtered.filter(planilla => planilla.mes.toString() === filterMes)
+      filtered = filtered.filter(
+        (planilla) => planilla.mes.toString() === filterMes
+      );
     }
 
     // Filtro por año
     if (filterAnio) {
-      filtered = filtered.filter(planilla => planilla.anio.toString() === filterAnio.toString())
+      filtered = filtered.filter(
+        (planilla) => planilla.anio.toString() === filterAnio.toString()
+      );
     }
 
-    setFilteredPlanillas(filtered)
-  }, [planillas, searchTerm, filterEstado, filterMes, filterAnio])
+    setFilteredPlanillas(filtered);
+  }, [planillas, searchTerm, filterEstado, filterMes, filterAnio]);
 
   const cargarPlanillas = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      console.log('🔄 Cargando planillas (modo demo)...')
-      const response = await demoPlanillaMensualService.obtenerPlanillasMensuales()
-      
+      console.log("🔄 Cargando planillas (modo demo)...");
+      const response =
+        await demoPlanillaMensualService.obtenerPlanillasMensuales();
+
       if (response.success) {
-        setPlanillas(response.data)
-        console.log('✅ Planillas cargadas (demo):', response.data.length)
-        toast.success(`${response.data.length} planillas cargadas (modo demo)`)
+        setPlanillas(response.data);
+        console.log("✅ Planillas cargadas (demo):", response.data.length);
+        toast.success(`${response.data.length} planillas cargadas (modo demo)`);
       }
     } catch (error) {
-      console.error('❌ Error al cargar planillas:', error)
-      toast.error('Error al cargar las planillas')
-      setPlanillas([])
+      console.error("❌ Error al cargar planillas:", error);
+      toast.error("Error al cargar las planillas");
+      setPlanillas([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleBack = () => {
-    window.dispatchEvent(new CustomEvent('changeFinanceView', { 
-      detail: { component: 'GestionFinanciera' } 
-    }))
-  }
+    window.dispatchEvent(
+      new CustomEvent("changeFinanceView", {
+        detail: { component: "GestionFinanciera" },
+      })
+    );
+  };
 
   const toggleSeleccionPlanilla = (idPlanilla) => {
-    setSelectedPlanillas(prev => {
+    setSelectedPlanillas((prev) => {
       if (prev.includes(idPlanilla)) {
-        return prev.filter(id => id !== idPlanilla)
+        return prev.filter((id) => id !== idPlanilla);
       } else {
-        return [...prev, idPlanilla]
+        return [...prev, idPlanilla];
       }
-    })
-  }
+    });
+  };
 
   const seleccionarTodas = () => {
     const planillasDisponibles = filteredPlanillas
-      .filter(p => p.estadoPlanilla === 'GENERADA' || p.estadoPlanilla === 'PENDIENTE')
-      .map(p => p.idPlanillaMensual)
-    
-    setSelectedPlanillas(planillasDisponibles)
-  }
+      .filter(
+        (p) =>
+          p.estadoPlanilla === "GENERADA" || p.estadoPlanilla === "PENDIENTE"
+      )
+      .map((p) => p.idPlanillaMensual);
+
+    setSelectedPlanillas(planillasDisponibles);
+  };
 
   const limpiarSeleccion = () => {
-    setSelectedPlanillas([])
-  }
+    setSelectedPlanillas([]);
+  };
 
   const aprobarPlanillas = async () => {
     if (selectedPlanillas.length === 0) {
-      toast.error('Selecciona al menos una planilla para aprobar')
-      return
+      toast.error("Selecciona al menos una planilla para aprobar");
+      return;
     }
 
     // En modo demo, solo mostramos mensaje informativo
     toast.info(
-      '📋 Para aprobar planillas mensuales y procesar pagos reales, adquiere el software completo. Contáctanos en ventas@hannahlab.com o WhatsApp +51 925 223 153',
-      { 
+      "📋 Para aprobar planillas mensuales y procesar pagos reales, adquiere el software completo. Contáctanos en ventas@hannahlab.com o WhatsApp +51 925 223 153",
+      {
         duration: 7000,
-        description: `${selectedPlanillas.length} planilla(s) seleccionada(s)`
+        description: `${selectedPlanillas.length} planilla(s) seleccionada(s)`,
       }
-    )
-    
+    );
+
     // Limpiar selección y observaciones
-    setSelectedPlanillas([])
-    setObservaciones('')
-  }
+    setSelectedPlanillas([]);
+    setObservaciones("");
+  };
 
   const formatFecha = (fecha) => {
-    if (!fecha) return ''
+    if (!fecha) return "";
     try {
-      const fechaObj = new Date(fecha + 'T00:00:00')
-      return fechaObj.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+      const fechaObj = new Date(fecha + "T00:00:00");
+      return fechaObj.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
     } catch (error) {
-      return fecha
+      return fecha;
     }
-  }
+  };
 
   const formatMonto = (monto) => {
-    return `S/ ${parseFloat(monto || 0).toFixed(2)}`
-  }
+    return `S/ ${parseFloat(monto || 0).toFixed(2)}`;
+  };
 
   const getEstadoColor = (estado) => {
     switch (estado) {
-      case 'APROBADA':
-      case 'PAGADA':
-        return 'text-green-600 bg-green-100'
-      case 'GENERADA':
-      case 'PENDIENTE':
-        return 'text-yellow-600 bg-yellow-100'
-      case 'RECHAZADA':
-        return 'text-red-600 bg-red-100'
+      case "APROBADA":
+      case "PAGADA":
+        return "text-green-600 bg-green-100";
+      case "GENERADA":
+      case "PENDIENTE":
+        return "text-yellow-600 bg-yellow-100";
+      case "RECHAZADA":
+        return "text-red-600 bg-red-100";
       default:
-        return 'text-gray-600 bg-gray-100'
+        return "text-gray-600 bg-gray-100";
     }
-  }
+  };
 
   const getMesNombre = (mes) => {
     const meses = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ]
-    return meses[mes - 1] || `Mes ${mes}`
-  }
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    return meses[mes - 1] || `Mes ${mes}`;
+  };
 
   const contarTrabajadores = (planilla) => {
-    return planilla.detallePlanillas?.length || 0
-  }
+    return planilla.detallePlanillas?.length || 0;
+  };
 
   const calcularTotalPlanilla = (planilla) => {
-    return planilla.totalNeto || 0
-  }
+    return planilla.totalNeto || 0;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-3">
@@ -200,7 +225,7 @@ const PagosPlanillas = () => {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Volver a Gestión Financiera
           </button>
-          
+
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Aprobar Planillas Mensuales
           </h1>
@@ -245,8 +270,10 @@ const PagosPlanillas = () => {
                 className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Todos los meses</option>
-                {Array.from({length: 12}, (_, i) => (
-                  <option key={i + 1} value={i + 1}>{getMesNombre(i + 1)}</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {getMesNombre(i + 1)}
+                  </option>
                 ))}
               </select>
 
@@ -275,7 +302,10 @@ const PagosPlanillas = () => {
         </div>
 
         {/* Panel de aprobación masiva */}
-        {filteredPlanillas.filter(p => p.estadoPlanilla === 'GENERADA' || p.estadoPlanilla === 'PENDIENTE').length > 0 && (
+        {filteredPlanillas.filter(
+          (p) =>
+            p.estadoPlanilla === "GENERADA" || p.estadoPlanilla === "PENDIENTE"
+        ).length > 0 && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex items-center space-x-4">
@@ -326,42 +356,64 @@ const PagosPlanillas = () => {
                 <FileText className="w-8 h-8 text-blue-600 mr-3" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Total</p>
-                  <p className="text-xl font-semibold text-gray-900">{filteredPlanillas.length}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <div className="flex items-center">
-                <AlertTriangle className="w-8 h-8 text-yellow-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Pendientes</p>
-                  <p className="text-xl font-semibold text-yellow-600">
-                    {filteredPlanillas.filter(p => p.estadoPlanilla === 'GENERADA' || p.estadoPlanilla === 'PENDIENTE').length}
+                  <p className="text-xl font-semibold text-gray-900">
+                    {filteredPlanillas.length}
                   </p>
                 </div>
               </div>
             </div>
-            
+
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center">
+                <AlertTriangle className="w-8 h-8 text-yellow-600 mr-3" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Pendientes
+                  </p>
+                  <p className="text-xl font-semibold text-yellow-600">
+                    {
+                      filteredPlanillas.filter(
+                        (p) =>
+                          p.estadoPlanilla === "GENERADA" ||
+                          p.estadoPlanilla === "PENDIENTE"
+                      ).length
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-lg p-4 border border-gray-200">
               <div className="flex items-center">
                 <CheckCircle2 className="w-8 h-8 text-green-600 mr-3" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Aprobadas</p>
                   <p className="text-xl font-semibold text-green-600">
-                    {filteredPlanillas.filter(p => p.estadoPlanilla === 'APROBADA' || p.estadoPlanilla === 'PAGADA').length}
+                    {
+                      filteredPlanillas.filter(
+                        (p) =>
+                          p.estadoPlanilla === "APROBADA" ||
+                          p.estadoPlanilla === "PAGADA"
+                      ).length
+                    }
                   </p>
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-lg p-4 border border-gray-200">
               <div className="flex items-center">
                 <X className="w-8 h-8 text-red-600 mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Rechazadas</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Rechazadas
+                  </p>
                   <p className="text-xl font-semibold text-red-600">
-                    {filteredPlanillas.filter(p => p.estadoPlanilla === 'RECHAZADA').length}
+                    {
+                      filteredPlanillas.filter(
+                        (p) => p.estadoPlanilla === "RECHAZADA"
+                      ).length
+                    }
                   </p>
                 </div>
               </div>
@@ -373,20 +425,23 @@ const PagosPlanillas = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando planillas...</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Cargando planillas...
+            </h3>
             <p className="text-gray-600">Obteniendo información de planillas</p>
           </div>
         ) : filteredPlanillas.length === 0 ? (
           <div className="bg-gray-100 rounded-lg p-8 text-center">
             <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-600 mb-2">
-              {planillas.length === 0 ? 'No hay planillas registradas' : 'No se encontraron planillas'}
+              {planillas.length === 0
+                ? "No hay planillas registradas"
+                : "No se encontraron planillas"}
             </h3>
             <p className="text-gray-500">
-              {planillas.length === 0 
-                ? 'Aún no hay planillas en el sistema' 
-                : 'Intenta ajustar los filtros de búsqueda'
-              }
+              {planillas.length === 0
+                ? "Aún no hay planillas en el sistema"
+                : "Intenta ajustar los filtros de búsqueda"}
             </p>
           </div>
         ) : (
@@ -423,14 +478,24 @@ const PagosPlanillas = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPlanillas.map((planilla) => (
-                    <tr key={planilla.idPlanillaMensual} className="hover:bg-gray-50">
+                    <tr
+                      key={planilla.idPlanillaMensual}
+                      className="hover:bg-gray-50"
+                    >
                       {/* Checkbox para selección */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {(planilla.estadoPlanilla === 'GENERADA' || planilla.estadoPlanilla === 'PENDIENTE') && (
+                        {(planilla.estadoPlanilla === "GENERADA" ||
+                          planilla.estadoPlanilla === "PENDIENTE") && (
                           <input
                             type="checkbox"
-                            checked={selectedPlanillas.includes(planilla.idPlanillaMensual)}
-                            onChange={() => toggleSeleccionPlanilla(planilla.idPlanillaMensual)}
+                            checked={selectedPlanillas.includes(
+                              planilla.idPlanillaMensual
+                            )}
+                            onChange={() =>
+                              toggleSeleccionPlanilla(
+                                planilla.idPlanillaMensual
+                              )
+                            }
                             className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
                           />
                         )}
@@ -481,10 +546,9 @@ const PagosPlanillas = () => {
                       {/* Fecha Pago */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {planilla.fechaPagoReal ? 
-                            formatFecha(planilla.fechaPagoReal) : 
-                            formatFecha(planilla.fechaPagoProgramada)
-                          }
+                          {planilla.fechaPagoReal
+                            ? formatFecha(planilla.fechaPagoReal)
+                            : formatFecha(planilla.fechaPagoProgramada)}
                         </div>
                         {planilla.fechaPagoReal && (
                           <div className="text-sm text-green-600">Pagado</div>
@@ -493,7 +557,11 @@ const PagosPlanillas = () => {
 
                       {/* Estado */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(planilla.estadoPlanilla)}`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(
+                            planilla.estadoPlanilla
+                          )}`}
+                        >
                           {planilla.estadoPlanilla}
                         </span>
                       </td>
@@ -517,7 +585,7 @@ const PagosPlanillas = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PagosPlanillas
+export default PagosPlanillas;

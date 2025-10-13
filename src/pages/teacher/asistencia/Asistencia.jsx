@@ -134,11 +134,8 @@ const Asistencia = () => {
 
   // Inicializar asistencias cuando se cargan estudiantes o asistencias existentes
   useEffect(() => {
-    // Solo ejecutar si tenemos estudiantes Y (tenemos asistencias registradas O acabamos de cambiar de fecha/aula)
-    if (
-      estudiantes.length > 0 &&
-      (asistenciasRegistradas.length > 0 || !tieneAsistenciasRegistradas)
-    ) {
+    // Solo ejecutar si tenemos estudiantes
+    if (estudiantes.length > 0) {
       console.log(
         "🔄 Inicializando asistencias para",
         estudiantes.length,
@@ -153,7 +150,7 @@ const Asistencia = () => {
 
       estudiantes.forEach((estudiante) => {
         const idEstudiante =
-          estudiante.id_estudiante || estudiante.idEstudiante;
+          estudiante.id_estudiante || estudiante.idEstudiante || estudiante.id;
         console.log(
           "👤 Procesando estudiante:",
           estudiante.nombres,
@@ -164,8 +161,8 @@ const Asistencia = () => {
         // Buscar si ya tiene asistencia registrada para esta fecha
         const asistenciaExistente = asistenciasRegistradas.find((asist) => {
           const asistId =
-            asist.idEstudiante || asist.id_estudiante || asist.idEstudiante;
-          const match = asistId === idEstudiante;
+            asist.idEstudiante || asist.id_estudiante || asist.estudianteId;
+          const match = String(asistId) === String(idEstudiante);
           if (match) {
             console.log("🔍 Coincidencia encontrada:", {
               asistId,
@@ -183,50 +180,53 @@ const Asistencia = () => {
             ":",
             asistenciaExistente
           );
-          // Convertir el formato del backend al formato local
+          // Convertir el formato del backend al formato local (objeto con estado y observaciones)
+          let estado = "";
+          let observaciones = asistenciaExistente.observaciones || "";
+
           if (
             asistenciaExistente.asistio === true ||
             asistenciaExistente.asistio === "true"
           ) {
             // Si asistió, verificar las observaciones para determinar el estado exacto
             if (asistenciaExistente.observaciones === "Presente") {
-              asistenciasIniciales[idEstudiante] = "presente";
+              estado = "presente";
             } else if (asistenciaExistente.observaciones === "Tardanza") {
-              asistenciasIniciales[idEstudiante] = "tardanza";
+              estado = "tardanza";
             } else if (asistenciaExistente.observaciones === "Justificado") {
-              asistenciasIniciales[idEstudiante] = "justificado";
+              estado = "justificado";
             } else {
-              asistenciasIniciales[idEstudiante] = "presente"; // Default para asistio=true
+              estado = "presente"; // Default para asistio=true
             }
           } else if (
             asistenciaExistente.asistio === false ||
             asistenciaExistente.asistio === "false"
           ) {
-            asistenciasIniciales[idEstudiante] = "ausente";
-          } else {
-            // Si no hay valor claro, dejar vacío
-            asistenciasIniciales[idEstudiante] = "";
+            estado = "ausente";
           }
+
+          asistenciasIniciales[idEstudiante] = {
+            estado: estado,
+            observaciones: observaciones,
+          };
         } else {
           console.log(
             "❌ No se encontró asistencia para estudiante",
             idEstudiante
           );
-          asistenciasIniciales[idEstudiante] = "";
+          asistenciasIniciales[idEstudiante] = {
+            estado: "",
+            observaciones: "",
+          };
         }
       });
 
       console.log("📋 Asistencias iniciales finales:", asistenciasIniciales);
       setAsistencias(asistenciasIniciales);
     }
-  }, [
-    estudiantes.length,
-    getAulaId(selectedAula),
-    selectedDate,
-    asistenciasRegistradas,
-  ]); // Incluir asistenciasRegistradas como dependencia
+  }, [estudiantes.length, getAulaId(selectedAula), selectedDate]);
 
-  // Refrescar asistencias cuando cambie la fecha o el aula (SIN refetchAsistenciasExistentes en dependencias)
+  // Refrescar asistencias cuando cambie la fecha o el aula
   useEffect(() => {
     if (selectedAula && selectedDate) {
       console.log(
@@ -237,83 +237,6 @@ const Asistencia = () => {
       refetchAsistenciasExistentes();
     }
   }, [getAulaId(selectedAula), selectedDate]); // Solo ID del aula y fecha
-
-  // Efecto adicional para procesar asistencias cuando se cargan por primera vez
-  useEffect(() => {
-    if (asistenciasRegistradas.length > 0 && estudiantes.length > 0) {
-      console.log("🎯 Asistencias existentes detectadas, procesando...");
-      // Forzar re-ejecución del useEffect principal
-      const asistenciasIniciales = {};
-
-      estudiantes.forEach((estudiante) => {
-        const idEstudiante =
-          estudiante.id_estudiante || estudiante.idEstudiante;
-
-        const asistenciaExistente = asistenciasRegistradas.find((asist) => {
-          const asistId =
-            asist.idEstudiante || asist.id_estudiante || asist.idEstudiante;
-          return asistId === idEstudiante;
-        });
-
-        if (asistenciaExistente) {
-          console.log(
-            "✅ Procesando asistencia existente:",
-            asistenciaExistente
-          );
-          if (
-            asistenciaExistente.asistio === true ||
-            asistenciaExistente.asistio === "true"
-          ) {
-            if (asistenciaExistente.observaciones === "Presente") {
-              asistenciasIniciales[idEstudiante] = {
-                estado: "presente",
-                observaciones: "Presente",
-              };
-            } else if (asistenciaExistente.observaciones === "Tardanza") {
-              asistenciasIniciales[idEstudiante] = {
-                estado: "tardanza",
-                observaciones: "Tardanza",
-              };
-            } else if (asistenciaExistente.observaciones === "Justificado") {
-              asistenciasIniciales[idEstudiante] = {
-                estado: "justificado",
-                observaciones: "Justificado",
-              };
-            } else {
-              asistenciasIniciales[idEstudiante] = {
-                estado: "presente",
-                observaciones: asistenciaExistente.observaciones || "Presente",
-              };
-            }
-          } else if (
-            asistenciaExistente.asistio === false ||
-            asistenciaExistente.asistio === "false"
-          ) {
-            asistenciasIniciales[idEstudiante] = {
-              estado: "ausente",
-              observaciones: asistenciaExistente.observaciones || "Ausente",
-            };
-          } else {
-            asistenciasIniciales[idEstudiante] = {
-              estado: "",
-              observaciones: "",
-            };
-          }
-        } else {
-          asistenciasIniciales[idEstudiante] = {
-            estado: "",
-            observaciones: "",
-          };
-        }
-      });
-
-      console.log(
-        "📋 Aplicando asistencias desde efecto secundario:",
-        asistenciasIniciales
-      );
-      setAsistencias(asistenciasIniciales);
-    }
-  }, [asistenciasRegistradas.length, estudiantes.length]); // Solo cuando cambian las cantidades
 
   const handleAsistenciaChange = (
     estudianteId,
@@ -442,19 +365,20 @@ const Asistencia = () => {
   const estadisticas = {
     total: estudiantesFiltrados.length,
     presentes: Object.values(asistencias).filter(
-      (estado) => estado === "presente"
+      (a) => a?.estado === "presente" || a === "presente"
     ).length,
     ausentes: Object.values(asistencias).filter(
-      (estado) => estado === "ausente"
+      (a) => a?.estado === "ausente" || a === "ausente"
     ).length,
     tardanzas: Object.values(asistencias).filter(
-      (estado) => estado === "tardanza"
+      (a) => a?.estado === "tardanza" || a === "tardanza"
     ).length,
     justificados: Object.values(asistencias).filter(
-      (estado) => estado === "justificado"
+      (a) => a?.estado === "justificado" || a === "justificado"
     ).length,
-    pendientes: Object.values(asistencias).filter((estado) => estado === "")
-      .length,
+    pendientes: Object.values(asistencias).filter(
+      (a) => !a || a === "" || a?.estado === ""
+    ).length,
   };
 
   const porcentajeAsistencia =

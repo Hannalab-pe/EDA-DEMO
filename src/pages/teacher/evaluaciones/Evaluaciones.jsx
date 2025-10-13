@@ -12,14 +12,13 @@ const EvaluacionCard = ({ evaluacion }) => {
       return;
     }
 
-    try {
-      // Abrir el archivo en una nueva pestaña/ventana
-      window.open(archivoUrl, "_blank", "noopener,noreferrer");
-      toast.success("Archivo abierto en nueva pestaña");
-    } catch (error) {
-      console.error("Error al abrir archivo:", error);
-      toast.error("Error al abrir el archivo: " + error.message);
-    }
+    // Modo demo: simular apertura de archivo
+    toast.info(
+      "📄 Esta es una demostración. Contáctenos para acceder a esta funcionalidad completa",
+      {
+        duration: 3000,
+      }
+    );
   };
 
   const formatDate = (dateString) => {

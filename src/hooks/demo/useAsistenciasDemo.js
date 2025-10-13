@@ -125,8 +125,9 @@ export const useActualizarAsistenciaDemo = () => {
  * Hook para gestión de asistencia del profesor (equivalente a useAsistenciaProfesor)
  */
 export const useAsistenciaProfesorDemo = () => {
-  // Obtener aulas del profesor desde mock data
-  const aulas = mockData.aulas.filter((aula) => aula.docenteId === "2"); // Carlos Ruiz
+  // En modo DEMO siempre retornamos aulas para que el profesor pueda ver el módulo
+  // Obtener todas las aulas disponibles (no filtrar por docente en DEMO)
+  const aulas = mockData.aulas.slice(0, 5); // Tomar las primeras 5 aulas para demo
 
   return {
     aulas: aulas.map((aula) => ({
@@ -139,11 +140,13 @@ export const useAsistenciaProfesorDemo = () => {
     loadingAulas: false,
     errorAulas: null,
     registrarAsistencia: async (datos) => {
-      console.log("🎭 Demo: Registrando asistencia", datos);
+      console.log("🎭 Demo: Registrando asistencia masiva", datos);
+      // Simular delay de 500ms para feedback visual
+      await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true };
     },
     loadingRegistro: false,
-    tieneAulas: aulas.length > 0,
+    tieneAulas: true, // Siempre true en DEMO
   };
 };
 
@@ -154,10 +157,48 @@ export const useEstudiantesAulaDemo = (aulaId) => {
   return useDemoQuery({
     queryKey: ["estudiantes", "aula", aulaId],
     queryFn: async () => {
+      if (!aulaId) return [];
+
+      // Filtrar estudiantes del aula
       const estudiantes = mockData.estudiantes.filter(
         (e) => e.aulaId === aulaId
       );
-      return estudiantes;
+
+      // Si no hay estudiantes en mockData para esta aula, generar algunos ficticios
+      if (estudiantes.length === 0) {
+        const nombresDemo = [
+          { nombres: "Juan Carlos", apellido: "Pérez González" },
+          { nombres: "María Isabel", apellido: "López Martínez" },
+          { nombres: "Pedro Luis", apellido: "Sánchez Torres" },
+          { nombres: "Ana Sofía", apellido: "Ramírez Díaz" },
+          { nombres: "Carlos Alberto", apellido: "García Fernández" },
+          { nombres: "Lucía Elena", apellido: "Hernández Ruiz" },
+          { nombres: "Miguel Ángel", apellido: "Morales Castro" },
+          { nombres: "Valentina", apellido: "Vargas Mendoza" },
+          { nombres: "Diego Alejandro", apellido: "Romero Silva" },
+          { nombres: "Isabella", apellido: "Cruz Valdez" },
+          { nombres: "Santiago", apellido: "Flores Paredes" },
+          { nombres: "Camila", apellido: "Gutiérrez Vega" },
+        ];
+
+        return nombresDemo.map((est, idx) => ({
+          id: `est-demo-${aulaId}-${idx + 1}`,
+          id_estudiante: `est-demo-${aulaId}-${idx + 1}`,
+          idEstudiante: `est-demo-${aulaId}-${idx + 1}`,
+          nombres: est.nombres,
+          apellido: est.apellido,
+          apellido_paterno: est.apellido.split(" ")[0],
+          apellido_materno: est.apellido.split(" ")[1] || "",
+          aulaId: aulaId,
+          codigo: `EST${String(idx + 1).padStart(3, "0")}`,
+        }));
+      }
+
+      return estudiantes.map((e) => ({
+        ...e,
+        id_estudiante: e.id_estudiante || e.id,
+        idEstudiante: e.idEstudiante || e.id,
+      }));
     },
     enabled: !!aulaId,
     defaultData: [],
@@ -171,6 +212,12 @@ export const useAsistenciasPorAulaYFechaDemo = (aulaId, fecha) => {
   return useDemoQuery({
     queryKey: ["asistencias", "aula-fecha", aulaId, fecha],
     queryFn: async () => {
+      if (!aulaId || !fecha) return [];
+
+      // En modo DEMO, retornar array vacío para que el profesor pueda registrar
+      // Si se quiere simular asistencias previas, descomentar el código de abajo:
+
+      /*
       // Obtener estudiantes del aula
       const estudiantesAula = mockData.estudiantes.filter(
         (e) => e.aulaId === aulaId
@@ -179,12 +226,17 @@ export const useAsistenciasPorAulaYFechaDemo = (aulaId, fecha) => {
       // Simular asistencias para esa fecha
       return estudiantesAula.map((estudiante) => ({
         id: `${estudiante.id}-${fecha}`,
-        estudianteId: estudiante.id,
+        idEstudiante: estudiante.id,
+        id_estudiante: estudiante.id,
         fecha: fecha,
-        estado: Math.random() > 0.2 ? "PRESENTE" : "AUSENTE", // 80% presente
-        observaciones: "",
+        asistio: Math.random() > 0.2, // 80% presente
+        observaciones: Math.random() > 0.5 ? "Presente" : "Tardanza",
         estudiante: estudiante,
       }));
+      */
+
+      // Retornar vacío para que el profesor registre desde cero
+      return [];
     },
     enabled: !!aulaId && !!fecha,
     defaultData: [],

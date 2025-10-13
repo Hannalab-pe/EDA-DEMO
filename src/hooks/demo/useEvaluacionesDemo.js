@@ -13,19 +13,29 @@ export const useEvaluacionesProfesorDemo = (profesorId) => {
   return useDemoQuery({
     queryKey: ["evaluaciones", "profesor", profesorId],
     queryFn: async () => {
-      // Simular evaluaciones del profesor Carlos Ruiz (ID: 2)
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      console.log(
+        "🎭 [EVALUACIONES DEMO] Generando evaluaciones ficticias para profesor:",
+        profesorId || "2"
+      );
+
+      // Evaluaciones ficticias para el profesor (siempre retorna 5 evaluaciones)
       const evaluaciones = [
         {
-          id: "1",
-          profesorId: "2",
+          id: "eval-1",
+          profesorId: profesorId || "2",
           motivo: "Evaluación de desempeño docente - Primer bimestre",
-          fechaCreacion: "2024-09-15",
-          fechaEvaluacion: "2024-09-20",
+          descripcion:
+            "Excelente desempeño en el aula. Maneja muy bien la metodología lúdica apropiada para la edad. Los estudiantes muestran gran motivación y compromiso durante sus clases.",
+          fechaCreacion: "2025-10-05T10:30:00",
+          fechaEvaluacion: "2025-10-10T14:00:00",
           estado: "COMPLETADA",
           puntaje: 18.5,
           puntajeMaximo: 20,
           coordinador: {
-            id: "1",
+            id: "coord-1",
             nombre: "María",
             apellido: "González",
             cargo: "Coordinadora Académica",
@@ -55,16 +65,18 @@ export const useEvaluacionesProfesorDemo = (profesorId) => {
           archivoUrl: null,
         },
         {
-          id: "2",
-          profesorId: "2",
+          id: "eval-2",
+          profesorId: profesorId || "2",
           motivo: "Evaluación de integración curricular",
-          fechaCreacion: "2024-08-10",
-          fechaEvaluacion: "2024-08-15",
+          descripcion:
+            "Muy buen trabajo en la integración de actividades entre diferentes áreas. Los padres destacan la comunicación fluida y el seguimiento personalizado de cada estudiante.",
+          fechaCreacion: "2025-10-08T09:15:00",
+          fechaEvaluacion: "2025-10-12T11:30:00",
           estado: "COMPLETADA",
           puntaje: 17.2,
           puntajeMaximo: 20,
           coordinador: {
-            id: "1",
+            id: "coord-1",
             nombre: "María",
             apellido: "González",
             cargo: "Coordinadora Académica",
@@ -94,13 +106,115 @@ export const useEvaluacionesProfesorDemo = (profesorId) => {
           observaciones:
             "Muy buen trabajo en la integración de actividades. Los padres destacan la comunicación fluida.",
           recomendaciones: "Fortalecer el uso de tecnología educativa.",
+          archivoUrl: "https://ejemplo.com/evaluacion-curricular.pdf",
+        },
+        {
+          id: "eval-3",
+          profesorId: profesorId || "2",
+          motivo: "Observación de clase - Matemática",
+          descripcion:
+            "Se observó una clase dinámica y participativa. El docente utiliza material concreto y ejemplos del entorno cercano de los estudiantes para facilitar la comprensión de conceptos matemáticos.",
+          fechaCreacion: "2025-10-14T08:00:00",
+          fechaEvaluacion: "2025-10-14T10:00:00",
+          estado: "COMPLETADA",
+          puntaje: 19.0,
+          puntajeMaximo: 20,
+          coordinador: {
+            id: "coord-2",
+            nombre: "José",
+            apellido: "Martínez",
+            cargo: "Coordinador de Nivel",
+          },
+          areas: [
+            { nombre: "Dominio del tema", puntaje: 5.0, puntajeMaximo: 5 },
+            {
+              nombre: "Estrategias didácticas",
+              puntaje: 4.8,
+              puntajeMaximo: 5,
+            },
+            { nombre: "Clima de aula", puntaje: 4.7, puntajeMaximo: 5 },
+            { nombre: "Uso de materiales", puntaje: 4.5, puntajeMaximo: 5 },
+          ],
+          observaciones:
+            "Clase muy bien estructurada. Los estudiantes participaron activamente.",
+          recomendaciones:
+            "Incorporar más uso de tecnología en las explicaciones.",
+          archivoUrl: null,
+        },
+        {
+          id: "eval-4",
+          profesorId: profesorId || "2",
+          motivo: "Evaluación de manejo de conflictos",
+          descripcion:
+            "El docente demuestra habilidades efectivas para manejar situaciones de conflicto en el aula, promoviendo el diálogo y la resolución pacífica. Implementa estrategias de mediación apropiadas para la edad.",
+          fechaCreacion: "2025-10-16T13:45:00",
+          fechaEvaluacion: "2025-10-17T09:00:00",
+          estado: "COMPLETADA",
+          puntaje: 16.8,
+          puntajeMaximo: 20,
+          coordinador: {
+            id: "coord-3",
+            nombre: "Ana",
+            apellido: "Torres",
+            cargo: "Coordinadora de Convivencia",
+          },
+          areas: [
+            {
+              nombre: "Resolución de conflictos",
+              puntaje: 4.5,
+              puntajeMaximo: 5,
+            },
+            { nombre: "Clima emocional", puntaje: 4.2, puntajeMaximo: 5 },
+            { nombre: "Normas de convivencia", puntaje: 4.1, puntajeMaximo: 5 },
+            { nombre: "Comunicación efectiva", puntaje: 4.0, puntajeMaximo: 5 },
+          ],
+          observaciones:
+            "Buen manejo de situaciones complejas. Los estudiantes responden positivamente.",
+          recomendaciones:
+            "Continuar implementando círculos de paz semanalmente.",
+          archivoUrl: "https://ejemplo.com/reporte-convivencia.pdf",
+        },
+        {
+          id: "eval-5",
+          profesorId: profesorId || "2",
+          motivo: "Revisión de planificación anual",
+          descripcion:
+            "La planificación anual está bien estructurada y alineada con los objetivos curriculares. Se evidencia una secuencia lógica de contenidos y actividades diversificadas que atienden diferentes estilos de aprendizaje.",
+          fechaCreacion: "2025-10-18T15:30:00",
+          fechaEvaluacion: "2025-10-19T16:00:00",
+          estado: "COMPLETADA",
+          puntaje: 18.0,
+          puntajeMaximo: 20,
+          coordinador: {
+            id: "coord-1",
+            nombre: "María",
+            apellido: "González",
+            cargo: "Coordinadora Académica",
+          },
+          areas: [
+            { nombre: "Coherencia curricular", puntaje: 4.8, puntajeMaximo: 5 },
+            { nombre: "Secuencia didáctica", puntaje: 4.5, puntajeMaximo: 5 },
+            { nombre: "Diversificación", puntaje: 4.3, puntajeMaximo: 5 },
+            { nombre: "Evaluación", puntaje: 4.4, puntajeMaximo: 5 },
+          ],
+          observaciones:
+            "Planificación coherente y bien fundamentada. Se aprecia el trabajo reflexivo.",
+          recomendaciones:
+            "Incluir más actividades de evaluación formativa continua.",
           archivoUrl: null,
         },
       ];
 
-      return evaluaciones.filter((e) => e.profesorId === profesorId);
+      console.log(
+        "🎭 [EVALUACIONES DEMO] Total de evaluaciones generadas:",
+        evaluaciones.length
+      );
+
+      return evaluaciones;
     },
-    enabled: !!profesorId,
+    enabled: true, // Siempre habilitado, no depende de profesorId
+    refetchOnMount: "always",
+    staleTime: 0,
     defaultData: [],
   });
 };

@@ -35,10 +35,24 @@ const TablaAulas = ({ onVerEstudiantes }) => {
       // Generar datos demo de aulas sin depender de autenticación
       const { mockData } = await import("../../../../data/mockData.js");
 
-      // Para demo, mostrar todas las aulas o filtrar por un docente específico
-      const aulasDemo = mockData.aulas.filter(
-        (aula) => aula.estado === "ACTIVO"
-      );
+      // Para demo, mostrar todas las aulas activas
+      const aulasDemo = mockData.aulas
+        .filter((aula) => aula.estaActivo === true)
+        .map((aula) => ({
+          ...aula,
+          grado: aula.idGrado?.grado || "N/A",
+          estado: aula.estaActivo ? "ACTIVA" : "INACTIVA",
+          cantidadEstudiantes: Math.floor(Math.random() * 10) + 18, // Entre 18-27 estudiantes
+          ubicacion: `Pabellón ${String.fromCharCode(
+            65 + Math.floor(Math.random() * 3)
+          )} - Aula ${aula.seccion}`,
+          equipamiento: [
+            "Proyector",
+            "Pizarra digital",
+            "Aire acondicionado",
+            "Biblioteca de aula",
+          ][Math.floor(Math.random() * 4)],
+        }));
 
       console.log("✅ Aulas cargadas (DEMO):", aulasDemo.length);
 
@@ -140,29 +154,65 @@ const TablaAulas = ({ onVerEstudiantes }) => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">
                     Aula {aula.seccion}
                   </h3>
+                  <p className="text-sm text-gray-600">{aula.grado}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <BookOpen className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
 
-              {/* Información del aula */}
-              <div className="space-y-3 mb-4">
-                {aula.ubicacion && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{aula.ubicacion}</span>
-                  </div>
-                )}
+              {/* Información del aula en caja gris */}
+              <div className="bg-gray-50 rounded-lg p-3 space-y-2 mb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">
+                    Capacidad:
+                  </span>
+                  <span className="text-sm font-bold text-blue-700">
+                    {aula.capacidad} estudiantes
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">
+                    Estudiantes:
+                  </span>
+                  <span className="text-sm font-bold text-green-700">
+                    {aula.cantidadEstudiantes}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">
+                    Estado:
+                  </span>
+                  <span
+                    className={`text-sm font-bold ${
+                      aula.estado === "ACTIVA"
+                        ? "text-green-700"
+                        : "text-red-700"
+                    }`}
+                  >
+                    {aula.estado}
+                  </span>
+                </div>
               </div>
+
+              {/* Ubicación */}
+              {aula.ubicacion && (
+                <div className="flex items-center text-sm text-gray-600 mb-3">
+                  <MapPin className="w-4 h-4 mr-2 text-purple-500" />
+                  <span>{aula.ubicacion}</span>
+                </div>
+              )}
 
               {/* Equipamiento (si existe) */}
               {aula.equipamiento && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 mb-1">
+                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm font-medium text-yellow-900 mb-1 flex items-center">
+                    <GraduationCap className="w-4 h-4 mr-2" />
                     Equipamiento:
                   </p>
-                  <p className="text-sm text-gray-600">{aula.equipamiento}</p>
+                  <p className="text-sm text-yellow-800">
+                    • {aula.equipamiento}
+                  </p>
                 </div>
               )}
 

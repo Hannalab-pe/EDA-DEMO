@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Plus,
   Search,
@@ -58,6 +58,12 @@ const Tareas = () => {
 
   const { user } = useAuthStore();
 
+  console.log("👤 [TAREAS] Usuario actual:", {
+    id: user?.id,
+    nombre: user?.nombre,
+    rol: user?.role?.nombre || user?.rol,
+  });
+
   // Hook para obtener tareas del trabajador (versión demo)
   const {
     data: tareas = [],
@@ -65,6 +71,21 @@ const Tareas = () => {
     error,
     refetch: refrescarTareas,
   } = useTareasPorDocenteDemo(user?.id);
+
+  console.log("📚 [TAREAS] Tareas recibidas del hook:", tareas.length, tareas);
+  console.log("⏳ [TAREAS] Estado loading:", loading);
+  console.log("❌ [TAREAS] Error:", error);
+
+  // Efecto para debug cuando cambian las tareas
+  useEffect(() => {
+    console.log("🔄 [TAREAS] useEffect - Tareas cambiaron:", {
+      cantidad: tareas.length,
+      loading,
+      primerasTareas: tareas
+        .slice(0, 2)
+        .map((t) => ({ id: t.id, titulo: t.titulo })),
+    });
+  }, [tareas, loading]);
 
   // Hooks de mutación demo
   const crearTareaMutation = useCrearTareaDemo();

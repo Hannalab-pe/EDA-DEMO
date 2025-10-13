@@ -62,13 +62,16 @@ const MisAulas = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Usar datos demo sin depender de autenticación
-      const aulasDemo = mockData.aulas.map((aula) => ({
-        ...aula,
-        // Agregar algunos campos adicionales que podrían necesitarse
-        estudiantesCount: Math.floor(Math.random() * 25) + 15,
-        profesorAsignado: "Profesor Demo",
-        estadoAula: "Activa",
-      }));
+      const aulasDemo = mockData.aulas
+        .filter((aula) => aula.estaActivo === true)
+        .map((aula) => ({
+          ...aula,
+          grado: aula.idGrado?.grado || "N/A",
+          estado: aula.estaActivo ? "activa" : "inactiva",
+          cantidadEstudiantes: Math.floor(Math.random() * 10) + 18, // Entre 18-27 estudiantes
+          profesorAsignado: "Profesor Demo",
+          estadoAula: "Activa",
+        }));
 
       console.log("✅ Aulas cargadas (demo):", aulasDemo);
 
@@ -89,20 +92,206 @@ const MisAulas = () => {
     setCurrentView("estudiantes");
 
     try {
-      console.log("🔍 Cargando estudiantes del aula (demo):", aula.id);
+      console.log("🔍 Cargando estudiantes del aula (demo):", aula.idAula);
 
       // Simular delay de red
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Usar datos ficticios de mockData - filtrar estudiantes por grado
-      const estudiantesAulaDemo = mockData.estudiantes
-        .filter((estudiante) => estudiante.grado === aula.grado)
-        .slice(0, Math.floor(Math.random() * 10) + 15) // Entre 15-25 estudiantes
-        .map((estudiante) => ({
-          ...estudiante,
-          aulaId: aula.id,
-          nombreAula: aula.nombre,
-          seccion: aula.seccion || "A",
+      // Generar estudiantes ficticios para esta aula
+      const nombresEstudiantes = [
+        {
+          nombre: "Sofía",
+          apellido: "Pérez Morales",
+          nroDocumento: "00123456",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Carlos",
+          apellido: "Mendoza Silva",
+          nroDocumento: "00123457",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "María",
+          apellido: "González Torres",
+          nroDocumento: "00123458",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Diego",
+          apellido: "Ramírez Castro",
+          nroDocumento: "00123459",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Valentina",
+          apellido: "López García",
+          nroDocumento: "00123460",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Sebastián",
+          apellido: "Vargas Rojas",
+          nroDocumento: "00123461",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Isabella",
+          apellido: "Flores Medina",
+          nroDocumento: "00123462",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Mateo",
+          apellido: "Herrera Sánchez",
+          nroDocumento: "00123463",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Camila",
+          apellido: "Díaz Paredes",
+          nroDocumento: "00123464",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Lucas",
+          apellido: "Moreno Vega",
+          nroDocumento: "00123465",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Emma",
+          apellido: "Castro Núñez",
+          nroDocumento: "00123466",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Nicolás",
+          apellido: "Ruiz Ortiz",
+          nroDocumento: "00123467",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Abril",
+          apellido: "Santos León",
+          nroDocumento: "00123468",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Thiago",
+          apellido: "Ramos Quispe",
+          nroDocumento: "00123469",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Lucía",
+          apellido: "Palacios Díaz",
+          nroDocumento: "00123470",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Joaquín",
+          apellido: "Torres Álvarez",
+          nroDocumento: "00123471",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Martina",
+          apellido: "Reyes Gutiérrez",
+          nroDocumento: "00123472",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Benjamín",
+          apellido: "Cruz Medina",
+          nroDocumento: "00123473",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Victoria",
+          apellido: "Salazar Montes",
+          nroDocumento: "00123474",
+          tipoDocumento: "DNI",
+        },
+        {
+          nombre: "Ángel",
+          apellido: "Ortega Campos",
+          nroDocumento: "00123475",
+          tipoDocumento: "DNI",
+        },
+      ];
+
+      // Generar de 18 a 22 estudiantes para esta aula
+      const cantidadEstudiantes = Math.floor(Math.random() * 5) + 18;
+
+      const estudiantesAulaDemo = nombresEstudiantes
+        .slice(0, cantidadEstudiantes)
+        .map((estudiante, index) => ({
+          idEstudiante: `EST-${aula.idAula}-${index + 1}`,
+          nombreCompleto: `${estudiante.nombre} ${estudiante.apellido}`,
+          nroDocumento: estudiante.nroDocumento,
+          tipoDocumento: estudiante.tipoDocumento,
+          observaciones:
+            Math.random() > 0.7
+              ? `Estudiante destacado en ${
+                  ["matemáticas", "comunicación", "arte", "deportes"][
+                    Math.floor(Math.random() * 4)
+                  ]
+                }`
+              : null,
+          infoApoderado: {
+            grado: {
+              grado: aula.grado,
+            },
+            aula: {
+              seccion: aula.seccion,
+              cantidadEstudiantes: aula.capacidad,
+              estado: "Activo",
+              fechaAsignacion: "2025-03-01T00:00:00Z",
+            },
+            apoderado: {
+              nombreCompleto: `${
+                ["María", "Carlos", "Ana", "José", "Rosa"][
+                  Math.floor(Math.random() * 5)
+                ]
+              } ${estudiante.apellido.split(" ")[1]}`,
+              tipoApoderado: ["Madre", "Padre", "Tutor"][
+                Math.floor(Math.random() * 3)
+              ],
+              tipoDocumentoIdentidad: "DNI",
+              documentoIdentidad: `${
+                Math.floor(Math.random() * 90000000) + 10000000
+              }`,
+              numero: `9${Math.floor(Math.random() * 90000000) + 10000000}`,
+              correo: `${estudiante.nombre.toLowerCase()}.apoderado@email.com`,
+              direccion: `${
+                [
+                  "Jr. Los Pinos",
+                  "Av. Las Flores",
+                  "Calle Los Rosales",
+                  "Jr. San Martín",
+                ][Math.floor(Math.random() * 4)]
+              } ${Math.floor(Math.random() * 500) + 100} - Lima`,
+            },
+          },
+          contactosEmergencia: [
+            {
+              idContacto: `CONT-${index + 1}`,
+              nombre: ["María", "Carlos", "Ana", "José"][
+                Math.floor(Math.random() * 4)
+              ],
+              apellido: estudiante.apellido.split(" ")[0],
+              relacionEstudiante: ["Madre", "Padre", "Tío/a", "Abuelo/a"][
+                Math.floor(Math.random() * 4)
+              ],
+              telefono: `9${Math.floor(Math.random() * 90000000) + 10000000}`,
+              email: `contacto${index + 1}@email.com`,
+              tipoContacto: "Familiar",
+              prioridad: 1,
+              esPrincipal: true,
+              observaciones: null,
+            },
+          ],
         }));
 
       console.log("✅ Estudiantes cargados (demo):", estudiantesAulaDemo);

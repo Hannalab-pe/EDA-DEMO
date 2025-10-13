@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { 
-  BookOpen, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  BookOpen,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   Calendar,
   FileText,
   User,
@@ -12,9 +12,9 @@ import {
   Download,
   Upload,
   Eye,
-  BookOpenCheck
+  BookOpenCheck,
 } from "lucide-react";
-import { useTareasEstudianteQuery } from "../../../hooks/useTareasEstudianteQuery";
+import { useTareasEstudianteDemo as useTareasEstudianteQuery } from "../../../hooks/useTareasEstudianteDemo";
 import { SubirTareaModal, VerTareaModal } from "../../../components/tareas";
 
 const Tareas = () => {
@@ -22,62 +22,63 @@ const Tareas = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [verTareaModalOpen, setVerTareaModalOpen] = useState(false);
   const [selectedTarea, setSelectedTarea] = useState(null);
-  const { tareas, loading, error, refrescarTareas, isRefetching } = useTareasEstudianteQuery();
+  const { tareas, loading, error, refrescarTareas, isRefetching } =
+    useTareasEstudianteQuery();
 
   const getStatusInfo = (status) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return {
-          label: 'Completada',
-          color: 'bg-green-100 text-green-800 border-green-200',
+          label: "Completada",
+          color: "bg-green-100 text-green-800 border-green-200",
           icon: CheckCircle,
-          emoji: '✅'
+          emoji: "✅",
         };
-      case 'in_progress':
+      case "in_progress":
         return {
-          label: 'En Progreso',
-          color: 'bg-blue-100 text-blue-800 border-blue-200',
+          label: "En Progreso",
+          color: "bg-blue-100 text-blue-800 border-blue-200",
           icon: Clock,
-          emoji: '⏳'
+          emoji: "⏳",
         };
-      case 'overdue':
+      case "overdue":
         return {
-          label: 'Atrasada',
-          color: 'bg-red-100 text-red-800 border-red-200',
+          label: "Atrasada",
+          color: "bg-red-100 text-red-800 border-red-200",
           icon: AlertCircle,
-          emoji: '⚠️'
+          emoji: "⚠️",
         };
-      case 'pending':
+      case "pending":
       default:
         return {
-          label: 'Pendiente',
-          color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+          label: "Pendiente",
+          color: "bg-yellow-100 text-yellow-800 border-yellow-200",
           icon: Clock,
-          emoji: '⏰'
+          emoji: "⏰",
         };
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high':
-        return 'border-l-red-400';
-      case 'medium':
-        return 'border-l-yellow-400';
-      case 'low':
-        return 'border-l-green-400';
+      case "high":
+        return "border-l-red-400";
+      case "medium":
+        return "border-l-yellow-400";
+      case "low":
+        return "border-l-green-400";
       default:
-        return 'border-l-gray-400';
+        return "border-l-gray-400";
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Sin fecha';
+    if (!dateString) return "Sin fecha";
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -87,10 +88,10 @@ const Tareas = () => {
     const due = new Date(dueDate);
     const diffTime = due - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) return `Venció hace ${Math.abs(diffDays)} día(s)`;
-    if (diffDays === 0) return 'Vence hoy';
-    if (diffDays === 1) return 'Vence mañana';
+    if (diffDays === 0) return "Vence hoy";
+    if (diffDays === 1) return "Vence mañana";
     return `${diffDays} días restantes`;
   };
 
@@ -118,7 +119,7 @@ const Tareas = () => {
     refrescarTareas();
   };
 
-  const filteredTareas = tareas.filter(tarea => {
+  const filteredTareas = tareas.filter((tarea) => {
     if (selectedFilter === "todas") return true;
     if (selectedFilter === "overdue") return tarea.isOverdue;
     return tarea.status === selectedFilter;
@@ -126,9 +127,11 @@ const Tareas = () => {
 
   const getStatsCard = () => {
     const total = tareas.length;
-    const completadas = tareas.filter(t => t.status === 'completed').length;
-    const pendientes = tareas.filter(t => t.status === 'pending').length;
-    const atrasadas = tareas.filter(t => t.isOverdue || t.status === 'overdue').length;
+    const completadas = tareas.filter((t) => t.status === "completed").length;
+    const pendientes = tareas.filter((t) => t.status === "pending").length;
+    const atrasadas = tareas.filter(
+      (t) => t.isOverdue || t.status === "overdue"
+    ).length;
 
     return { total, completadas, pendientes, atrasadas };
   };
@@ -155,7 +158,9 @@ const Tareas = () => {
           <div className="flex items-center space-x-3">
             <AlertCircle className="w-6 h-6 text-red-600" />
             <div>
-              <h3 className="text-red-800 font-semibold">Error al cargar las tareas</h3>
+              <h3 className="text-red-800 font-semibold">
+                Error al cargar las tareas
+              </h3>
               <p className="text-red-600 mt-1">{error}</p>
               <button
                 onClick={refrescarTareas}
@@ -176,7 +181,10 @@ const Tareas = () => {
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900"> Tareas Asignadas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {" "}
+              Tareas Asignadas
+            </h1>
             <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
               Revisa y completa las tareas asignadas por tus profesores
             </p>
@@ -185,13 +193,17 @@ const Tareas = () => {
             onClick={refrescarTareas}
             disabled={isRefetching}
             className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors min-w-max ${
-              isRefetching 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700'
+              isRefetching
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             } text-white`}
           >
-            <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
-            <span className="text-sm sm:text-base">{isRefetching ? 'Actualizando...' : 'Actualizar'}</span>
+            <RefreshCw
+              className={`w-4 h-4 ${isRefetching ? "animate-spin" : ""}`}
+            />
+            <span className="text-sm sm:text-base">
+              {isRefetching ? "Actualizando..." : "Actualizar"}
+            </span>
           </button>
         </div>
       </div>
@@ -201,38 +213,54 @@ const Tareas = () => {
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Total</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Total
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                {stats.total}
+              </p>
             </div>
             <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Completadas</p>
-              <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.completadas}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Completadas
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">
+                {stats.completadas}
+              </p>
             </div>
             <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Pendientes</p>
-              <p className="text-xl sm:text-2xl font-bold text-yellow-600">{stats.pendientes}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Pendientes
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-yellow-600">
+                {stats.pendientes}
+              </p>
             </div>
             <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
           </div>
         </div>
-        
+
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Atrasadas</p>
-              <p className="text-xl sm:text-2xl font-bold text-red-600">{stats.atrasadas}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Atrasadas
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-red-600">
+                {stats.atrasadas}
+              </p>
             </div>
             <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
           </div>
@@ -244,9 +272,11 @@ const Tareas = () => {
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-2">
             <Filter className="w-5 h-5 text-gray-400" />
-            <span className="text-sm font-medium text-gray-700">Filtrar por:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Filtrar por:
+            </span>
           </div>
-          
+
           <select
             value={selectedFilter}
             onChange={(e) => setSelectedFilter(e.target.value)}
@@ -257,7 +287,7 @@ const Tareas = () => {
             <option value="completed">Completadas</option>
             <option value="overdue">Atrasadas</option>
           </select>
-          
+
           <span className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
             Mostrando {filteredTareas.length} de {tareas.length} tareas
           </span>
@@ -269,16 +299,20 @@ const Tareas = () => {
         <div className="text-center py-12">
           <BookOpenCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {selectedFilter === "todas" 
-              ? "No tienes tareas asignadas" 
-              : `No hay tareas ${selectedFilter === "pending" ? "pendientes" : selectedFilter === "completed" ? "completadas" : "atrasadas"}`
-            }
+            {selectedFilter === "todas"
+              ? "No tienes tareas asignadas"
+              : `No hay tareas ${
+                  selectedFilter === "pending"
+                    ? "pendientes"
+                    : selectedFilter === "completed"
+                    ? "completadas"
+                    : "atrasadas"
+                }`}
           </h3>
           <p className="text-gray-600">
-            {selectedFilter === "todas" 
-              ? "Cuando tus profesores asignen tareas, aparecerán aquí." 
-              : "Prueba cambiando el filtro para ver otras tareas."
-            }
+            {selectedFilter === "todas"
+              ? "Cuando tus profesores asignen tareas, aparecerán aquí."
+              : "Prueba cambiando el filtro para ver otras tareas."}
           </p>
         </div>
       ) : (
@@ -287,17 +321,21 @@ const Tareas = () => {
             const statusInfo = getStatusInfo(tarea.status);
             const StatusIcon = statusInfo.icon;
             const daysLeft = getDaysLeft(tarea.dueDate);
-            
+
             return (
               <div
                 key={tarea.id}
-                className={`bg-white border-l-4 ${getPriorityColor(tarea.priority)} rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow`}
+                className={`bg-white border-l-4 ${getPriorityColor(
+                  tarea.priority
+                )} rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow`}
               >
                 <div className="p-4 sm:p-6">
                   {/* Header de la tarea */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                     <div className="flex items-start space-x-3 flex-1">
-                      <div className="text-xl sm:text-2xl flex-shrink-0">{tarea.emoji}</div>
+                      <div className="text-xl sm:text-2xl flex-shrink-0">
+                        {tarea.emoji}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">
@@ -318,7 +356,9 @@ const Tareas = () => {
                           </span>
                           <span className="flex items-center space-x-1">
                             <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                            <span className="truncate">Prof. {tarea.profesor}</span>
+                            <span className="truncate">
+                              Prof. {tarea.profesor}
+                            </span>
                           </span>
                           <span className="flex items-center space-x-1">
                             <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -327,18 +367,24 @@ const Tareas = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-end sm:justify-start">
-                      <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${statusInfo.color}`}>
+                      <span
+                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${statusInfo.color}`}
+                      >
                         <StatusIcon className="w-3 h-3 mr-1" />
-                        <span className="hidden sm:inline">{statusInfo.label}</span>
+                        <span className="hidden sm:inline">
+                          {statusInfo.label}
+                        </span>
                         <span className="sm:hidden">{statusInfo.emoji}</span>
                       </span>
                     </div>
                   </div>
 
                   {/* Descripción */}
-                  <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">{tarea.description}</p>
+                  <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">
+                    {tarea.description}
+                  </p>
 
                   {/* Fechas e información adicional */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
@@ -352,11 +398,15 @@ const Tareas = () => {
                     </div>
                     <div className="text-xs sm:text-sm col-span-1 sm:col-span-2 lg:col-span-1">
                       {daysLeft && (
-                        <span className={`font-medium ${
-                          tarea.isOverdue ? 'text-red-600' : 
-                          tarea.daysLeft <= 1 ? 'text-orange-600' : 
-                          'text-green-600'
-                        }`}>
+                        <span
+                          className={`font-medium ${
+                            tarea.isOverdue
+                              ? "text-red-600"
+                              : tarea.daysLeft <= 1
+                              ? "text-orange-600"
+                              : "text-green-600"
+                          }`}
+                        >
                           {daysLeft}
                         </span>
                       )}
@@ -368,7 +418,9 @@ const Tareas = () => {
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
                       <div className="flex items-center space-x-2">
                         <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                        <span className="text-green-800 font-medium text-sm sm:text-base">¡Tarea completada!</span>
+                        <span className="text-green-800 font-medium text-sm sm:text-base">
+                          ¡Tarea completada!
+                        </span>
                       </div>
                       {tarea.completedAt && (
                         <p className="text-green-700 text-xs sm:text-sm mt-1">
@@ -377,8 +429,12 @@ const Tareas = () => {
                       )}
                       {tarea.entrega?.observaciones && (
                         <div className="mt-3">
-                          <p className="text-green-700 text-xs sm:text-sm font-medium">Observaciones:</p>
-                          <p className="text-green-700 text-xs sm:text-sm">{tarea.entrega.observaciones}</p>
+                          <p className="text-green-700 text-xs sm:text-sm font-medium">
+                            Observaciones:
+                          </p>
+                          <p className="text-green-700 text-xs sm:text-sm">
+                            {tarea.entrega.observaciones}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -387,7 +443,9 @@ const Tareas = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex items-center space-x-2">
                           <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0" />
-                          <span className="text-yellow-800 font-medium text-sm sm:text-base">Pendiente de entrega</span>
+                          <span className="text-yellow-800 font-medium text-sm sm:text-base">
+                            Pendiente de entrega
+                          </span>
                         </div>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                           {tarea.entrega?.archivoUrl && (
@@ -396,7 +454,7 @@ const Tareas = () => {
                               <span>Ver archivo</span>
                             </button>
                           )}
-                          <button 
+                          <button
                             onClick={() => handleSubirTarea(tarea)}
                             className="flex items-center justify-center space-x-1 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-xs sm:text-sm hover:bg-green-200 transition-colors"
                           >
@@ -415,7 +473,7 @@ const Tareas = () => {
       )}
 
       {/* Modal para subir tarea */}
-      <SubirTareaModal 
+      <SubirTareaModal
         isOpen={modalOpen}
         onClose={handleModalClose}
         tarea={selectedTarea}

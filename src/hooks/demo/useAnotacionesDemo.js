@@ -5,6 +5,7 @@ import {
   createDemoMutationFn,
 } from "./useDemoQuery";
 import { mockData } from "../../data/mockData";
+import { anotacionesStore } from "../../store/anotacionesStore";
 
 /**
  * Hook para obtener anotaciones por trabajador/docente
@@ -13,36 +14,154 @@ export const useAnotacionesByTrabajadorDemo = (trabajadorId) => {
   return useDemoQuery({
     queryKey: ["anotaciones", "trabajador", trabajadorId],
     queryFn: async () => {
-      // Obtener aulas del trabajador
-      const aulasTrabajadar = mockData.aulas.filter(
-        (a) => a.docenteId === trabajadorId
+      console.log(
+        "🎭 [ANOTACIONES DEMO] Generando anotaciones ficticias para trabajador:",
+        trabajadorId || "2"
       );
-      const aulaIds = aulasTrabajadar.map((a) => a.id);
 
-      // Obtener estudiantes de esas aulas
-      const estudiantesIds = mockData.estudiantes
-        .filter((e) => aulaIds.includes(e.aulaId))
-        .map((e) => e.id);
+      // Simular delay de carga
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Filtrar anotaciones de esos estudiantes
-      const anotaciones = mockData.anotaciones
-        .filter((a) => estudiantesIds.includes(a.estudianteId))
-        .map((a) => {
-          const estudiante = mockData.estudiantes.find(
-            (e) => e.id === a.estudianteId
-          );
-          return {
-            ...a,
-            estudiante: estudiante
-              ? `${estudiante.nombre} ${estudiante.apellidos}`
-              : "Estudiante no encontrado",
-            estudianteData: estudiante,
-          };
-        });
+      // Obtener anotaciones temporales del store
+      const anotacionesTemporales = anotacionesStore.obtenerAnotaciones();
+      console.log(
+        "📦 [STORE] Anotaciones temporales obtenidas:",
+        anotacionesTemporales.length
+      );
 
-      return anotaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+      // Generar anotaciones ficticias base
+      const anotacionesFicticias = [
+        {
+          idAnotacionAlumno: "anot-1",
+          titulo: "Excelente progreso en matemáticas",
+          observacion:
+            "Ana ha mostrado una mejora significativa en la resolución de problemas de fracciones. Su participación en clase es activa y sus tareas están bien desarrolladas.",
+          fecha: "2025-10-12T10:30:00",
+          tipo: "POSITIVA",
+          estudiante: {
+            id: "est-1",
+            nombre: "Ana María",
+            apellido: "García Pérez",
+          },
+          curso: {
+            idCurso: "1",
+            nombreCurso: "Matemática",
+          },
+          docenteId: trabajadorId || "2",
+        },
+        {
+          idAnotacionAlumno: "anot-2",
+          titulo: "Incidente en el recreo",
+          observacion:
+            "Carlos tuvo una discusión menor con un compañero durante el recreo. Se conversó con ambos estudiantes y resolvieron sus diferencias. Requiere seguimiento.",
+          fecha: "2025-10-11T14:15:00",
+          tipo: "NEGATIVA",
+          estudiante: {
+            id: "est-2",
+            nombre: "Carlos Eduardo",
+            apellido: "López Torres",
+          },
+          curso: {
+            idCurso: "2",
+            nombreCurso: "Comunicación",
+          },
+          docenteId: trabajadorId || "2",
+        },
+        {
+          idAnotacionAlumno: "anot-3",
+          titulo: "Reconocimiento por proyecto de ciencias",
+          observacion:
+            "Isabella presentó un proyecto excepcional sobre el sistema solar. Su creatividad y dedicación fueron notables. Se recomienda para la feria de ciencias.",
+          fecha: "2025-10-10T09:45:00",
+          tipo: "POSITIVA",
+          estudiante: {
+            id: "est-3",
+            nombre: "Isabella",
+            apellido: "Rodríguez Martínez",
+          },
+          curso: {
+            idCurso: "3",
+            nombreCurso: "Ciencia y Tecnología",
+          },
+          docenteId: trabajadorId || "2",
+        },
+        {
+          idAnotacionAlumno: "anot-4",
+          titulo: "Ausencias frecuentes",
+          observacion:
+            "Diego ha faltado 3 veces esta semana. Los padres indican problemas de salud menores. Importante dar seguimiento a las tareas perdidas.",
+          fecha: "2025-10-09T11:20:00",
+          tipo: "NEUTRA",
+          estudiante: {
+            id: "est-4",
+            nombre: "Diego",
+            apellido: "Fernández Ruiz",
+          },
+          curso: {
+            idCurso: "4",
+            nombreCurso: "Personal Social",
+          },
+          docenteId: trabajadorId || "2",
+        },
+        {
+          idAnotacionAlumno: "anot-5",
+          titulo: "Participación destacada en clase",
+          observacion:
+            "Sofía ha demostrado un gran interés en las actividades de arte. Sus dibujos reflejan creatividad y técnica avanzada para su edad.",
+          fecha: "2025-10-08T15:00:00",
+          tipo: "POSITIVA",
+          estudiante: {
+            id: "est-5",
+            nombre: "Sofía",
+            apellido: "Mendoza Castro",
+          },
+          curso: {
+            idCurso: "5",
+            nombreCurso: "Arte y Cultura",
+          },
+          docenteId: trabajadorId || "2",
+        },
+        {
+          idAnotacionAlumno: "anot-6",
+          titulo: "Mejora en conducta",
+          observacion:
+            "Luis ha mostrado una actitud más positiva en clase esta semana. Está cumpliendo con las normas de convivencia y colabora con sus compañeros.",
+          fecha: "2025-10-07T13:30:00",
+          tipo: "POSITIVA",
+          estudiante: {
+            id: "est-6",
+            nombre: "Luis",
+            apellido: "Ramírez Soto",
+          },
+          curso: {
+            idCurso: "2",
+            nombreCurso: "Comunicación",
+          },
+          docenteId: trabajadorId || "2",
+        },
+      ];
+
+      // Combinar: anotaciones temporales primero (más recientes), luego las ficticias
+      const todasLasAnotaciones = [
+        ...anotacionesTemporales,
+        ...anotacionesFicticias,
+      ];
+
+      console.log(
+        "✅ [ANOTACIONES DEMO] Total anotaciones:",
+        todasLasAnotaciones.length,
+        "(Temporales:",
+        anotacionesTemporales.length,
+        "+ Base:",
+        anotacionesFicticias.length,
+        ")"
+      );
+
+      return todasLasAnotaciones;
     },
-    enabled: !!trabajadorId,
+    enabled: true, // Siempre habilitado
+    refetchOnMount: "always",
+    staleTime: 0,
     defaultData: [],
   });
 };
@@ -59,7 +178,12 @@ export const useAnotacionesDemo = (filters = {}) => {
 
   // Agregar operaciones CRUD simuladas
   const deleteAnotacion = async (id) => {
-    console.log("🎭 Demo: Eliminando anotación", id);
+    console.log("🎭 [DEMO] Simulando eliminación de anotación:", id);
+
+    // Simular delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    console.log("✅ [DEMO] Anotación eliminada exitosamente");
     return { success: true };
   };
 
