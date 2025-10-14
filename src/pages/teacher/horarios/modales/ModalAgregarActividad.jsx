@@ -7,7 +7,6 @@ import {
   X,
   Calendar,
   Clock,
-  MapPin,
   User,
   FileText,
   Save,
@@ -16,8 +15,6 @@ import {
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useAulasHook } from "../../../../hooks/useAulas";
-import { useAulasByTrabajador } from "../../../../hooks/queries/useAulasQueries";
 import { useAuthStore } from "../../../../store/useAuthStore";
 
 // Esquema de validación con Yup
@@ -71,83 +68,19 @@ const ModalAgregarActividad = ({
   // Hooks
   const { user } = useAuthStore();
 
-  // Lógica condicional para obtener aulas según el rol
-  const isDocente = user?.rol === "DOCENTE" || user?.role === "DOCENTE";
-  const trabajadorId = user?.entidadId || localStorage.getItem("entidadId");
+  // Datos ficticios de aulas para demo (sin conexión a BD)
+  const aulasFicticias = [
+    { id: "aula-1", nombre: "Aula Amarilla", grado: "Inicial 4 años", seccion: "A" },
+    { id: "aula-2", nombre: "Aula Azul", grado: "Inicial 5 años", seccion: "B" },
+    { id: "aula-3", nombre: "Aula Roja", grado: "Primaria 1er grado", seccion: "A" },
+    { id: "aula-4", nombre: "Aula Verde", grado: "Primaria 2do grado", seccion: "B" },
+    { id: "aula-5", nombre: "Aula Morada", grado: "Primaria 3er grado", seccion: "A" },
+    { id: "aula-6", nombre: "Aula Naranja", grado: "Inicial 3 años", seccion: "C" },
+  ];
 
-  // Hook para todas las aulas (solo para admin)
-  const { aulas: allAulas, loading: loadingAllAulas } = useAulasHook();
-
-  // Hook para aulas específicas del trabajador (solo para docentes)
-  const {
-    data: aulasTrabajador = [],
-    isLoading: loadingAulasTrabajador,
-    error: errorAulasTrabajador,
-  } = useAulasByTrabajador(trabajadorId, {
-    enabled: isDocente && !!trabajadorId,
-    refetchOnMount: true,
-    refetchOnWindowFocus: false,
-    staleTime: 0, // Forzar refetch cada vez
-  });
-
-  // Determinar qué aulas usar y el estado de loading
-  // Asegurar que siempre sea un array
-  const rawAulas = isDocente ? aulasTrabajador?.aulas || [] : allAulas;
-  const aulas = Array.isArray(rawAulas) ? rawAulas : [];
-  const loadingAulas = isDocente ? loadingAulasTrabajador : loadingAllAulas;
-
-  // Debug: ver estructura de aulas
-  console.log("🏫 Datos del usuario:", {
-    rol: user?.rol,
-    role: user?.role,
-    entidadId: user?.entidadId,
-    isDocente,
-    trabajadorId,
-    fullUserData: user,
-  });
-  console.log("🏫 Raw aulas data:", { rawAulas, aulasTrabajador, allAulas });
-  console.log("🏫 Aulas procesadas (array):", aulas);
-  console.log("🏫 Loading state:", {
-    loadingAulas,
-    isDocente,
-    loadingAllAulas,
-    loadingAulasTrabajador,
-  });
-  console.log("🏫 localStorage entidadId:", localStorage.getItem("entidadId"));
-  console.log("🏫 Array check:", {
-    isArray: Array.isArray(aulas),
-    length: aulas?.length,
-    type: typeof aulas,
-  });
-
-  // Debug adicional para errores
-  if (errorAulasTrabajador) {
-    console.error("❌ Error en aulasTrabajador:", errorAulasTrabajador);
-  }
-  console.log("🔍 aulasTrabajador detallado:", {
-    data: aulasTrabajador,
-    isArray: Array.isArray(aulasTrabajador),
-    keys: Object.keys(aulasTrabajador || {}),
-    type: typeof aulasTrabajador,
-    firstItem: aulasTrabajador?.[0],
-    length: aulasTrabajador?.length,
-  });
-
-  // Debug específico para aulas procesadas
-  console.log(
-    "🏫 Aulas finales para select:",
-    aulas.map((aula) => ({
-      id: aula.id_aula || aula.idAula || aula.id,
-      nombre: aula.nombre,
-      seccion: aula.seccion,
-      grado: aula.grado,
-      display:
-        aula.grado && aula.seccion
-          ? `${aula.grado} - ${aula.seccion}`
-          : aula.nombre,
-      original: aula,
-    }))
-  );
+  // Usar aulas ficticias (no hay loading ya que son datos estáticos)
+  const aulas = aulasFicticias;
+  const loadingAulas = false;
 
   const {
     register,
@@ -166,7 +99,7 @@ const ModalAgregarActividad = ({
       horaInicio: "08:00",
       horaFin: "09:00",
       idAula: "",
-      idTrabajador: user?.entidadId || "",
+      idTrabajador: user?.entidadId || "demo-trabajador-123",
     },
   });
 
@@ -241,8 +174,8 @@ const ModalAgregarActividad = ({
 
   // Efecto para setear el ID del trabajador automáticamente
   useEffect(() => {
-    if (user?.entidadId && isOpen) {
-      setValue("idTrabajador", user.entidadId);
+    if (isOpen) {
+      setValue("idTrabajador", user?.entidadId || "demo-trabajador-123");
     }
   }, [user, isOpen, setValue]);
 
@@ -291,7 +224,7 @@ const ModalAgregarActividad = ({
       horaInicio: "08:00",
       horaFin: "09:00",
       idAula: "",
-      idTrabajador: user?.entidadId || "",
+      idTrabajador: user?.entidadId || "demo-trabajador-123",
     });
     onClose();
   };
@@ -465,80 +398,25 @@ const ModalAgregarActividad = ({
                         <select
                           {...register("idAula")}
                           className={inputClassName(errors.idAula)}
-                          disabled={isLoading || loadingAulas}
+                          disabled={isLoading}
                         >
                           <option value="">
-                            {loadingAulas
-                              ? "Cargando aulas..."
-                              : isDocente
-                              ? "Seleccionar aula asignada"
-                              : "Seleccionar aula"}
+                            Seleccionar aula
                           </option>
-                          {Array.isArray(aulas) && aulas.length > 0 ? (
-                            aulas.map((aula) => (
-                              <option
-                                key={aula.id_aula || aula.idAula || aula.id}
-                                value={aula.id_aula || aula.idAula || aula.id}
-                              >
-                                {aula.grado && aula.seccion
-                                  ? `${aula.grado} - ${aula.seccion}`
-                                  : aula.nombre ||
-                                    `Aula ${
-                                      aula.seccion || aula.numero || aula.id
-                                    }`}
-                              </option>
-                            ))
-                          ) : !loadingAulas ? (
-                            <option value="" disabled>
-                              {isDocente
-                                ? "No tienes aulas asignadas"
-                                : "No hay aulas disponibles"}
+                          {aulas.map((aula) => (
+                            <option
+                              key={aula.id}
+                              value={aula.id}
+                            >
+                              {aula.grado && aula.seccion
+                                ? `${aula.grado} - ${aula.seccion}`
+                                : aula.nombre}
                             </option>
-                          ) : null}
+                          ))}
                         </select>
-                        {loadingAulas && (
-                          <p className="text-blue-500 text-sm mt-1 flex items-center gap-1">
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                            Cargando aulas{isDocente ? " asignadas" : ""}...
-                          </p>
-                        )}
-                        {!loadingAulas &&
-                          Array.isArray(aulas) &&
-                          aulas.length === 0 && (
-                            <p className="text-amber-600 text-sm mt-1">
-                              ⚠️{" "}
-                              {isDocente
-                                ? "No tienes aulas asignadas. Contacta al administrador."
-                                : "No hay aulas disponibles en el sistema."}
-                            </p>
-                          )}
-                        {!loadingAulas && !Array.isArray(aulas) && (
-                          <p className="text-red-600 text-sm mt-1">
-                            ❌ Error: Los datos de aulas no son válidos. Revisa
-                            la consola para más detalles.
-                          </p>
-                        )}
-                        {isDocente &&
-                          !loadingAulas &&
-                          Array.isArray(aulas) &&
-                          aulas.length > 0 && (
-                            <p className="text-green-600 text-xs mt-1">
-                              📚 Mostrando {aulas.length} aula
-                              {aulas.length !== 1 ? "s" : ""} asignada
-                              {aulas.length !== 1 ? "s" : ""} a ti como docente
-                            </p>
-                          )}
-                        {!isDocente &&
-                          !loadingAulas &&
-                          Array.isArray(aulas) &&
-                          aulas.length > 0 && (
-                            <p className="text-blue-600 text-xs mt-1">
-                              🏫 Mostrando {aulas.length} aula
-                              {aulas.length !== 1 ? "s" : ""} disponible
-                              {aulas.length !== 1 ? "s" : ""} (modo
-                              administrador)
-                            </p>
-                          )}
+                        <p className="text-blue-600 text-xs mt-1">
+                          🏫 Mostrando {aulas.length} aulas disponibles (modo demo)
+                        </p>
                       </FormField>
 
                       <FormField
@@ -551,13 +429,13 @@ const ModalAgregarActividad = ({
                           className={`${inputClassName(
                             errors.idTrabajador
                           )} bg-gray-50`}
-                          value={user?.fullName || "Usuario actual"}
+                          value={user?.fullName || "Prof. Demo García"}
                           disabled={true}
                           readOnly
                         />
-                        <input type="hidden" {...register("idTrabajador")} />
+                        <input type="hidden" {...register("idTrabajador")} value={user?.entidadId || "demo-trabajador-123"} />
                         <p className="text-gray-500 text-xs mt-1">
-                          ID: {user?.entidadId || "No disponible"}
+                          ID: {user?.entidadId || "demo-trabajador-123"} {!user?.entidadId && "(modo demo)"}
                         </p>
                       </FormField>
                     </div>

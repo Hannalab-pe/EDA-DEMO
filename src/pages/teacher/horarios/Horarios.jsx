@@ -376,15 +376,6 @@ const Horarios = () => {
         </button>
       </div>
 
-      {/* Información del docente */}
-      <div
-        className={`${
-          isMobile
-            ? "px-4 pb-3 bg-white border-b flex-shrink-0"
-            : "bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-        }`}
-      ></div>
-
       {/* Vista de Calendario */}
       <div className={`${isMobile ? "flex-1 overflow-hidden" : ""}`}>
         <CalendarioHorarios
