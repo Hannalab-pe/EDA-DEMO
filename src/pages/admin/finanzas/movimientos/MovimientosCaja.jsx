@@ -327,61 +327,22 @@ const MovimientosCaja = () => {
     setLoadingUpdate(true)
 
     try {
-      // Preparar solo los campos que han cambiado
-      const fieldsToUpdate = {}
-      const originalData = {
-        tipo: movimientoToEdit.tipo,
-        concepto: movimientoToEdit.concepto,
-        descripcion: movimientoToEdit.descripcion || '',
-        monto: movimientoToEdit.monto.toString(),
-        categoria: movimientoToEdit.categoria,
-        subcategoria: movimientoToEdit.subcategoria || '',
-        metodoPago: movimientoToEdit.metodoPago,
-        comprobante: movimientoToEdit.comprobante || '',
-        fecha: movimientoToEdit.fecha,
-        numeroTransaccion: movimientoToEdit.numeroTransaccion || '',
-        referenciaExterna: movimientoToEdit.referenciaExterna || ''
-      }
-
-      // Comparar cada campo y agregar solo los que han cambiado
-      Object.keys(editFormData).forEach(key => {
-        if (editFormData[key] !== originalData[key]) {
-          if (key === 'monto') {
-            fieldsToUpdate[key] = parseFloat(editFormData[key])
-          } else {
-            fieldsToUpdate[key] = editFormData[key]
-          }
-        }
+      // Mostrar toast informativo para funcionalidad premium
+      toast.info('Funcionalidad Premium', {
+        description: 'Contacte con nosotros para acceder a todas las funcionalidades de edición y actualización de movimientos.',
+        duration: 5000
       })
 
-      // Si no hay cambios, mostrar mensaje
-      if (Object.keys(fieldsToUpdate).length === 0) {
-        toast.info('No se detectaron cambios para actualizar')
-        return
-      }
-
-      console.log('📝 Campos a actualizar:', fieldsToUpdate)
-
-      // Llamar al servicio de actualización
-      const response = await cajaService.actualizarMovimiento(
-        movimientoToEdit.idMovimiento, 
-        fieldsToUpdate
-      )
-
-      if (response.success) {
-        toast.success('Movimiento actualizado exitosamente')
+      // Cerrar modal después de un breve delay
+      setTimeout(() => {
         setIsEditModalOpen(false)
         setMovimientoToEdit(null)
         setEditFormData({})
-        
-        // Recargar movimientos y saldo
-        cargarMovimientos()
-        cargarSaldoCaja()
-      }
+      }, 1000)
 
     } catch (error) {
-      console.error('❌ Error al actualizar:', error)
-      toast.error(error.message || 'Error al actualizar el movimiento')
+      console.error('❌ Error:', error)
+      toast.error('Error al procesar la solicitud')
     } finally {
       setLoadingUpdate(false)
     }
