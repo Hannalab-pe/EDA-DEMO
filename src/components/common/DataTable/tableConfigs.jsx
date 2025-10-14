@@ -1701,14 +1701,6 @@ export const rolesColumns = [
 
 // Filtros para roles
 export const rolesFilters = {
-  status: {
-    label: "Estado",
-    placeholder: "Todos los estados",
-    options: [
-      { value: "active", label: "Activo" },
-      { value: "inactive", label: "Inactivo" },
-    ],
-  },
   nombre: {
     label: "Nombre del Rol",
     placeholder: "Buscar por nombre",

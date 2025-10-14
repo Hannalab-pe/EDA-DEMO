@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Save,
   Loader2,
@@ -8,207 +8,211 @@ import {
   DollarSign,
   Calendar,
   FileText,
-  ArrowLeft
-} from 'lucide-react'
-import { toast } from 'sonner'
-import { movimientosCajaDemo, saldoCajaDemo } from '../../../../data/finanzasDemo'
+  ArrowLeft,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  movimientosCajaDemo,
+  saldoCajaDemo,
+} from "../../../../data/finanzasDemo";
 
 // Categorías por tipo de movimiento
 const categoriasIngreso = [
-  'INGRESO_ADICIONAL',
-  'MATERIAL_EDUCATIVO',
-  'OTROS_INGRESOS'
+  "INGRESO_ADICIONAL",
+  "MATERIAL_EDUCATIVO",
+  "OTROS_INGRESOS",
 ];
 
 const categoriasEgreso = [
-  'SUELDO_DOCENTE',
-  'GASTOS_OPERATIVOS',
-  'GASTOS_ADMINISTRATIVOS',
-  'INFRAESTRUCTURA',
-  'OTROS_GASTOS'
+  "SUELDO_DOCENTE",
+  "GASTOS_OPERATIVOS",
+  "GASTOS_ADMINISTRATIVOS",
+  "INFRAESTRUCTURA",
+  "OTROS_GASTOS",
 ];
 
 // Función para obtener el label legible de una categoría
 const getCategoriaLabel = (categoria) => {
   const labels = {
     // Ingresos
-    'PENSION_MENSUAL': 'Pensión Mensual',
-    'MATRICULA': 'Matrícula',
-    'INGRESO_ADICIONAL': 'Ingreso Adicional',
-    'MATERIAL_EDUCATIVO': 'Material Educativo',
-    'OTROS_INGRESOS': 'Otros Ingresos',
-    
+    PENSION_MENSUAL: "Pensión Mensual",
+    MATRICULA: "Matrícula",
+    INGRESO_ADICIONAL: "Ingreso Adicional",
+    MATERIAL_EDUCATIVO: "Material Educativo",
+    OTROS_INGRESOS: "Otros Ingresos",
+
     // Egresos
-    'PAGO_PLANILLA': 'Pago de Planilla',
-    'SUELDO_DOCENTE': 'Sueldo Docente RH',
-    'GASTOS_OPERATIVOS': 'Gastos Operativos',
-    'GASTOS_ADMINISTRATIVOS': 'Gastos Administrativos',
-    'INFRAESTRUCTURA': 'Infraestructura',
-    'OTROS_GASTOS': 'Otros Gastos'
+    PAGO_PLANILLA: "Pago de Planilla",
+    SUELDO_DOCENTE: "Sueldo Docente RH",
+    GASTOS_OPERATIVOS: "Gastos Operativos",
+    GASTOS_ADMINISTRATIVOS: "Gastos Administrativos",
+    INFRAESTRUCTURA: "Infraestructura",
+    OTROS_GASTOS: "Otros Gastos",
   };
-  
+
   return labels[categoria] || categoria;
 };
 
 const MovimientosCaja = () => {
-  const [activeTab, setActiveTab] = useState('nuevo')
-  const [loading, setLoading] = useState(false)
-  const [loadingHistorial, setLoadingHistorial] = useState(false)
-  const [loadingSaldo, setLoadingSaldo] = useState(false)
-  const [movimientos, setMovimientos] = useState([])
-  const [filteredMovimientos, setFilteredMovimientos] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterTipo, setFilterTipo] = useState('TODOS')
-  
+  const [activeTab, setActiveTab] = useState("nuevo");
+  const [loading, setLoading] = useState(false);
+  const [loadingHistorial, setLoadingHistorial] = useState(false);
+  const [loadingSaldo, setLoadingSaldo] = useState(false);
+  const [movimientos, setMovimientos] = useState([]);
+  const [filteredMovimientos, setFilteredMovimientos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterTipo, setFilterTipo] = useState("TODOS");
+
   // Estados para paginación
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   // Estados para edición
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [movimientoToEdit, setMovimientoToEdit] = useState(null)
-  const [editFormData, setEditFormData] = useState({})
-  const [loadingUpdate, setLoadingUpdate] = useState(false)
-  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [movimientoToEdit, setMovimientoToEdit] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+
   // Estado del saldo
   const [saldoData, setSaldoData] = useState({
     saldo: 0,
     ingresos: 0,
-    egresos: 0
-  })
-  
+    egresos: 0,
+  });
+
   // Estado del formulario
   const [formData, setFormData] = useState({
-    tipo: 'INGRESO',
-    concepto: '',
-    descripcion: '',
-    monto: '',
-    categoria: '',
-    subcategoria: '',
-    metodoPago: 'EFECTIVO',
-    comprobante: '',
-    estado: 'CONFIRMADO',
-    fecha: new Date().toLocaleDateString('en-CA'),
-    numeroTransaccion: '',
-    referenciaExterna: ''
-  })
+    tipo: "INGRESO",
+    concepto: "",
+    descripcion: "",
+    monto: "",
+    categoria: "",
+    subcategoria: "",
+    metodoPago: "EFECTIVO",
+    comprobante: "",
+    estado: "CONFIRMADO",
+    fecha: new Date().toLocaleDateString("en-CA"),
+    numeroTransaccion: "",
+    referenciaExterna: "",
+  });
 
   // Cargar movimientos y saldo cuando se cambia a la pestaña historial
   useEffect(() => {
-    if (activeTab === 'historial') {
-      cargarMovimientos()
-      cargarSaldoCaja()
+    if (activeTab === "historial") {
+      cargarMovimientos();
+      cargarSaldoCaja();
     }
-  }, [activeTab])
+  }, [activeTab]);
 
   // Filtrar movimientos cuando cambia el término de búsqueda o el filtro
   useEffect(() => {
-    let filtered = movimientos
+    let filtered = movimientos;
 
     // Filtrar por tipo
-    if (filterTipo !== 'TODOS') {
-      filtered = filtered.filter(mov => mov.tipo === filterTipo)
+    if (filterTipo !== "TODOS") {
+      filtered = filtered.filter((mov) => mov.tipo === filterTipo);
     }
 
     // Filtrar por término de búsqueda
     if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(mov => 
-        mov.concepto?.toLowerCase().includes(term) ||
-        mov.descripcion?.toLowerCase().includes(term) ||
-        mov.estudiante?.nombre?.toLowerCase().includes(term) ||
-        mov.estudiante?.apellido?.toLowerCase().includes(term) ||
-        mov.numeroTransaccion?.toLowerCase().includes(term) ||
-        mov.comprobante?.toLowerCase().includes(term)
-      )
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (mov) =>
+          mov.concepto?.toLowerCase().includes(term) ||
+          mov.descripcion?.toLowerCase().includes(term) ||
+          mov.estudiante?.nombre?.toLowerCase().includes(term) ||
+          mov.estudiante?.apellido?.toLowerCase().includes(term) ||
+          mov.numeroTransaccion?.toLowerCase().includes(term) ||
+          mov.comprobante?.toLowerCase().includes(term)
+      );
     }
 
-    setFilteredMovimientos(filtered)
+    setFilteredMovimientos(filtered);
     // Resetear a la primera página cuando cambian los filtros
-    setCurrentPage(1)
-  }, [movimientos, searchTerm, filterTipo])
+    setCurrentPage(1);
+  }, [movimientos, searchTerm, filterTipo]);
 
   const cargarMovimientos = async () => {
-    setLoadingHistorial(true)
+    setLoadingHistorial(true);
     try {
-      console.log('🎭 DEMO: Cargando historial de movimientos...')
+      console.log("🎭 DEMO: Cargando historial de movimientos...");
 
       // Simular delay de carga
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Usar datos demo
-      setMovimientos(movimientosCajaDemo)
-      console.log('✅ Movimientos demo cargados:', movimientosCajaDemo.length)
-      toast.success(`${movimientosCajaDemo.length} movimientos cargados`)
+      setMovimientos(movimientosCajaDemo);
+      console.log("✅ Movimientos demo cargados:", movimientosCajaDemo.length);
+      toast.success(`${movimientosCajaDemo.length} movimientos cargados`);
     } catch (error) {
-      console.error('❌ Error al cargar movimientos:', error)
-      toast.error('Error al cargar el historial de movimientos')
-      setMovimientos([])
+      console.error("❌ Error al cargar movimientos:", error);
+      toast.error("Error al cargar el historial de movimientos");
+      setMovimientos([]);
     } finally {
-      setLoadingHistorial(false)
+      setLoadingHistorial(false);
     }
     // Resetear a la primera página cuando se cargan nuevos movimientos
-    setCurrentPage(1)
-  }
+    setCurrentPage(1);
+  };
 
   const cargarSaldoCaja = async () => {
-    setLoadingSaldo(true)
+    setLoadingSaldo(true);
     try {
-      console.log('🎭 DEMO: Cargando saldo de caja...')
+      console.log("🎭 DEMO: Cargando saldo de caja...");
 
       // Simular delay de carga
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Usar datos demo
       setSaldoData({
         saldo: saldoCajaDemo.saldo,
         ingresos: saldoCajaDemo.ingresos,
-        egresos: saldoCajaDemo.egresos
-      })
-      console.log('✅ Saldo demo cargado:', saldoCajaDemo)
+        egresos: saldoCajaDemo.egresos,
+      });
+      console.log("✅ Saldo demo cargado:", saldoCajaDemo);
     } catch (error) {
-      console.error('❌ Error al cargar saldo:', error)
-      toast.error('Error al cargar el saldo de caja')
+      console.error("❌ Error al cargar saldo:", error);
+      toast.error("Error al cargar el saldo de caja");
     } finally {
-      setLoadingSaldo(false)
+      setLoadingSaldo(false);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    
+    const { name, value } = e.target;
+
     // Si cambia el tipo de movimiento, limpiar categoría y subcategoría
-    if (name === 'tipo') {
-      setFormData(prev => ({
+    if (name === "tipo") {
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
-        categoria: '',
-        subcategoria: ''
-      }))
+        categoria: "",
+        subcategoria: "",
+      }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
-      }))
+        [name]: value,
+      }));
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       // Validaciones básicas
       if (!formData.concepto || !formData.monto) {
-        toast.error('Complete los campos requeridos')
-        setLoading(false)
-        return
+        toast.error("Complete los campos requeridos");
+        setLoading(false);
+        return;
       }
 
-      console.log('🎭 DEMO: Guardando movimiento...')
+      console.log("🎭 DEMO: Guardando movimiento...");
 
       // Simular delay de guardado
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Preparar nuevo movimiento demo
       const nuevoMovimiento = {
@@ -225,304 +229,329 @@ const MovimientosCaja = () => {
         fecha: formData.fecha,
         numeroTransaccion: formData.numeroTransaccion || `TRX-${Date.now()}`,
         referenciaExterna: formData.referenciaExterna,
-        creadoPor: 'admin@nidopro.com'
-      }
+        creadoPor: "admin@nidopro.com",
+      };
 
-      console.log('✅ Movimiento demo creado:', nuevoMovimiento)
+      console.log("✅ Movimiento demo creado:", nuevoMovimiento);
 
       // Agregar al listado de movimientos
-      setMovimientos(prev => [nuevoMovimiento, ...prev])
+      setMovimientos((prev) => [nuevoMovimiento, ...prev]);
 
       // Actualizar saldo
-      if (formData.tipo === 'INGRESO') {
-        setSaldoData(prev => ({
+      if (formData.tipo === "INGRESO") {
+        setSaldoData((prev) => ({
           ...prev,
           saldo: prev.saldo + parseFloat(formData.monto),
-          ingresos: prev.ingresos + parseFloat(formData.monto)
-        }))
+          ingresos: prev.ingresos + parseFloat(formData.monto),
+        }));
       } else {
-        setSaldoData(prev => ({
+        setSaldoData((prev) => ({
           ...prev,
           saldo: prev.saldo - parseFloat(formData.monto),
-          egresos: prev.egresos + parseFloat(formData.monto)
-        }))
+          egresos: prev.egresos + parseFloat(formData.monto),
+        }));
       }
 
-      toast.success('Movimiento registrado exitosamente (demo)')
+      toast.success("Movimiento registrado exitosamente (demo)");
 
       // Limpiar formulario
       setFormData({
-        tipo: 'INGRESO',
-        concepto: '',
-        descripcion: '',
-        monto: '',
-        categoria: '',
-        subcategoria: '',
-        metodoPago: 'EFECTIVO',
-        comprobante: '',
-        estado: 'CONFIRMADO',
-        fecha: new Date().toLocaleDateString('en-CA'),
-        numeroTransaccion: '',
-        referenciaExterna: ''
-      })
+        tipo: "INGRESO",
+        concepto: "",
+        descripcion: "",
+        monto: "",
+        categoria: "",
+        subcategoria: "",
+        metodoPago: "EFECTIVO",
+        comprobante: "",
+        estado: "CONFIRMADO",
+        fecha: new Date().toLocaleDateString("en-CA"),
+        numeroTransaccion: "",
+        referenciaExterna: "",
+      });
 
       // Cambiar a pestaña historial para ver el nuevo movimiento
-      setActiveTab('historial')
-
+      setActiveTab("historial");
     } catch (error) {
-      console.error('❌ Error:', error)
-      toast.error(error.message || 'Error al registrar el movimiento')
+      console.error("❌ Error:", error);
+      toast.error(error.message || "Error al registrar el movimiento");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Funciones para manejo de edición
   const handleEditClick = (movimiento) => {
     // No permitir editar movimientos anulados
-    if (movimiento.estado === 'ANULADO') {
-      toast.error('No se puede editar un movimiento anulado')
-      return
+    if (movimiento.estado === "ANULADO") {
+      toast.error("No se puede editar un movimiento anulado");
+      return;
     }
 
-    setMovimientoToEdit(movimiento)
+    setMovimientoToEdit(movimiento);
     setEditFormData({
       tipo: movimiento.tipo,
       concepto: movimiento.concepto,
-      descripcion: movimiento.descripcion || '',
+      descripcion: movimiento.descripcion || "",
       monto: movimiento.monto.toString(),
       categoria: movimiento.categoria,
-      subcategoria: movimiento.subcategoria || '',
+      subcategoria: movimiento.subcategoria || "",
       metodoPago: movimiento.metodoPago,
-      comprobante: movimiento.comprobante || '',
+      comprobante: movimiento.comprobante || "",
       fecha: movimiento.fecha,
-      numeroTransaccion: movimiento.numeroTransaccion || '',
-      referenciaExterna: movimiento.referenciaExterna || '',
-      estado: movimiento.estado
-    })
-    setIsEditModalOpen(true)
-  }
+      numeroTransaccion: movimiento.numeroTransaccion || "",
+      referenciaExterna: movimiento.referenciaExterna || "",
+      estado: movimiento.estado,
+    });
+    setIsEditModalOpen(true);
+  };
 
   const handleEditInputChange = (e) => {
-    const { name, value } = e.target
-    
+    const { name, value } = e.target;
+
     // Si cambia el tipo de movimiento, limpiar categoría y subcategoría
-    if (name === 'tipo') {
-      setEditFormData(prev => ({
+    if (name === "tipo") {
+      setEditFormData((prev) => ({
         ...prev,
         [name]: value,
-        categoria: '',
-        subcategoria: ''
-      }))
+        categoria: "",
+        subcategoria: "",
+      }));
     } else {
-      setEditFormData(prev => ({
+      setEditFormData((prev) => ({
         ...prev,
-        [name]: value
-      }))
+        [name]: value,
+      }));
     }
-  }
+  };
 
   const handleUpdateSubmit = async (e) => {
-    e.preventDefault()
-    setLoadingUpdate(true)
+    e.preventDefault();
+    setLoadingUpdate(true);
 
     try {
       // Mostrar toast informativo para funcionalidad premium
-      toast.info('Funcionalidad Premium', {
-        description: 'Contacte con nosotros para acceder a todas las funcionalidades de edición y actualización de movimientos.',
-        duration: 5000
-      })
+      toast.info("Funcionalidad Premium", {
+        description:
+          "Contacte con nosotros para acceder a todas las funcionalidades de edición y actualización de movimientos.",
+        duration: 5000,
+      });
 
       // Cerrar modal después de un breve delay
       setTimeout(() => {
-        setIsEditModalOpen(false)
-        setMovimientoToEdit(null)
-        setEditFormData({})
-      }, 1000)
-
+        setIsEditModalOpen(false);
+        setMovimientoToEdit(null);
+        setEditFormData({});
+      }, 1000);
     } catch (error) {
-      console.error('❌ Error:', error)
-      toast.error('Error al procesar la solicitud')
+      console.error("❌ Error:", error);
+      toast.error("Error al procesar la solicitud");
     } finally {
-      setLoadingUpdate(false)
+      setLoadingUpdate(false);
     }
-  }
+  };
 
   const handleCloseEditModal = () => {
-    setIsEditModalOpen(false)
-    setMovimientoToEdit(null)
-    setEditFormData({})
-  }
+    setIsEditModalOpen(false);
+    setMovimientoToEdit(null);
+    setEditFormData({});
+  };
 
   // Funciones auxiliares
   const formatFecha = (fecha) => {
-    if (!fecha) return ''
-    
+    if (!fecha) return "";
+
     try {
       // Si la fecha viene en formato ISO (YYYY-MM-DD)
       let fechaObj;
-      
-      if (fecha.includes('-')) {
+
+      if (fecha.includes("-")) {
         // Formato ISO: 2025-09-10
         // Para evitar problemas de zona horaria, creamos la fecha como UTC
-        const [year, month, day] = fecha.split('-');
-        fechaObj = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+        const [year, month, day] = fecha.split("-");
+        fechaObj = new Date(
+          Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day))
+        );
       } else {
         // Formato estándar
         fechaObj = new Date(fecha);
       }
-      
+
       // Verificar que la fecha es válida
       if (isNaN(fechaObj.getTime())) {
-        console.error('Fecha inválida:', fecha);
+        console.error("Fecha inválida:", fecha);
         return fecha;
       }
-      
+
       // Mostrar la fecha en zona horaria de Perú (America/Lima)
-      return fechaObj.toLocaleDateString('es-PE', {
-        timeZone: 'America/Lima',
-        day: '2-digit',
-        month: '2-digit', 
-        year: 'numeric'
+      return fechaObj.toLocaleDateString("es-PE", {
+        timeZone: "America/Lima",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       });
     } catch (error) {
-      console.error('Error al formatear fecha:', fecha, error);
+      console.error("Error al formatear fecha:", fecha, error);
       return fecha;
     }
-  }
+  };
 
   const formatHora = (hora) => {
-    if (!hora) return ''
+    if (!hora) return "";
     try {
       // Si la hora viene en formato HH:MM:SS, convertirla a zona horaria de Perú
       let horaObj;
-      
-      if (hora.includes(':')) {
+
+      if (hora.includes(":")) {
         // Formato HH:MM:SS o HH:MM:SS.mmm
-        const [timePart] = hora.split('.');
-        const [hours, minutes, seconds] = timePart.split(':');
-        
+        const [timePart] = hora.split(".");
+        const [hours, minutes, seconds] = timePart.split(":");
+
         // Crear fecha con la hora actual en zona horaria de Perú
         const now = new Date();
-        horaObj = new Date(now.toLocaleString('en-US', { timeZone: 'America/Lima' }));
-        horaObj.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds || 0));
+        horaObj = new Date(
+          now.toLocaleString("en-US", { timeZone: "America/Lima" })
+        );
+        horaObj.setHours(
+          parseInt(hours),
+          parseInt(minutes),
+          parseInt(seconds || 0)
+        );
       } else {
         // Si no tiene formato esperado, devolver como está
         return hora;
       }
-      
+
       // Formatear la hora en zona horaria de Perú
-      return horaObj.toLocaleTimeString('es-PE', {
-        timeZone: 'America/Lima',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+      return horaObj.toLocaleTimeString("es-PE", {
+        timeZone: "America/Lima",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
       });
     } catch (error) {
-      console.error('Error al formatear hora:', hora, error)
-      return hora
+      console.error("Error al formatear hora:", hora, error);
+      return hora;
     }
-  }
+  };
 
   const formatMonto = (monto) => {
-    return `S/ ${parseFloat(monto).toFixed(2)}`
-  }
+    return `S/ ${parseFloat(monto).toFixed(2)}`;
+  };
 
   const getTipoColor = (tipo) => {
-    return tipo === 'INGRESO' 
-      ? 'text-green-600 bg-green-100' 
-      : 'text-red-600 bg-red-100'
-  }
+    return tipo === "INGRESO"
+      ? "text-green-600 bg-green-100"
+      : "text-red-600 bg-red-100";
+  };
 
   const getEstadoColor = (estado) => {
     switch (estado) {
-      case 'CONFIRMADO':
-        return 'text-green-700 bg-green-100'
-      case 'PENDIENTE':
-        return 'text-yellow-700 bg-yellow-100'
-      case 'CANCELADO':
-        return 'text-red-700 bg-red-100'
+      case "CONFIRMADO":
+        return "text-green-700 bg-green-100";
+      case "PENDIENTE":
+        return "text-yellow-700 bg-yellow-100";
+      case "CANCELADO":
+        return "text-red-700 bg-red-100";
       default:
-        return 'text-gray-700 bg-gray-100'
+        return "text-gray-700 bg-gray-100";
     }
-  }
+  };
 
   // Función para obtener elementos paginados
   const getPaginatedMovimientos = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const endIndex = startIndex + itemsPerPage
-    return filteredMovimientos.slice(startIndex, endIndex)
-  }
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredMovimientos.slice(startIndex, endIndex);
+  };
 
   // Función para calcular el número total de páginas
   const getTotalPages = () => {
-    return Math.ceil(filteredMovimientos.length / itemsPerPage)
-  }
+    return Math.ceil(filteredMovimientos.length / itemsPerPage);
+  };
 
   // Función para manejar cambio de página
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= getTotalPages()) {
-      setCurrentPage(pageNumber)
+      setCurrentPage(pageNumber);
     }
-  }
+  };
 
   // Función para generar números de página a mostrar
   const getPageNumbers = () => {
-    const totalPages = getTotalPages()
-    const current = currentPage
-    const pages = []
-    
+    const totalPages = getTotalPages();
+    const current = currentPage;
+    const pages = [];
+
     if (totalPages <= 5) {
       // Mostrar todas las páginas si son 5 o menos
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
       // Lógica para mostrar páginas con ellipsis
       if (current <= 3) {
-        pages.push(1, 2, 3, 4, 5)
+        pages.push(1, 2, 3, 4, 5);
       } else if (current >= totalPages - 2) {
-        pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages)
+        pages.push(
+          totalPages - 4,
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
       } else {
-        pages.push(current - 2, current - 1, current, current + 1, current + 2)
+        pages.push(current - 2, current - 1, current, current + 1, current + 2);
       }
     }
-    
-    return pages
-  }
+
+    return pages;
+  };
 
   const handleBack = () => {
-    window.dispatchEvent(new CustomEvent('changeFinanceView', { 
-      detail: { component: 'GestionFinanciera' } 
-    }))
-  }
+    window.dispatchEvent(
+      new CustomEvent("changeFinanceView", {
+        detail: { component: "GestionFinanciera" },
+      })
+    );
+  };
 
   const tabs = [
-    { id: 'nuevo', label: 'Nuevo Movimiento', icon: Plus },
-    { id: 'historial', label: 'Historial', icon: DollarSign }
-  ]
+    { id: "nuevo", label: "Nuevo Movimiento", icon: Plus },
+    { id: "historial", label: "Historial", icon: DollarSign },
+  ];
 
   const tiposMovimiento = [
-    { id: 'ingreso', label: 'Ingreso', color: 'text-green-600', bgColor: 'bg-green-50' },
-    { id: 'egreso', label: 'Egreso', color: 'text-red-600', bgColor: 'bg-red-50' }
-  ]
+    {
+      id: "ingreso",
+      label: "Ingreso",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    {
+      id: "egreso",
+      label: "Egreso",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+    },
+  ];
 
   const conceptosIngreso = [
-    'Pago de Pensión',
-    'Pago de Matrícula',
-    'Otros Ingresos',
-    'Donaciones',
-    'Servicios Adicionales'
-  ]
+    "Pago de Pensión",
+    "Pago de Matrícula",
+    "Otros Ingresos",
+    "Donaciones",
+    "Servicios Adicionales",
+  ];
 
   const conceptosEgreso = [
-    'Pago de Planilla',
-    'Servicios Básicos',
-    'Materiales y Suministros',
-    'Mantenimiento',
-    'Otros Gastos'
-  ]
+    "Pago de Planilla",
+    "Servicios Básicos",
+    "Materiales y Suministros",
+    "Mantenimiento",
+    "Otros Gastos",
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-3">
@@ -536,7 +565,7 @@ const MovimientosCaja = () => {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Volver a Gestión Financiera
           </button>
-          
+
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Movimientos de Caja
           </h1>
@@ -550,29 +579,30 @@ const MovimientosCaja = () => {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex">
               {tabs.map((tab) => {
-                const IconComponent = tab.icon
+                const IconComponent = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
                       py-3 px-6 border-b-2 font-medium text-sm flex items-center
-                      ${activeTab === tab.id
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ${
+                        activeTab === tab.id
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }
                     `}
                   >
                     <IconComponent className="h-5 w-5 mr-2" />
                     {tab.label}
                   </button>
-                )
+                );
               })}
             </nav>
           </div>
 
           <div className="p-4">
-            {activeTab === 'nuevo' && (
+            {activeTab === "nuevo" && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Registrar Nuevo Movimiento
@@ -590,15 +620,23 @@ const MovimientosCaja = () => {
                           key={tipo.id}
                           className={`
                             border-2 rounded-lg p-4 cursor-pointer transition-all
-                            ${formData.tipo === tipo.id.toUpperCase() 
-                              ? `border-blue-500 ${tipo.bgColor}` 
-                              : 'border-gray-200 hover:border-gray-300'
+                            ${
+                              formData.tipo === tipo.id.toUpperCase()
+                                ? `border-blue-500 ${tipo.bgColor}`
+                                : "border-gray-200 hover:border-gray-300"
                             }
                           `}
-                          onClick={() => setFormData(prev => ({ ...prev, tipo: tipo.id.toUpperCase() }))}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              tipo: tipo.id.toUpperCase(),
+                            }))
+                          }
                         >
                           <div className="flex items-center justify-center">
-                            <span className={`text-lg font-medium ${tipo.color}`}>
+                            <span
+                              className={`text-lg font-medium ${tipo.color}`}
+                            >
                               {tipo.label}
                             </span>
                           </div>
@@ -636,18 +674,22 @@ const MovimientosCaja = () => {
                         required
                       >
                         <option value="">
-                          {!formData.tipo ? 'Primero selecciona el tipo' : 'Seleccionar categoría'}
+                          {!formData.tipo
+                            ? "Primero selecciona el tipo"
+                            : "Seleccionar categoría"}
                         </option>
-                        {formData.tipo === 'INGRESO' && categoriasIngreso.map(categoria => (
-                          <option key={categoria} value={categoria}>
-                            {getCategoriaLabel(categoria)}
-                          </option>
-                        ))}
-                        {formData.tipo === 'EGRESO' && categoriasEgreso.map(categoria => (
-                          <option key={categoria} value={categoria}>
-                            {getCategoriaLabel(categoria)}
-                          </option>
-                        ))}
+                        {formData.tipo === "INGRESO" &&
+                          categoriasIngreso.map((categoria) => (
+                            <option key={categoria} value={categoria}>
+                              {getCategoriaLabel(categoria)}
+                            </option>
+                          ))}
+                        {formData.tipo === "EGRESO" &&
+                          categoriasEgreso.map((categoria) => (
+                            <option key={categoria} value={categoria}>
+                              {getCategoriaLabel(categoria)}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -715,7 +757,7 @@ const MovimientosCaja = () => {
                         name="fecha"
                         value={formData.fecha}
                         onChange={handleInputChange}
-                        max={new Date().toLocaleDateString('en-CA')}
+                        max={new Date().toLocaleDateString("en-CA")}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                       />
@@ -810,19 +852,19 @@ const MovimientosCaja = () => {
                       type="button"
                       onClick={() => {
                         setFormData({
-                          tipo: 'INGRESO',
-                          concepto: '',
-                          descripcion: '',
-                          monto: '',
-                          categoria: '',
-                          subcategoria: '',
-                          metodoPago: 'EFECTIVO',
-                          comprobante: '',
-                          estado: 'CONFIRMADO',
-                          fecha: new Date().toLocaleDateString('en-CA'),
-                          numeroTransaccion: '',
-                          referenciaExterna: ''
-                        })
+                          tipo: "INGRESO",
+                          concepto: "",
+                          descripcion: "",
+                          monto: "",
+                          categoria: "",
+                          subcategoria: "",
+                          metodoPago: "EFECTIVO",
+                          comprobante: "",
+                          estado: "CONFIRMADO",
+                          fecha: new Date().toLocaleDateString("en-CA"),
+                          numeroTransaccion: "",
+                          referenciaExterna: "",
+                        });
                       }}
                       className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
                       disabled={loading}
@@ -851,13 +893,13 @@ const MovimientosCaja = () => {
               </div>
             )}
 
-            {activeTab === 'historial' && (
+            {activeTab === "historial" && (
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 className="text-xl font-semibold text-gray-900">
                     Historial de Movimientos
                   </h2>
-                  
+
                   <div className="flex flex-col sm:flex-row gap-3">
                     {/* Filtro por tipo */}
                     <select
@@ -869,7 +911,7 @@ const MovimientosCaja = () => {
                       <option value="INGRESO">Ingresos</option>
                       <option value="EGRESO">Egresos</option>
                     </select>
-                    
+
                     {/* Buscador */}
                     <div className="relative">
                       <input
@@ -880,13 +922,13 @@ const MovimientosCaja = () => {
                         className="pl-4 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
                       />
                     </div>
-                    
+
                     {/* Botones de acción */}
                     <div className="flex space-x-2">
                       <button
                         onClick={() => {
-                          cargarMovimientos()
-                          cargarSaldoCaja()
+                          cargarMovimientos();
+                          cargarSaldoCaja();
                         }}
                         disabled={loadingHistorial}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
@@ -907,34 +949,50 @@ const MovimientosCaja = () => {
                   <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-100 text-sm font-medium">Total Ingresos</p>
-                        <p className="text-2xl font-bold">{formatMonto(saldoData.ingresos)}</p>
+                        <p className="text-green-100 text-sm font-medium">
+                          Total Ingresos
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {formatMonto(saldoData.ingresos)}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-4 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-red-100 text-sm font-medium">Total Egresos</p>
-                        <p className="text-2xl font-bold">{formatMonto(saldoData.egresos)}</p>
+                        <p className="text-red-100 text-sm font-medium">
+                          Total Egresos
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {formatMonto(saldoData.egresos)}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className={`bg-gradient-to-r ${
-                    saldoData.saldo >= 0 
-                      ? 'from-blue-500 to-blue-600' 
-                      : 'from-orange-500 to-orange-600'
-                  } rounded-lg p-4 text-white`}>
+
+                  <div
+                    className={`bg-gradient-to-r ${
+                      saldoData.saldo >= 0
+                        ? "from-blue-500 to-blue-600"
+                        : "from-orange-500 to-orange-600"
+                    } rounded-lg p-4 text-white`}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className={`text-sm font-medium ${
-                          saldoData.saldo >= 0 ? 'text-blue-100' : 'text-orange-100'
-                        }`}>
+                        <p
+                          className={`text-sm font-medium ${
+                            saldoData.saldo >= 0
+                              ? "text-blue-100"
+                              : "text-orange-100"
+                          }`}
+                        >
                           Saldo Actual
                         </p>
-                        <p className="text-2xl font-bold">{formatMonto(saldoData.saldo)}</p>
+                        <p className="text-2xl font-bold">
+                          {formatMonto(saldoData.saldo)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -943,7 +1001,9 @@ const MovimientosCaja = () => {
                 {/* Estadísticas de filtros aplicados */}
                 {movimientos.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Resultados del filtro actual:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">
+                      Resultados del filtro actual:
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <div className="bg-white rounded-lg p-3 border border-gray-200">
                         <div className="flex items-center">
@@ -953,12 +1013,16 @@ const MovimientosCaja = () => {
                             </div>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">Total</p>
-                            <p className="text-lg font-semibold text-gray-900">{filteredMovimientos.length}</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              Total
+                            </p>
+                            <p className="text-lg font-semibold text-gray-900">
+                              {filteredMovimientos.length}
+                            </p>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="bg-white rounded-lg p-3 border border-gray-200">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
@@ -967,14 +1031,20 @@ const MovimientosCaja = () => {
                             </div>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">Ingresos</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              Ingresos
+                            </p>
                             <p className="text-lg font-semibold text-green-600">
-                              {filteredMovimientos.filter(m => m.tipo === 'INGRESO').length}
+                              {
+                                filteredMovimientos.filter(
+                                  (m) => m.tipo === "INGRESO"
+                                ).length
+                              }
                             </p>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="bg-white rounded-lg p-3 border border-gray-200">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
@@ -983,14 +1053,20 @@ const MovimientosCaja = () => {
                             </div>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">Egresos</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              Egresos
+                            </p>
                             <p className="text-lg font-semibold text-red-600">
-                              {filteredMovimientos.filter(m => m.tipo === 'EGRESO').length}
+                              {
+                                filteredMovimientos.filter(
+                                  (m) => m.tipo === "EGRESO"
+                                ).length
+                              }
                             </p>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="bg-white rounded-lg p-3 border border-gray-200">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
@@ -999,15 +1075,31 @@ const MovimientosCaja = () => {
                             </div>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">Balance Filtrado</p>
-                            <p className={`text-lg font-semibold ${
-                              filteredMovimientos.reduce((acc, m) => 
-                                acc + (m.tipo === 'INGRESO' ? parseFloat(m.monto) : -parseFloat(m.monto)), 0
-                              ) >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
+                            <p className="text-sm font-medium text-gray-900">
+                              Balance Filtrado
+                            </p>
+                            <p
+                              className={`text-lg font-semibold ${
+                                filteredMovimientos.reduce(
+                                  (acc, m) =>
+                                    acc +
+                                    (m.tipo === "INGRESO"
+                                      ? parseFloat(m.monto)
+                                      : -parseFloat(m.monto)),
+                                  0
+                                ) >= 0
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
                               {formatMonto(
-                                filteredMovimientos.reduce((acc, m) => 
-                                  acc + (m.tipo === 'INGRESO' ? parseFloat(m.monto) : -parseFloat(m.monto)), 0
+                                filteredMovimientos.reduce(
+                                  (acc, m) =>
+                                    acc +
+                                    (m.tipo === "INGRESO"
+                                      ? parseFloat(m.monto)
+                                      : -parseFloat(m.monto)),
+                                  0
                                 )
                               )}
                             </p>
@@ -1021,20 +1113,25 @@ const MovimientosCaja = () => {
                 {loadingHistorial ? (
                   <div className="flex flex-col items-center justify-center py-12">
                     <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Cargando movimientos...</h3>
-                    <p className="text-gray-600">Obteniendo el historial de caja</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Cargando movimientos...
+                    </h3>
+                    <p className="text-gray-600">
+                      Obteniendo el historial de caja
+                    </p>
                   </div>
                 ) : filteredMovimientos.length === 0 ? (
                   <div className="bg-gray-100 rounded-lg p-8 text-center">
                     <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-600 mb-2">
-                      {movimientos.length === 0 ? 'No hay movimientos registrados' : 'No se encontraron movimientos'}
+                      {movimientos.length === 0
+                        ? "No hay movimientos registrados"
+                        : "No se encontraron movimientos"}
                     </h3>
                     <p className="text-gray-500">
-                      {movimientos.length === 0 
-                        ? 'Los movimientos de caja aparecerán aquí una vez que se registren'
-                        : 'Intenta ajustar los filtros de búsqueda'
-                      }
+                      {movimientos.length === 0
+                        ? "Los movimientos de caja aparecerán aquí una vez que se registren"
+                        : "Intenta ajustar los filtros de búsqueda"}
                     </p>
                   </div>
                 ) : (
@@ -1077,7 +1174,10 @@ const MovimientosCaja = () => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {getPaginatedMovimientos().map((movimiento) => (
-                            <tr key={movimiento.idMovimiento} className="hover:bg-gray-50">
+                            <tr
+                              key={movimiento.idMovimiento}
+                              className="hover:bg-gray-50"
+                            >
                               {/* Fecha/Hora */}
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
@@ -1092,11 +1192,15 @@ const MovimientosCaja = () => {
                                   </div>
                                 </div>
                               </td>
-                              
+
                               {/* Tipo */}
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTipoColor(movimiento.tipo)}`}>
-                                  {movimiento.tipo === 'INGRESO' ? (
+                                <span
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTipoColor(
+                                    movimiento.tipo
+                                  )}`}
+                                >
+                                  {movimiento.tipo === "INGRESO" ? (
                                     <Plus className="w-3 h-3 mr-1" />
                                   ) : (
                                     <Minus className="w-3 h-3 mr-1" />
@@ -1104,34 +1208,43 @@ const MovimientosCaja = () => {
                                   {movimiento.tipo}
                                 </span>
                               </td>
-                              
+
                               {/* Concepto */}
                               <td className="px-6 py-4">
                                 <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                                   {movimiento.concepto}
                                 </div>
                               </td>
-                              
+
                               {/* Descripción */}
                               <td className="px-6 py-4">
-                                <div className="text-sm text-gray-500 max-w-xs truncate" title={movimiento.descripcion}>
-                                  {movimiento.descripcion || '-'}
+                                <div
+                                  className="text-sm text-gray-500 max-w-xs truncate"
+                                  title={movimiento.descripcion}
+                                >
+                                  {movimiento.descripcion || "-"}
                                 </div>
                               </td>
-                              
+
                               {/* Monto */}
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm font-bold ${
-                                  movimiento.tipo === 'INGRESO' ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                  {movimiento.tipo === 'INGRESO' ? '+' : '-'}S/ {parseFloat(movimiento.monto).toFixed(2)}
+                                <div
+                                  className={`text-sm font-bold ${
+                                    movimiento.tipo === "INGRESO"
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }`}
+                                >
+                                  {movimiento.tipo === "INGRESO" ? "+" : "-"}S/{" "}
+                                  {parseFloat(movimiento.monto).toFixed(2)}
                                 </div>
                               </td>
-                              
+
                               {/* Categoría */}
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
-                                  {getCategoriaLabel(movimiento.categoria) || '-'}
+                                  {getCategoriaLabel(movimiento.categoria) ||
+                                    "-"}
                                 </div>
                                 {movimiento.subcategoria && (
                                   <div className="text-xs text-gray-500">
@@ -1139,18 +1252,18 @@ const MovimientosCaja = () => {
                                   </div>
                                 )}
                               </td>
-                              
+
                               {/* Método de Pago */}
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
-                                  {movimiento.metodoPago || '-'}
+                                  {movimiento.metodoPago || "-"}
                                 </div>
                               </td>
-                              
+
                               {/* Comprobante */}
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
-                                  {movimiento.comprobante || '-'}
+                                  {movimiento.comprobante || "-"}
                                 </div>
                                 {movimiento.numeroTransaccion && (
                                   <div className="text-xs text-gray-500">
@@ -1163,10 +1276,14 @@ const MovimientosCaja = () => {
                                   </div>
                                 )}
                               </td>
-                              
+
                               {/* Estado */}
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(movimiento.estado)}`}>
+                                <span
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(
+                                    movimiento.estado
+                                  )}`}
+                                >
                                   {movimiento.estado}
                                 </span>
                                 {movimiento.anuladoEn && (
@@ -1175,7 +1292,7 @@ const MovimientosCaja = () => {
                                   </div>
                                 )}
                               </td>
-                              
+
                               {/* Acciones */}
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex items-center justify-end space-x-2">
@@ -1183,7 +1300,7 @@ const MovimientosCaja = () => {
                                     onClick={() => handleEditClick(movimiento)}
                                     className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
                                     title="Editar movimiento"
-                                    disabled={movimiento.estado === 'ANULADO'}
+                                    disabled={movimiento.estado === "ANULADO"}
                                   >
                                     <Edit className="w-4 h-4" />
                                     <span>Editar</span>
@@ -1201,12 +1318,15 @@ const MovimientosCaja = () => {
                       <div className="flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200">
                         <div className="flex items-center text-sm text-gray-700">
                           <span>
-                            Mostrando {((currentPage - 1) * itemsPerPage) + 1} a{' '}
-                            {Math.min(currentPage * itemsPerPage, filteredMovimientos.length)} de{' '}
-                            {filteredMovimientos.length} resultados
+                            Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
+                            {Math.min(
+                              currentPage * itemsPerPage,
+                              filteredMovimientos.length
+                            )}{" "}
+                            de {filteredMovimientos.length} resultados
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => handlePageChange(currentPage - 1)}
@@ -1215,22 +1335,22 @@ const MovimientosCaja = () => {
                           >
                             Anterior
                           </button>
-                          
+
                           {/* Números de página */}
-                          {getPageNumbers().map(pageNumber => (
+                          {getPageNumbers().map((pageNumber) => (
                             <button
                               key={pageNumber}
                               onClick={() => handlePageChange(pageNumber)}
                               className={`px-3 py-1 text-sm font-medium rounded-md ${
                                 currentPage === pageNumber
-                                  ? 'text-blue-600 bg-blue-50 border border-blue-500'
-                                  : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                                  ? "text-blue-600 bg-blue-50 border border-blue-500"
+                                  : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
                               }`}
                             >
                               {pageNumber}
                             </button>
                           ))}
-                          
+
                           <button
                             onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage === getTotalPages()}
@@ -1277,15 +1397,21 @@ const MovimientosCaja = () => {
                       key={tipo.id}
                       className={`
                         border-2 rounded-lg p-4 cursor-pointer transition-all
-                        ${editFormData.tipo === tipo.id.toUpperCase() 
-                          ? `border-blue-500 ${tipo.bgColor}` 
-                          : 'border-gray-200 hover:border-gray-300'
+                        ${
+                          editFormData.tipo === tipo.id.toUpperCase()
+                            ? `border-blue-500 ${tipo.bgColor}`
+                            : "border-gray-200 hover:border-gray-300"
                         }
                       `}
-                      onClick={() => setEditFormData(prev => ({ ...prev, tipo: tipo.id.toUpperCase() }))}
+                      onClick={() =>
+                        setEditFormData((prev) => ({
+                          ...prev,
+                          tipo: tipo.id.toUpperCase(),
+                        }))
+                      }
                     >
                       <div className="flex items-center justify-center">
-                        {tipo.id === 'ingreso' ? (
+                        {tipo.id === "ingreso" ? (
                           <Plus className={`h-8 w-8 ${tipo.color} mr-3`} />
                         ) : (
                           <Minus className={`h-8 w-8 ${tipo.color} mr-3`} />
@@ -1308,7 +1434,7 @@ const MovimientosCaja = () => {
                   <input
                     type="text"
                     name="concepto"
-                    value={editFormData.concepto || ''}
+                    value={editFormData.concepto || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -1320,25 +1446,29 @@ const MovimientosCaja = () => {
                   </label>
                   <select
                     name="categoria"
-                    value={editFormData.categoria || ''}
+                    value={editFormData.categoria || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={!editFormData.tipo}
                     required
                   >
                     <option value="">
-                      {!editFormData.tipo ? 'Primero selecciona el tipo' : 'Seleccionar categoría'}
+                      {!editFormData.tipo
+                        ? "Primero selecciona el tipo"
+                        : "Seleccionar categoría"}
                     </option>
-                    {editFormData.tipo === 'INGRESO' && categoriasIngreso.map(categoria => (
-                      <option key={categoria} value={categoria}>
-                        {getCategoriaLabel(categoria)}
-                      </option>
-                    ))}
-                    {editFormData.tipo === 'EGRESO' && categoriasEgreso.map(categoria => (
-                      <option key={categoria} value={categoria}>
-                        {getCategoriaLabel(categoria)}
-                      </option>
-                    ))}
+                    {editFormData.tipo === "INGRESO" &&
+                      categoriasIngreso.map((categoria) => (
+                        <option key={categoria} value={categoria}>
+                          {getCategoriaLabel(categoria)}
+                        </option>
+                      ))}
+                    {editFormData.tipo === "EGRESO" &&
+                      categoriasEgreso.map((categoria) => (
+                        <option key={categoria} value={categoria}>
+                          {getCategoriaLabel(categoria)}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
@@ -1352,7 +1482,7 @@ const MovimientosCaja = () => {
                   <input
                     type="text"
                     name="subcategoria"
-                    value={editFormData.subcategoria || ''}
+                    value={editFormData.subcategoria || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Ej: Pago especial, Material didáctico, etc."
@@ -1365,7 +1495,7 @@ const MovimientosCaja = () => {
                   </label>
                   <select
                     name="metodoPago"
-                    value={editFormData.metodoPago || ''}
+                    value={editFormData.metodoPago || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -1387,7 +1517,7 @@ const MovimientosCaja = () => {
                   <input
                     type="number"
                     name="monto"
-                    value={editFormData.monto || ''}
+                    value={editFormData.monto || ""}
                     onChange={handleEditInputChange}
                     step="0.01"
                     min="0"
@@ -1402,9 +1532,9 @@ const MovimientosCaja = () => {
                   <input
                     type="date"
                     name="fecha"
-                    value={editFormData.fecha || ''}
+                    value={editFormData.fecha || ""}
                     onChange={handleEditInputChange}
-                    max={new Date().toLocaleDateString('en-CA')}
+                    max={new Date().toLocaleDateString("en-CA")}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -1418,7 +1548,7 @@ const MovimientosCaja = () => {
                 </label>
                 <textarea
                   name="descripcion"
-                  value={editFormData.descripcion || ''}
+                  value={editFormData.descripcion || ""}
                   onChange={handleEditInputChange}
                   rows={3}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1436,7 +1566,7 @@ const MovimientosCaja = () => {
                   <input
                     type="text"
                     name="comprobante"
-                    value={editFormData.comprobante || ''}
+                    value={editFormData.comprobante || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Número de comprobante"
@@ -1450,7 +1580,7 @@ const MovimientosCaja = () => {
                   <input
                     type="text"
                     name="numeroTransaccion"
-                    value={editFormData.numeroTransaccion || ''}
+                    value={editFormData.numeroTransaccion || ""}
                     onChange={handleEditInputChange}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Número de transacción"
@@ -1466,7 +1596,7 @@ const MovimientosCaja = () => {
                 <input
                   type="text"
                   name="referenciaExterna"
-                  value={editFormData.referenciaExterna || ''}
+                  value={editFormData.referenciaExterna || ""}
                   onChange={handleEditInputChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Referencia externa"
@@ -1481,7 +1611,7 @@ const MovimientosCaja = () => {
                 </label>
                 <select
                   name="estado"
-                  value={editFormData.estado || 'CONFIRMADO'}
+                  value={editFormData.estado || "CONFIRMADO"}
                   onChange={handleEditInputChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -1524,7 +1654,7 @@ const MovimientosCaja = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MovimientosCaja
+export default MovimientosCaja;

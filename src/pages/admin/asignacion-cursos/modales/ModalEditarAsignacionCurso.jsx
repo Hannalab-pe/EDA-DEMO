@@ -1,28 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { X, BookOpen, User, Calendar, CheckCircle, Edit } from 'lucide-react';
-import { useCursos } from 'src/hooks/useCursos';
-import { useTrabajadores } from 'src/hooks/queries/useTrabajadoresQueries';
-import { useUpdateAsignacionCurso } from 'src/hooks/queries/useAsignacionCursosQueries';
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { X, BookOpen, User, Calendar, CheckCircle, Edit } from "lucide-react";
+import { useCursos } from "src/hooks/useCursos";
+import { useTrabajadores } from "src/hooks/queries/useTrabajadoresQueries";
+import { useUpdateAsignacionCurso } from "src/hooks/queries/useAsignacionCursosQueries";
+import { toast } from "sonner";
 
-const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) => {
+const ModalEditarAsignacionCurso = ({
+  isOpen,
+  onClose,
+  asignacion,
+  onSuccess,
+}) => {
   const [formData, setFormData] = useState({
-    fechaAsignacion: '',
+    fechaAsignacion: "",
     estaActivo: true,
-    idCurso: '',
-    idTrabajador: ''
+    idCurso: "",
+    idTrabajador: "",
   });
 
   const [errors, setErrors] = useState({});
 
   // Hooks para obtener datos
   const { data: cursos = [], isLoading: loadingCursos } = useCursos();
-  const { data: trabajadoresData, isLoading: loadingTrabajadores } = useTrabajadores({});
+  const { data: trabajadoresData, isLoading: loadingTrabajadores } =
+    useTrabajadores({});
 
   // Extraer trabajadores del hook
-  const trabajadores = Array.isArray(trabajadoresData) ? trabajadoresData :
-                       trabajadoresData?.trabajadores ? trabajadoresData.trabajadores :
-                       trabajadoresData?.data ? trabajadoresData.data : [];
+  const trabajadores = Array.isArray(trabajadoresData)
+    ? trabajadoresData
+    : trabajadoresData?.trabajadores
+    ? trabajadoresData.trabajadores
+    : trabajadoresData?.data
+    ? trabajadoresData.data
+    : [];
 
   // Hook para actualizar asignación
   const updateMutation = useUpdateAsignacionCurso();
@@ -31,10 +42,15 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
   useEffect(() => {
     if (isOpen && asignacion) {
       setFormData({
-        fechaAsignacion: asignacion.fechaAsignacion ? asignacion.fechaAsignacion.split('T')[0] : '',
+        fechaAsignacion: asignacion.fechaAsignacion
+          ? asignacion.fechaAsignacion.split("T")[0]
+          : "",
         estaActivo: asignacion.estaActivo ?? true,
-        idCurso: asignacion.idCurso?.idCurso || asignacion.idCurso || '',
-        idTrabajador: asignacion.idTrabajador?.idTrabajador || asignacion.idTrabajador || ''
+        idCurso: asignacion.idCurso?.idCurso || asignacion.idCurso || "",
+        idTrabajador:
+          asignacion.idTrabajador?.idTrabajador ||
+          asignacion.idTrabajador ||
+          "",
       });
       setErrors({});
     }
@@ -42,16 +58,16 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
 
     // Limpiar error específico cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -60,15 +76,15 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
     const newErrors = {};
 
     if (!formData.fechaAsignacion) {
-      newErrors.fechaAsignacion = 'La fecha de asignación es obligatoria';
+      newErrors.fechaAsignacion = "La fecha de asignación es obligatoria";
     }
 
     if (!formData.idCurso) {
-      newErrors.idCurso = 'Debe seleccionar un curso';
+      newErrors.idCurso = "Debe seleccionar un curso";
     }
 
     if (!formData.idTrabajador) {
-      newErrors.idTrabajador = 'Debe seleccionar un docente';
+      newErrors.idTrabajador = "Debe seleccionar un docente";
     }
 
     setErrors(newErrors);
@@ -88,26 +104,35 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
         fechaAsignacion: formData.fechaAsignacion,
         estaActivo: formData.estaActivo,
         idCurso: formData.idCurso,
-        idTrabajador: formData.idTrabajador
+        idTrabajador: formData.idTrabajador,
       };
 
       await updateMutation.mutateAsync({
         id: asignacion.idAsignacionCurso,
-        asignacionData
+        asignacionData,
       });
       onSuccess();
     } catch (error) {
-      console.error('Error actualizando asignación de curso:', error);
-      setErrors({ submit: 'Error al actualizar la asignación. Por favor, inténtelo de nuevo.' });
+      console.error("Error actualizando asignación de curso:", error);
+      // Mostrar toast de funcionalidad premium en lugar del error
+      toast.info("Funcionalidad Premium", {
+        description:
+          "Para actualizar asignaciones de curso y acceder a más funcionalidades, contáctanos.",
+        duration: 5000,
+      });
+      // Cerrar el modal después del toast
+      setTimeout(() => {
+        onClose();
+      }, 1000);
     }
   };
 
   const handleClose = () => {
     setFormData({
-      fechaAsignacion: '',
+      fechaAsignacion: "",
       estaActivo: true,
-      idCurso: '',
-      idTrabajador: ''
+      idCurso: "",
+      idTrabajador: "",
     });
     setErrors({});
     onClose();
@@ -187,11 +212,17 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
                         value={formData.fechaAsignacion}
                         onChange={handleInputChange}
                         className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          errors.fechaAsignacion ? 'border-red-300' : 'border-gray-300'
+                          errors.fechaAsignacion
+                            ? "border-red-300"
+                            : "border-gray-300"
                         }`}
                       />
                     </div>
-                    {errors.fechaAsignacion && <p className="text-red-500 text-xs mt-1">{errors.fechaAsignacion}</p>}
+                    {errors.fechaAsignacion && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.fechaAsignacion}
+                      </p>
+                    )}
                   </div>
 
                   {/* Seleccionar Docente */}
@@ -207,23 +238,33 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
                         onChange={handleInputChange}
                         disabled={loadingTrabajadores}
                         className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          errors.idTrabajador ? 'border-red-300' : 'border-gray-300'
+                          errors.idTrabajador
+                            ? "border-red-300"
+                            : "border-gray-300"
                         }`}
                       >
                         <option value="">
-                          {loadingTrabajadores ? 'Cargando docentes...' : 'Seleccionar docente'}
+                          {loadingTrabajadores
+                            ? "Cargando docentes..."
+                            : "Seleccionar docente"}
                         </option>
                         {trabajadores
-                          .filter(trabajador => trabajador.estaActivo) // Solo docentes activos
-                          .map(trabajador => (
-                            <option key={trabajador.idTrabajador} value={trabajador.idTrabajador}>
+                          .filter((trabajador) => trabajador.estaActivo) // Solo docentes activos
+                          .map((trabajador) => (
+                            <option
+                              key={trabajador.idTrabajador}
+                              value={trabajador.idTrabajador}
+                            >
                               {trabajador.nombre} {trabajador.apellido}
                             </option>
-                          ))
-                        }
+                          ))}
                       </select>
                     </div>
-                    {errors.idTrabajador && <p className="text-red-500 text-xs mt-1">{errors.idTrabajador}</p>}
+                    {errors.idTrabajador && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.idTrabajador}
+                      </p>
+                    )}
                   </div>
 
                   {/* Seleccionar Curso */}
@@ -239,20 +280,26 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
                         onChange={handleInputChange}
                         disabled={loadingCursos}
                         className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          errors.idCurso ? 'border-red-300' : 'border-gray-300'
+                          errors.idCurso ? "border-red-300" : "border-gray-300"
                         }`}
                       >
                         <option value="">
-                          {loadingCursos ? 'Cargando cursos...' : 'Seleccionar curso'}
+                          {loadingCursos
+                            ? "Cargando cursos..."
+                            : "Seleccionar curso"}
                         </option>
-                        {cursos.map(curso => (
+                        {cursos.map((curso) => (
                           <option key={curso.idCurso} value={curso.idCurso}>
                             {curso.nombreCurso || curso.nombre}
                           </option>
                         ))}
                       </select>
                     </div>
-                    {errors.idCurso && <p className="text-red-500 text-xs mt-1">{errors.idCurso}</p>}
+                    {errors.idCurso && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.idCurso}
+                      </p>
+                    )}
                   </div>
 
                   {/* Estado Activo */}
@@ -265,7 +312,10 @@ const ModalEditarAsignacionCurso = ({ isOpen, onClose, asignacion, onSuccess }) 
                       onChange={handleInputChange}
                       className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="estaActivo" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="estaActivo"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       Asignación activa
                     </label>
                   </div>

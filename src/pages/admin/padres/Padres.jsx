@@ -1,27 +1,22 @@
-import React, { useState } from 'react';
-import { 
+import React, { useState } from "react";
+import {
   Users,
   UserPlus,
   UserCheck,
   Baby,
   TrendingUp,
-  RefreshCw
-} from 'lucide-react';
-import { usePadres } from '../../../hooks/usePadres';
-import TablaPadres from './tablas/TablaPadres';
-import ModalAgregarPadre from './modales/ModalAgregarPadre';
-import ModalVerPadre from './modales/ModalVerPadre';
-import ModalEditarPadre from './modales/ModalEditarPadre'; // Habilitado para edición
-import ModalEliminarPadre from './modales/ModalEliminarPadre';
+  RefreshCw,
+} from "lucide-react";
+import { usePadres } from "../../../hooks/usePadres";
+import TablaPadres from "./tablas/TablaPadres";
+import ModalAgregarPadre from "./modales/ModalAgregarPadre";
+import ModalVerPadre from "./modales/ModalVerPadre";
+import ModalEditarPadre from "./modales/ModalEditarPadre"; // Habilitado para edición
+import ModalEliminarPadre from "./modales/ModalEliminarPadre";
 
 const Padres = () => {
   // Hook personalizado para gestión de padres
-  const { 
-    parents, 
-    loading,
-    statistics,
-    refreshParents
-  } = usePadres();
+  const { parents, loading, statistics, refreshParents } = usePadres();
 
   // Estados locales solo para UI
   const [showModal, setShowModal] = useState(false);
@@ -60,12 +55,12 @@ const Padres = () => {
   };
 
   const handleImport = () => {
-    console.log('Importar padres');
+    console.log("Importar padres");
     // TODO: Implementar funcionalidad de importación
   };
 
   const handleExport = () => {
-    console.log('Exportar padres');
+    console.log("Exportar padres");
     // TODO: Implementar funcionalidad de exportación
   };
 
@@ -74,17 +69,13 @@ const Padres = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Gestión de Apoderados</h1>
-            <p className="text-gray-600 mt-1">Administra apoderados y sus estudiantes matriculados</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Gestión de Apoderados
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Administra apoderados y sus estudiantes matriculados
+            </p>
           </div>
-          <button
-            onClick={() => refreshParents()}
-            disabled={loading}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Actualizar</span>
-          </button>
         </div>
 
         {/* Estadísticas */}
@@ -93,8 +84,12 @@ const Padres = () => {
             <div className="flex items-center">
               <Users className="w-8 h-8 text-blue-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-blue-600">Total Apoderados</p>
-                <p className="text-2xl font-bold text-blue-900">{statistics.total}</p>
+                <p className="text-sm font-medium text-blue-600">
+                  Total Apoderados
+                </p>
+                <p className="text-2xl font-bold text-blue-900">
+                  {statistics.total}
+                </p>
               </div>
             </div>
           </div>
@@ -103,8 +98,12 @@ const Padres = () => {
             <div className="flex items-center">
               <UserCheck className="w-8 h-8 text-green-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-green-600">Con Estudiantes</p>
-                <p className="text-2xl font-bold text-green-900">{statistics.withChildren}</p>
+                <p className="text-sm font-medium text-green-600">
+                  Con Estudiantes
+                </p>
+                <p className="text-2xl font-bold text-green-900">
+                  {statistics.withChildren}
+                </p>
               </div>
             </div>
           </div>
@@ -113,8 +112,12 @@ const Padres = () => {
             <div className="flex items-center">
               <Baby className="w-8 h-8 text-purple-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-purple-600">Total Estudiantes</p>
-                <p className="text-2xl font-bold text-purple-900">{statistics.totalChildren}</p>
+                <p className="text-sm font-medium text-purple-600">
+                  Total Estudiantes
+                </p>
+                <p className="text-2xl font-bold text-purple-900">
+                  {statistics.totalChildren}
+                </p>
               </div>
             </div>
           </div>
@@ -123,16 +126,17 @@ const Padres = () => {
             <div className="flex items-center">
               <TrendingUp className="w-8 h-8 text-orange-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-orange-600">Promedio por Familia</p>
-                <p className="text-2xl font-bold text-orange-900">{statistics.averageChildren}</p>
+                <p className="text-sm font-medium text-orange-600">
+                  Promedio por Familia
+                </p>
+                <p className="text-2xl font-bold text-orange-900">
+                  {statistics.averageChildren}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-
-
 
       {/* Componente de Tabla de Padres */}
       <TablaPadres
