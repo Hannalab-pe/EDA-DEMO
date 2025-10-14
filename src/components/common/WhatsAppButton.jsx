@@ -111,7 +111,6 @@ const WhatsAppButton = () => {
       {/* Tooltip opcional cuando está hover - oculto en móvil cuando sidebar está abierto */}
       {isHovered && !isMobileSidebarOpen && (
         <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm animate-fade-in-up">
-          <p className="font-bold text-center">¿Necesitas ayuda? 💬</p>
           <p className="text-xs text-gray-300 text-center">
             Escríbenos por WhatsApp
           </p>

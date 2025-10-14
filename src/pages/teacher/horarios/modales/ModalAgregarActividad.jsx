@@ -70,12 +70,42 @@ const ModalAgregarActividad = ({
 
   // Datos ficticios de aulas para demo (sin conexión a BD)
   const aulasFicticias = [
-    { id: "aula-1", nombre: "Aula Amarilla", grado: "Inicial 4 años", seccion: "A" },
-    { id: "aula-2", nombre: "Aula Azul", grado: "Inicial 5 años", seccion: "B" },
-    { id: "aula-3", nombre: "Aula Roja", grado: "Primaria 1er grado", seccion: "A" },
-    { id: "aula-4", nombre: "Aula Verde", grado: "Primaria 2do grado", seccion: "B" },
-    { id: "aula-5", nombre: "Aula Morada", grado: "Primaria 3er grado", seccion: "A" },
-    { id: "aula-6", nombre: "Aula Naranja", grado: "Inicial 3 años", seccion: "C" },
+    {
+      id: "aula-1",
+      nombre: "Aula Amarilla",
+      grado: "Inicial 4 años",
+      seccion: "A",
+    },
+    {
+      id: "aula-2",
+      nombre: "Aula Azul",
+      grado: "Inicial 5 años",
+      seccion: "B",
+    },
+    {
+      id: "aula-3",
+      nombre: "Aula Roja",
+      grado: "Primaria 1er grado",
+      seccion: "A",
+    },
+    {
+      id: "aula-4",
+      nombre: "Aula Verde",
+      grado: "Primaria 2do grado",
+      seccion: "B",
+    },
+    {
+      id: "aula-5",
+      nombre: "Aula Morada",
+      grado: "Primaria 3er grado",
+      seccion: "A",
+    },
+    {
+      id: "aula-6",
+      nombre: "Aula Naranja",
+      grado: "Inicial 3 años",
+      seccion: "C",
+    },
   ];
 
   // Usar aulas ficticias (no hay loading ya que son datos estáticos)
@@ -400,14 +430,9 @@ const ModalAgregarActividad = ({
                           className={inputClassName(errors.idAula)}
                           disabled={isLoading}
                         >
-                          <option value="">
-                            Seleccionar aula
-                          </option>
+                          <option value="">Seleccionar aula</option>
                           {aulas.map((aula) => (
-                            <option
-                              key={aula.id}
-                              value={aula.id}
-                            >
+                            <option key={aula.id} value={aula.id}>
                               {aula.grado && aula.seccion
                                 ? `${aula.grado} - ${aula.seccion}`
                                 : aula.nombre}
@@ -415,7 +440,8 @@ const ModalAgregarActividad = ({
                           ))}
                         </select>
                         <p className="text-blue-600 text-xs mt-1">
-                          🏫 Mostrando {aulas.length} aulas disponibles (modo demo)
+                          🏫 Mostrando {aulas.length} aulas disponibles (modo
+                          demo)
                         </p>
                       </FormField>
 
@@ -433,9 +459,14 @@ const ModalAgregarActividad = ({
                           disabled={true}
                           readOnly
                         />
-                        <input type="hidden" {...register("idTrabajador")} value={user?.entidadId || "demo-trabajador-123"} />
+                        <input
+                          type="hidden"
+                          {...register("idTrabajador")}
+                          value={user?.entidadId || "demo-trabajador-123"}
+                        />
                         <p className="text-gray-500 text-xs mt-1">
-                          ID: {user?.entidadId || "demo-trabajador-123"} {!user?.entidadId && "(modo demo)"}
+                          ID: {user?.entidadId || "demo-trabajador-123"}{" "}
+                          {!user?.entidadId && "(modo demo)"}
                         </p>
                       </FormField>
                     </div>

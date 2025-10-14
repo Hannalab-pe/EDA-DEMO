@@ -644,7 +644,7 @@ const Login = () => {
                     <div className="text-center mt-4">
                       <div className="inline-flex items-center px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <span className="text-yellow-600 text-xs lg:text-sm">
-                          🎭 Modo Demo - Datos ficticios
+                          🎭 Modo Demo
                         </span>
                       </div>
                     </div>
@@ -696,12 +696,6 @@ const Login = () => {
 
                 {/* Features */}
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    <span className="text-gray-700">
-                      🎭 Acceso sin autenticación real
-                    </span>
-                  </div>
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                     <span className="text-gray-700">
